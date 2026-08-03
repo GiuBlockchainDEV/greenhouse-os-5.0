@@ -165,7 +165,7 @@ export function GreenhouseMesh() {
       normalizedArchTypes.map((archType, index) => ({
         index,
         archType,
-        zCenter: bayCenterZ(index, bayCount, bayWidthM, width),
+        zCenter: bayCenterZ(index, bayWidthM, width),
         apex: bayApexHeight(archType, eaveHeight, ridgeHeight, bayWidthM),
       })),
     [normalizedArchTypes, bayCount, bayWidthM, width, eaveHeight, ridgeHeight],

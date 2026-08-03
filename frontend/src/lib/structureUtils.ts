@@ -39,7 +39,6 @@ export function maxBayApexHeight(
 
 export function bayCenterZ(
   bayIndex: number,
-  bayCount: number,
   bayWidthM: number,
   totalWidth: number,
 ): number {
