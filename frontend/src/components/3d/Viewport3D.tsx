@@ -1,8 +1,9 @@
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
-import { GreenhouseMesh } from "@/components/3d/GreenhouseMesh";
+import { GreenhouseScene } from "@/components/3d/GreenhouseScene";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 function SceneLighting() {
@@ -22,6 +23,7 @@ function SceneLighting() {
 }
 
 function SceneContent() {
+  const orbitRef = useRef<OrbitControlsImpl | null>(null);
   const dimensions = useGreenhouseStore((state) => state.dimensions);
   const maxDim = Math.max(dimensions.length, dimensions.width, dimensions.ridgeHeight);
 
@@ -29,6 +31,7 @@ function SceneContent() {
     <>
       <PerspectiveCamera makeDefault position={[maxDim * 1.2, maxDim * 0.8, maxDim * 1.4]} fov={45} />
       <OrbitControls
+        ref={orbitRef}
         makeDefault
         enableDamping
         dampingFactor={0.08}
@@ -51,7 +54,7 @@ function SceneContent() {
         followCamera={false}
         infiniteGrid
       />
-      <GreenhouseMesh />
+      <GreenhouseScene orbitRef={orbitRef} />
     </>
   );
 }

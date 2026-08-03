@@ -140,6 +140,15 @@ The React Three Fiber viewport provides a **No-Form UX** foundation:
 
 ---
 
+## Interactive 3D Controls (Milestone 4)
+
+- **TransformControls Gizmo** — Scale/move greenhouse directly in the viewport (No-Form UX)
+- **GLSL Heatmap Shader** — Temperature and VPD floor overlay from live simulation data
+- **CropGridMesh** — High-performance InstancedMesh foliage grid scaled by LAI and growth stage
+- **GizmoToolbar** — Toggle gizmo mode and heatmap visualization (en/it/es/fr)
+
+---
+
 ## License
 
 Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts to Apache 2.0 on **2029-08-03**.
@@ -151,6 +160,6 @@ Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts t
 - [x] Milestone 1 — Project Setup, Living Docs & Core FAO Physics Engine
 - [x] Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n
 - [x] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
-- [ ] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
+- [x] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
 - [ ] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot
 - [ ] Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish

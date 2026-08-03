@@ -16,12 +16,20 @@
   },
   "viewport": {
     "title": "3D Viewport",
-    "hint": "Drag to orbit · Scroll to zoom · Right-click to pan",
+    "hint": "Drag to orbit · Scroll to zoom · Use gizmo handles to resize",
     "grid": "Ground Grid"
   },
   "gizmo": {
+    "title": "3D Gizmo",
+    "off": "Off",
     "translate": "Move",
     "rotate": "Rotate",
     "scale": "Scale"
+  },
+  "heatmap": {
+    "title": "Heatmap Overlay",
+    "off": "Off",
+    "temperature": "Temperature",
+    "vpd": "VPD"
   }
 }

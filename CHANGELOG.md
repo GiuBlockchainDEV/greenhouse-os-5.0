@@ -4,6 +4,16 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.0.0-milestone-4] - 2026-08-03
+
+### Added
+
+- **TransformControls gizmo** (`GreenhouseScene`) — Scale/move greenhouse in viewport with OrbitControls lock during drag
+- **GLSL heatmap shader** (`HeatmapShader.tsx`) — Custom vertex/fragment shaders for temperature and VPD floor overlay
+- **CropGridMesh** — InstancedMesh foliage grid with crop-specific spacing, color, and LAI/growth-stage scaling
+- **GizmoToolbar** — UI to toggle gizmo mode (off/translate/scale) and heatmap mode (off/temperature/vpd)
+- **Viewport store slice** — `gizmoMode` and `heatmapMode` in Zustand
+
 ## [5.0.0-milestone-3] - 2026-08-03
 
 ### Added

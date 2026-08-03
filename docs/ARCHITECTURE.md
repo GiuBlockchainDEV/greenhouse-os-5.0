@@ -224,11 +224,49 @@ Client                          Server
 
 ---
 
-## Planned Modules (Milestones 4–6)
+## Interactive 3D Layer (Milestone 4)
+
+### No-Form TransformControls
+
+Direct in-viewport geometry editing via `@react-three/drei` TransformControls:
+
+| Mode | Action |
+|------|--------|
+| Scale | Maps X/Y/Z scale to length/ridge/eave height and width |
+| Translate | Reposition (resets to origin on release) |
+| Off | Standard orbit navigation only |
+
+OrbitControls disabled during gizmo drag to prevent camera conflict.
+
+**Implementation:** `frontend/src/components/3d/GreenhouseScene.tsx`
+
+### GLSL Heatmap Shader
+
+Custom `ShaderMaterial` renders simulation `heatmap_matrix` as a floor overlay:
+
+- **Temperature mode** — Blue → green → yellow → red gradient
+- **VPD mode** — Optimal green → stress orange → severe red (computed per cell from temp + RH)
+
+Data uploaded via `THREE.DataTexture` (Float32, RedFormat).
+
+**Implementation:** `frontend/src/components/3d/HeatmapShader.tsx`, `frontend/src/components/3d/shaders/heatmapShader.ts`
+
+### InstancedMesh Crop Grid
+
+High-performance foliage rendering using `THREE.InstancedMesh`:
+
+- Grid spacing per crop type (lettuce 0.25 m, tomato 0.5 m, etc.)
+- Instance scale from LAI × growth stage
+- Crop-specific color palette
+
+**Implementation:** `frontend/src/components/3d/CropGridMesh.tsx`
+
+---
+
+## Planned Modules (Milestones 5–6)
 
 | Milestone | Module | Technology |
 |-----------|--------|------------|
-| 4 | Gizmos, GLSL heatmaps | TransformControls, custom shaders |
 | 5 | Multi-AI gateway | OpenAI, Anthropic, Gemini, Ollama |
 | 6 | Supabase RLS, dashboard | PostgreSQL, Priva/Ridder export |
 

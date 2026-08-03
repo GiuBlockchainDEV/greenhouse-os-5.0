@@ -16,12 +16,20 @@
   },
   "viewport": {
     "title": "Viewport 3D",
-    "hint": "Arrastra para orbitar · Scroll para zoom · Clic derecho para pan",
+    "hint": "Arrastra para orbitar · Scroll para zoom · Usa gizmo para redimensionar",
     "grid": "Cuadrícula del Suelo"
   },
   "gizmo": {
+    "title": "Gizmo 3D",
+    "off": "Off",
     "translate": "Mover",
     "rotate": "Rotar",
     "scale": "Escalar"
+  },
+  "heatmap": {
+    "title": "Overlay Heatmap",
+    "off": "Off",
+    "temperature": "Temperatura",
+    "vpd": "VPD"
   }
 }

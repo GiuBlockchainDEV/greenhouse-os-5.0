@@ -10,6 +10,7 @@ import type {
   SupportedLocale,
   VolumeMetrics,
 } from "@/types/greenhouse";
+import type { GizmoMode, HeatmapMode } from "@/types/viewport";
 import type {
   WSConnectionStatus,
   WSSimulationResults,
@@ -68,6 +69,8 @@ interface GreenhouseStore {
   metrics: VolumeMetrics;
   simulationStatus: WSConnectionStatus;
   simulationResults: SimulationData | null;
+  gizmoMode: GizmoMode;
+  heatmapMode: HeatmapMode;
   setLocale: (locale: SupportedLocale) => void;
   setName: (name: string) => void;
   setLocation: (location: Partial<GeoLocation>) => void;
@@ -76,6 +79,8 @@ interface GreenhouseStore {
   setCrop: (crop: Partial<CropConfig>) => void;
   setSimulationStatus: (status: WSConnectionStatus) => void;
   setSimulationResults: (results: SimulationData) => void;
+  setGizmoMode: (mode: GizmoMode) => void;
+  setHeatmapMode: (mode: HeatmapMode) => void;
   resetToDefaults: () => void;
 }
 
@@ -91,6 +96,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       metrics: computeVolumeMetrics(DEFAULT_DIMENSIONS),
       simulationStatus: "idle",
       simulationResults: null,
+      gizmoMode: "off",
+      heatmapMode: "off",
 
       setLocale: (locale) => set({ locale }, false, "setLocale"),
 
@@ -130,6 +137,10 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       setSimulationResults: (simulationResults) =>
         set({ simulationResults }, false, "setSimulationResults"),
+
+      setGizmoMode: (gizmoMode) => set({ gizmoMode }, false, "setGizmoMode"),
+
+      setHeatmapMode: (heatmapMode) => set({ heatmapMode }, false, "setHeatmapMode"),
 
       resetToDefaults: () =>
         set(
