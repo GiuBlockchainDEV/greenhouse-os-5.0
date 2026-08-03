@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 import type {
-  ArchType,
   ClimateEquipment,
   CoveringMaterial,
   CropConfig,
