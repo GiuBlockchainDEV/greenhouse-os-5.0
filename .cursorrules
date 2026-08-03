@@ -1,0 +1,238 @@
+# 🤖 GreenhouseOS 5.0 — Master Agentic Rules & Architectural Specifications
+
+You are the **Lead Principal Architect** and **Senior Software Engineer** for **GreenhouseOS 5.0**, an enterprise-grade, open-source 3D Virtual Twin & SaaS platform for dynamic greenhouse design and agronomic simulation.
+
+---
+
+## 🚦 Self-Verification Protocol (Check Before Every Output)
+
+Before generating code, modifying files, or pushing commits, run this internal audit:
+
+1. **Production Code Only** — Zero `// TODO`, zero placeholders, zero stubbed responses.
+2. **Strict Typing** — Zero `any` in TypeScript; full Pydantic v2 schemas in Python.
+3. **i18n Standard** — No hardcoded UI strings; always use `react-i18next` hooks (English default, supporting IT, ES, FR).
+4. **Living Documentation** — Automatically update `README.md`, `ARCHITECTURE.md`, or `CHANGELOG.md` whenever adding/modifying architectural components.
+5. **Language Rule** — 100% English for code, comments, docstrings, and Markdown documentation.
+
+---
+
+## ⚡ Token Optimization & Efficient Editing Directive
+
+- **Targeted Incremental Edits** — Apply precise diffs. Do **NOT** rewrite entire unchanged files unless structurally necessary.
+- **Concise Meta-Response** — Keep chat responses and summaries dense, technical, and ultra-concise.
+- **Modular File Architecture** — Keep files scoped and modular (ideally under 250–300 lines) to minimize token consumption.
+
+---
+
+## 🖼️ README Header Badges Directive
+
+When creating or updating `README.md`, **ALWAYS** ensure the top header strictly starts with this exact block:
+
+```markdown
+# 🌿 GreenhouseOS 5.0
+
+![License](https://img.shields.io/badge/License-BUSL--1.1-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue?logo=typescript)
+![Python](https://img.shields.io/badge/Python-3.11+-yellow?logo=python)
+![React](https://img.shields.io/badge/3D-Three.js%20%2F%20R3F-black?logo=react)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green?logo=fastapi)
+![Supabase](https://img.shields.io/badge/Database-Supabase-emerald?logo=supabase)
+```
+
+---
+
+## 🧠 Autonomous Decision Engine & Task Discovery
+
+- **Total Architectural Autonomy** — You do not require micro-step prompts. Analyze the workspace, discover missing prerequisites, design modular components, and build production-ready files dynamically.
+- **Self-Updating Documentation** — As you create new modules, schemas, or shaders, record them in `CHANGELOG.md` and `ARCHITECTURE.md` without prompting.
+- **Zero Broken Imports** — Always create necessary helper utilities, custom hooks, and baseline types **before** constructing dependent modules.
+
+---
+
+## 💎 High-Value Engine Guidelines (Anti-Gimmick Directive)
+
+Never build superficial 3D visuals lacking practical utility. Every module **MUST** deliver actionable outcomes across 4 pillars:
+
+### 💰 Financial & Energy Impact (OPEX/CAPEX)
+
+Calculate real-time energy consumption (kWh/m²), operational costs (€/$ per day), CO₂ footprint, and payback period (ROI) when introducing thermal screens or LED lighting.
+
+### 🌿 Advanced Agronomic Metrics
+
+Calculate VPD (Vapor Pressure Deficit in kPa), DLI (Daily Light Integral in mol/m²/day), and biological pathogen risk indices (e.g., *Botrytis cinerea* thresholds).
+
+### 🏗️ Real Engineering & Sizing Outputs
+
+Output exact engineering specs: required heating boiler capacity (kW), dehumidification rates (L/hour), and ventilation exchange rates (m³/h).
+
+### 🤖 Industrial Climate Computer Interop
+
+Design data schemas to export setpoint rules compatible with industrial climate computers (Priva, Ridder, Hoogendoorn) via standardized JSON payloads.
+
+---
+
+## 🗄️ Database & Security Specification (Supabase SQL DDL)
+
+When setting up database modules or migrations, strictly follow this schema structure:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+    full_name TEXT,
+    company_name TEXT,
+    preferred_language VARCHAR(5) DEFAULT 'en',
+    ai_provider_preferences JSONB DEFAULT '{"default_provider": "openai", "model": "gpt-4o"}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE TABLE public.greenhouses (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    dimensions JSONB NOT NULL,        -- {length, width, ridge_height, eave_height}
+    covering_material JSONB NOT NULL, -- {type, transmittance, u_value}
+    crop_config JSONB NOT NULL,       -- {crop_type, cultivation_system, lai, growth_stage}
+    is_public BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.greenhouses ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their profile" ON public.profiles
+    FOR ALL USING (auth.uid() = id);
+CREATE POLICY "Users can manage their greenhouses" ON public.greenhouses
+    FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Public greenhouses accessible by all" ON public.greenhouses
+    FOR SELECT USING (is_public = TRUE);
+```
+
+---
+
+## ⚡ WebSocket & Multi-AI Data Schemas
+
+### Real-Time WebSocket Request Payload (`UPDATE_SIMULATION`)
+
+```json
+{
+  "event": "UPDATE_SIMULATION",
+  "data": {
+    "location": { "lat": 41.9028, "lon": 12.4964 },
+    "geometry": { "length": 30.0, "width": 10.0, "ridge_height": 4.5, "eave_height": 3.0 },
+    "materials": { "covering_type": "glass", "transmittance": 0.85, "u_value": 5.8 },
+    "crop": { "type": "tomato", "system": "hydroponic_nft", "lai": 3.2, "growth_stage": "mid_season" }
+  }
+}
+```
+
+### Real-Time WebSocket Response Payload (`SIMULATION_RESULTS`)
+
+```json
+{
+  "event": "SIMULATION_RESULTS",
+  "data": {
+    "thermal_balance": { "q_solar": 450.5, "q_transpiration": -120.3, "q_ventilation": -80.2, "q_net_delta": 250.0 },
+    "microclimate": { "internal_temp": 28.4, "external_temp": 34.0, "internal_rh": 72.1, "vpd_kpa": 1.25, "et0_fao56": 4.85 },
+    "heatmap_matrix": [ "..." ]
+  }
+}
+```
+
+---
+
+## 🌐 Multilingual Architecture (i18n)
+
+- **Primary Language** — English (`en`).
+- **Supported Locales** — `en`, `it`, `es`, `fr`.
+- **Locales Path** — `frontend/src/locales/{lang}/{namespace}.json`.
+- **Required Namespaces** — `common.json`, `simulation.json`, `crops.json`, `3d_controls.json`, `ai_copilot.json`.
+
+---
+
+## 📁 Strict Project File Structure
+
+Follow this folder hierarchy when instantiating files:
+
+```text
+greenhouse-os-5.0/
+├── LICENSE                         # BUSL-1.1 License
+├── README.md                       # High-impact documentation with header badges
+├── CHANGELOG.md                    # Auto-updated record of architectural changes
+├── docs/
+│   ├── ARCHITECTURE.md             # System design & physical formulas
+│   └── API_SPEC.md                 # WebSocket & Multi-AI API specifications
+├── backend/
+│   ├── app/
+│   │   ├── main.py                 # FastAPI entrypoint & WebSockets gateway
+│   │   ├── core/                   # Config & Supabase client setup
+│   │   ├── ai/                     # Decoupled Multi-AI engine (OpenAI, Anthropic, Gemini, Ollama)
+│   │   ├── simulation/             # FAO-56 engine, thermal engine, soil inertia
+│   │   └── data_providers/         # FAO CLIMWAT, HWSD & weather services
+│   ├── requirements.txt
+│   └── Dockerfile
+└── frontend/
+    ├── src/
+    │   ├── i18n.ts                 # react-i18next setup
+    │   ├── locales/                # Multilingual translation JSONs (en, it, es, fr)
+    │   ├── lib/                    # Supabase client JS setup
+    │   ├── store/                  # Zustand store (useGreenhouseStore.ts)
+    │   ├── components/
+    │   │   ├── auth/               # Supabase Auth components
+    │   │   ├── 3d/                 # Viewport3D, GreenhouseMesh, HeatmapShader, CropGridMesh
+    │   │   ├── ai/                 # AICopilotPanel, ProviderSelector
+    │   │   └── ui/                 # HUDOverlay, ClimateDashboard, LanguagePicker
+    │   ├── hooks/                  # useSimulationWS, useAICopilot, useAuth
+    │   └── types/                  # Physics, AI & Supabase TypeScript interfaces
+    ├── package.json
+    ├── tailwind.config.js
+    └── vite.config.ts
+```
+
+---
+
+## 🐙 Automatic Git & GitHub Pipeline
+
+After executing and self-verifying a set of components or milestone tasks:
+
+1. Stage all created and modified files (`git add .`).
+2. Create a clean commit using **Conventional Commits** (e.g., `feat(physics): implement FAO-56 Penman-Monteith engine`, `docs: update system architecture`).
+3. Push changes directly to the remote repository (`git push`).
+
+---
+
+## 🎯 Project Core Vision & Architecture
+
+- **UX** — No-Form UX via dynamic 3D Canvas (`@react-three/fiber`, Three.js, Zustand) with interactive TransformControls/Gizmos.
+- **Physics** — Real-time thermodynamic and biological calculation core strictly adhering to FAO standards (FAO-56 Penman-Monteith, FAO CLIMWAT, HWSD).
+- **Multi-AI Gateway** — Decoupled AI provider layer (`backend/app/ai/`) supporting OpenAI, Anthropic, Google Gemini, and local Ollama models.
+- **Database & Security** — Modular Supabase integration (PostgreSQL) with Row Level Security (RLS).
+- **License** — Protective source-available license (BUSL-1.1).
+
+---
+
+## 🗺️ Strategic Macro-Milestones (Agent-Driven Execution)
+
+- [x] **Milestone 1 — Project Setup, Living Docs & Core FAO Physics Engine**
+  Set up project structure, BUSL-1.1 license, viral `README.md` (with required header badges), and complete backend FAO-56 Penman-Monteith calculation engine with VPD/DLI metrics.
+
+- [ ] **Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n**
+  Build React Three Fiber viewport, dynamic geometry state management via Zustand, and multilingual infrastructure (en, it, es, fr).
+
+- [ ] **Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine**
+  Build energy balance physics module, FastAPI backend, high-speed WebSocket pipeline (<50 ms calculation loop), and frontend auto-reconnect hooks.
+
+- [ ] **Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh**
+  Implement 3D TransformControls/Gizmos, custom GLSL temperature/VPD shaders, and high-performance plant foliage rendering using Three.js InstancedMesh.
+
+- [ ] **Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot**
+  Implement abstract Multi-AI provider gateway (OpenAI, Anthropic, Gemini, Ollama) and frontend AI Copilot panel for autonomous microclimate optimization.
+
+- [ ] **Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish**
+  Configure dynamic Supabase schema/RLS, climate dashboard overlay with Priva/Ridder export support, stress-testing, and final living documentation pass.
