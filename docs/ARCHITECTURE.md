@@ -286,11 +286,45 @@ Each provider implements `AIProvider.complete()`. When the selected provider is 
 
 ---
 
-## Planned Modules (Milestone 6)
+## Supabase Data Layer (Milestone 6)
 
-| Module | Technology |
-|--------|------------|
-| Supabase RLS, industrial dashboard | PostgreSQL, Priva/Ridder export |
+### Schema
+
+```text
+auth.users ──► profiles (RLS: auth.uid() = id)
+                    │
+                    └──► greenhouses (RLS: auth.uid() = user_id)
+                              └── public SELECT when is_public = TRUE
+```
+
+Migration: `supabase/migrations/001_initial_schema.sql`
+
+### Persistence Flow
+
+```text
+AuthPanel (Supabase Auth) → user.id
+    │
+    ▼
+ClimateDashboard "Save" → POST /api/v1/greenhouses (X-User-Id header)
+    │
+    ├── Supabase PostgREST (production)
+    └── In-memory dict (local dev fallback)
+```
+
+**Implementation:** `backend/app/data/greenhouse_service.py`, `frontend/src/lib/supabase.ts`
+
+### Industrial Export
+
+Climate computer JSON export with crop-stage-aware RH targets, ventilation rules, and format-specific tag prefixes for Ridder/Hoogendoorn.
+
+**Implementation:** `backend/app/export/climate_computer.py`, `frontend/src/lib/climateExport.ts`
+
+### Stress Testing
+
+`backend/scripts/stress_test.py` validates:
+- REST `/simulation/run` — p95 < 200 ms
+- WebSocket `UPDATE_SIMULATION` — p95 < 50 ms
+- Export and CRUD endpoints
 
 ---
 

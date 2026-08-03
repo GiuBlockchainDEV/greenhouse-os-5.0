@@ -20,6 +20,22 @@
   "actions": {
     "reconnect": "Reconnecter"
   },
+  "export": {
+    "priva": "Exporter Priva",
+    "ridder": "Exporter Ridder",
+    "hoogendoorn": "Exporter Hoogendoorn",
+    "success": "Export téléchargé",
+    "error": "Export échoué"
+  },
+  "save": {
+    "success": "Design enregistré dans le cloud",
+    "error": "Échec de l'enregistrement"
+  },
+  "opex": {
+    "energy": "Consommation Énergétique",
+    "cost": "OPEX Quotidien",
+    "co2": "Empreinte CO₂"
+  },
   "status": {
     "idle": "Simulation inactive",
     "ready": "Simulation live active",

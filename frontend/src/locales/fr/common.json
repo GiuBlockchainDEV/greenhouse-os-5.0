@@ -12,6 +12,14 @@
     "reset": "Réinitialiser",
     "save": "Enregistrer le Design"
   },
+  "auth": {
+    "signIn": "Connexion",
+    "signUp": "Inscription",
+    "signOut": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "checkEmail": "Vérifiez votre email pour confirmer"
+  },
   "labels": {
     "language": "Langue",
     "loading": "Chargement..."

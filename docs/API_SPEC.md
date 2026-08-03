@@ -265,3 +265,77 @@ Autonomous microclimate optimization with structured Priva/Ridder-compatible set
 | `OLLAMA_MODEL` | Ollama model name (default `llama3.2`) |
 
 Supported providers: OpenAI, Anthropic, Google Gemini, Ollama (local).
+
+---
+
+## Greenhouse Persistence
+
+### `GET /api/v1/greenhouses`
+
+List saved greenhouse designs. Requires `X-User-Id` header (UUID from Supabase Auth).
+
+### `POST /api/v1/greenhouses`
+
+Save a greenhouse design. Uses Supabase PostgREST when configured, in-memory fallback otherwise.
+
+### `DELETE /api/v1/greenhouses/{id}`
+
+Delete a greenhouse design.
+
+---
+
+## Industrial Climate Export
+
+### `POST /api/v1/export/climate-computer`
+
+Export setpoints compatible with Priva Compass, Ridder Synopta, or Hoogendoorn iSii.
+
+**Request Body:**
+
+```json
+{
+  "format": "priva",
+  "greenhouse_name": "Virtual Twin Alpha",
+  "internal_temp_c": 28.4,
+  "internal_rh_pct": 72.0,
+  "vpd_kpa": 1.25,
+  "et0_mm_day": 4.85,
+  "ventilation_ach": 2.3,
+  "crop_type": "tomato",
+  "growth_stage": "mid_season"
+}
+```
+
+**Response 200:**
+
+```json
+{
+  "format": "priva",
+  "version": "1.0",
+  "greenhouse_name": "Virtual Twin Alpha",
+  "exported_at": "2026-08-03T08:00:00+00:00",
+  "setpoints": [
+    {
+      "tag": "climate.temperature.setpoint",
+      "name": "Air Temperature Setpoint",
+      "value": 28.4,
+      "unit": "°C",
+      "min_value": 15.0,
+      "max_value": 35.0
+    }
+  ],
+  "rules": [
+    {
+      "condition": "VPD > 1.6",
+      "action": "INCREASE ventilation_leeward BY 10%",
+      "priority": 1
+    }
+  ],
+  "metadata": {
+    "platform": "GreenhouseOS 5.0",
+    "target_system": "Priva Compass"
+  }
+}
+```
+
+Supported formats: `priva`, `ridder`, `hoogendoorn`.

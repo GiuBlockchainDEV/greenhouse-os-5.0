@@ -12,6 +12,14 @@
     "reset": "Ripristina Predefiniti",
     "save": "Salva Progetto"
   },
+  "auth": {
+    "signIn": "Accedi",
+    "signUp": "Registrati",
+    "signOut": "Esci",
+    "email": "Email",
+    "password": "Password",
+    "checkEmail": "Controlla la email per confermare"
+  },
   "labels": {
     "language": "Lingua",
     "loading": "Caricamento..."

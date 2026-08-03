@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { DimensionControls } from "@/components/ui/DimensionControls";
@@ -22,7 +23,10 @@ export function AppShell() {
           </h1>
           <p className="text-xs text-white/50">{t("app.subtitle")}</p>
         </div>
-        <LanguagePicker />
+        <div className="flex items-center gap-4">
+          <AuthPanel />
+          <LanguagePicker />
+        </div>
       </header>
 
       <main className="grid flex-1 grid-cols-[320px_1fr_300px] gap-4 overflow-hidden p-4">

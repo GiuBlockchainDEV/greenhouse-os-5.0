@@ -13,6 +13,12 @@ export type {
 } from "./greenhouse";
 export type { GizmoMode, HeatmapMode } from "./viewport";
 export type {
+  AuthUser,
+  ClimateComputerExport,
+  ClimateComputerFormat,
+  Database,
+} from "./supabase";
+export type {
   AIChatRequest,
   AIChatResponse,
   AIProviderType,

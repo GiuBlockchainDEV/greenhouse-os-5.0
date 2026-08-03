@@ -12,6 +12,14 @@
     "reset": "Reset to Defaults",
     "save": "Save Design"
   },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "checkEmail": "Check your email to confirm"
+  },
   "labels": {
     "language": "Language",
     "loading": "Loading..."

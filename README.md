@@ -158,6 +158,40 @@ The React Three Fiber viewport provides a **No-Form UX** foundation:
 
 ---
 
+## Industrial Launch (Milestone 6)
+
+- **Supabase RLS** — PostgreSQL schema with profiles + greenhouses, Row Level Security policies
+- **AuthPanel** — Supabase Auth sign-in/sign-up (optional, graceful offline mode)
+- **Industrial Dashboard** — OPEX/energy/CO₂ metrics + Priva/Ridder/Hoogendoorn JSON export
+- **Greenhouse CRUD API** — Save designs to Supabase or in-memory fallback
+- **Stress Test** — `backend/scripts/stress_test.py` validates p95 latency targets
+
+### Supabase Setup
+
+```bash
+# Apply migration in Supabase SQL Editor
+cat supabase/migrations/001_initial_schema.sql
+
+# Backend .env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+
+# Frontend .env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+```
+
+### Stress Test
+
+```bash
+cd backend
+uvicorn app.main:app --port 8000 &
+python scripts/stress_test.py --iterations 50
+```
+
+---
+
 ## License
 
 Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts to Apache 2.0 on **2029-08-03**.
@@ -171,4 +205,4 @@ Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts t
 - [x] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
 - [x] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
 - [x] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot
-- [ ] Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish
+- [x] Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish

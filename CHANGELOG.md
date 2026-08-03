@@ -4,6 +4,18 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.0.0] - 2026-08-03
+
+### Added — Milestone 6 (Launch)
+
+- **Supabase migration** (`supabase/migrations/001_initial_schema.sql`) — profiles, greenhouses, RLS, auth trigger
+- **Greenhouse CRUD API** — `GET/POST/DELETE /api/v1/greenhouses` with Supabase + in-memory fallback
+- **Industrial climate export** — Priva, Ridder, Hoogendoorn JSON setpoint payloads
+- **Industrial dashboard** — OPEX €/day, energy kWh/m², CO₂ footprint in ClimateDashboard
+- **AuthPanel** — Supabase Auth integration with graceful unconfigured mode
+- **Frontend Supabase client** — `@supabase/supabase-js` with typed Database interface
+- **Stress test script** — REST + WebSocket + export + CRUD latency validation
+
 ## [5.0.0-milestone-5] - 2026-08-03
 
 ### Added

@@ -234,5 +234,5 @@ After executing and self-verifying a set of components or milestone tasks:
 - [x] **Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot**
   Implement abstract Multi-AI provider gateway (OpenAI, Anthropic, Gemini, Ollama) and frontend AI Copilot panel for autonomous microclimate optimization.
 
-- [ ] **Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish**
+- [x] **Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish**
   Configure dynamic Supabase schema/RLS, climate dashboard overlay with Priva/Ridder export support, stress-testing, and final living documentation pass.

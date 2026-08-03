@@ -12,6 +12,14 @@
     "reset": "Restablecer Valores",
     "save": "Guardar Diseño"
   },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "email": "Email",
+    "password": "Contraseña",
+    "checkEmail": "Revisa tu email para confirmar"
+  },
   "labels": {
     "language": "Idioma",
     "loading": "Cargando..."
