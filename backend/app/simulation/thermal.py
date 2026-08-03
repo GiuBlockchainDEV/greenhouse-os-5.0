@@ -2,7 +2,18 @@
 
 import math
 
+from app.simulation.climate_equipment import (
+    cooling_effect,
+    heating_flux_w_m2,
+    ventilation_ach,
+)
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
+from app.simulation.cultivation import (
+    CULTIVATION_ET_FACTOR,
+    CULTIVATION_THERMAL_MASS,
+    effective_lai,
+    normalize_cultivation_system,
+)
 from app.simulation.schemas import ThermalBalance, ThermalInput, ThermalResult
 from app.simulation.vpd import calculate_vpd_kpa
 
@@ -109,12 +120,18 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     irradiance = _solar_irradiance_w_m2(params.solar_radiation_mj_m2_day, daylight)
     q_solar = irradiance * params.materials.transmittance * 0.72
 
+    system = normalize_cultivation_system(params.crop.system)
+    tier_count = params.crop.layout.tier_count
+    et_factor = CULTIVATION_ET_FACTOR.get(system, 1.0)
+    thermal_mass = CULTIVATION_THERMAL_MASS.get(system, 1.0)
+
     kc = _crop_coefficient(params.crop.type, params.crop.growth_stage)
-    lai_factor = min(params.crop.lai / 3.0, 1.5)
-    et_rate_mm_h = (params.et0_mm_day / 24.0) * kc * lai_factor
+    lai_effective = effective_lai(params.crop.lai, system, tier_count)
+    lai_factor = min(lai_effective / 3.0, 2.0)
+    et_rate_mm_h = (params.et0_mm_day / 24.0) * kc * lai_factor * et_factor
     q_transpiration = -(et_rate_mm_h / 3600.0) * 1000.0 * LATENT_HEAT_J_KG / 1e6
 
-    ach = 1.5 + 0.4 * params.wind_speed_m_s + 0.01 * max(t_external - 20.0, 0.0)
+    ach = ventilation_ach(params.equipment.ventilation, params.wind_speed_m_s)
 
     t_internal = _solve_internal_temperature(
         t_external,
@@ -127,15 +144,25 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         q_transpiration,
     )
 
+    cool_delta, rh_cool_delta = cooling_effect(params.equipment.cooling)
+    t_internal += cool_delta
+
+    temp_deficit = params.heating_setpoint_c - t_internal
+    q_heating = heating_flux_w_m2(params.equipment.heating, temp_deficit)
+    if q_heating > 0:
+        t_internal += q_heating / max(params.materials.u_value * 2.5, 1.0)
+
+    t_internal = (t_internal - t_external) / thermal_mass + t_external
+
     q_conduction = -params.materials.u_value * (envelope_area / floor_area) * (t_internal - t_external)
     q_ventilation = -RHO_AIR * CP_AIR * ach * volume / (3600.0 * floor_area) * (t_internal - t_external)
-    q_net_delta = q_solar + q_transpiration + q_ventilation + q_conduction
+    q_net_delta = q_solar + q_transpiration + q_ventilation + q_conduction + q_heating
 
     internal_rh = min(
         95.0,
         max(
             30.0,
-            rh_external + (t_external - t_internal) * 1.8 + et_rate_mm_h * 0.5,
+            rh_external + (t_external - t_internal) * 1.8 + et_rate_mm_h * 0.5 + rh_cool_delta,
         ),
     )
     vpd = calculate_vpd_kpa(t_internal, relative_humidity_pct=internal_rh)

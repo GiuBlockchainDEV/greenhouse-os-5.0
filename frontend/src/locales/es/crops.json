@@ -8,23 +8,34 @@
     "cannabis": "Cáñamo"
   },
   "systems": {
+    "soil": "Suelo",
+    "substrate": "Sustrato / Lana de Roca",
+    "growbed": "Growbed / Cama Filtrante",
+    "nft": "NFT (Película Nutriente)",
+    "dwc": "DWC (Cultivo en Agua Profunda)",
+    "drip": "Riego por Goteo",
+    "aeroponic": "Aeroponía",
+    "ebb_flow": "Ebb & Flow",
     "hydroponic_nft": "Hidroponía NFT",
-    "hydroponic_drip": "Hidroponía por Goteo",
-    "substrate": "Sustrato",
-    "soil": "Suelo"
+    "hydroponic_drip": "Hidroponía por Goteo"
   },
   "stages": {
     "seedling": "Plántula",
-    "early_vegetative": "Vegetativo Temprano",
+    "early_vegetative": "Vegetativa Temprana",
     "mid_season": "Media Temporada",
-    "late_vegetative": "Vegetativo Tardío",
-    "generative": "Generativo",
+    "late_vegetative": "Vegetativa Tardía",
+    "generative": "Generativa",
     "harvest": "Cosecha"
   },
   "labels": {
     "cropType": "Tipo de Cultivo",
-    "cultivationSystem": "Sistema de Cultivo",
+    "cultivationSystem": "Método de Cultivo",
     "lai": "Índice de Área Foliar",
-    "growthStage": "Etapa de Crecimiento"
+    "growthStage": "Etapa de Crecimiento",
+    "tierLayout": "Disposición de Niveles",
+    "tierCount": "Número de Niveles",
+    "plantsPerTier": "Plantas por Nivel",
+    "aisleWidth": "Ancho del Pasillo",
+    "tiersShort": "niveles"
   }
 }

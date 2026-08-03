@@ -1,14 +1,19 @@
 export type {
+  ClimateEquipment,
   CoveringMaterial,
   CropConfig,
   CropType,
+  CultivationLayout,
   CultivationSystem,
+  CoolingSystem,
   DimensionUpdate,
   GeoLocation,
   GreenhouseDimensions,
   GreenhouseState,
   GrowthStage,
+  HeatingSystem,
   SupportedLocale,
+  VentilationSystem,
   VolumeMetrics,
 } from "./greenhouse";
 export type { GizmoMode, HeatmapMode } from "./viewport";
@@ -30,9 +35,11 @@ export type {
   ProviderInfo,
 } from "./ai";
 export type {
+  WSClimateEquipment,
   WSClimateOverride,
   WSConnectionStatus,
   WSCrop,
+  WSCultivationLayout,
   WSEventType,
   WSGeometry,
   WSIncomingMessage,

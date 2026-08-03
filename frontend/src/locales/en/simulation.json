@@ -3,6 +3,8 @@
     "floorArea": "Floor Area",
     "volume": "Enclosed Volume",
     "ridgeAngle": "Ridge Angle",
+    "cultivationArea": "Cultivation Area",
+    "totalPlants": "Total Plants",
     "vpd": "Vapor Pressure Deficit",
     "dli": "Daily Light Integral",
     "et0": "Reference ET₀",
@@ -47,5 +49,33 @@
     "latitude": "Latitude",
     "longitude": "Longitude",
     "elevation": "Elevation"
+  },
+  "equipment": {
+    "title": "Climate Equipment",
+    "cooling": "Cooling System",
+    "heating": "Heating System",
+    "ventilation": "Ventilation",
+    "coolingOptions": {
+      "none": "None",
+      "fan_and_pad": "Fan & Pad",
+      "evaporative": "Evaporative Cooling",
+      "mechanical_ac": "Mechanical AC",
+      "high_pressure_fog": "High-Pressure Fog"
+    },
+    "heatingOptions": {
+      "none": "None",
+      "hot_water_pipes": "Hot Water Pipes",
+      "unit_heater": "Unit Heater",
+      "air_heater": "Air Heater",
+      "geothermal": "Geothermal"
+    },
+    "ventilationOptions": {
+      "natural_ridge": "Natural Ridge Vents",
+      "natural_gable": "Natural Gable Vents",
+      "roof_vents": "Motorized Roof Vents",
+      "side_vents": "Side Wall Vents",
+      "forced_exhaust": "Forced Exhaust Fans",
+      "combined": "Combined (Roof + Side)"
+    }
   }
 }

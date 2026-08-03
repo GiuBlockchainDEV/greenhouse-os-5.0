@@ -8,10 +8,16 @@
     "cannabis": "Canapa"
   },
   "systems": {
+    "soil": "Suolo",
+    "substrate": "Substrato / Lana di Roccia",
+    "growbed": "Growbed / Letto Filtrante",
+    "nft": "NFT (Nutrient Film)",
+    "dwc": "DWC (Acqua Profonda)",
+    "drip": "Irrigazione a Goccia",
+    "aeroponic": "Aeroponica",
+    "ebb_flow": "Ebb & Flow / Fito",
     "hydroponic_nft": "Idroponica NFT",
-    "hydroponic_drip": "Idroponica a Goccia",
-    "substrate": "Substrato",
-    "soil": "Suolo"
+    "hydroponic_drip": "Idroponica a Goccia"
   },
   "stages": {
     "seedling": "Semenzale",
@@ -23,8 +29,13 @@
   },
   "labels": {
     "cropType": "Tipo di Coltura",
-    "cultivationSystem": "Sistema di Coltivazione",
+    "cultivationSystem": "Metodo di Coltivazione",
     "lai": "Indice di Area Fogliare",
-    "growthStage": "Fase di Crescita"
+    "growthStage": "Fase di Crescita",
+    "tierLayout": "Layout Campate",
+    "tierCount": "Numero di Campate",
+    "plantsPerTier": "Piante per Campata",
+    "aisleWidth": "Larghezza Corsello",
+    "tiersShort": "campate"
   }
 }

@@ -3,6 +3,8 @@
     "floorArea": "Superficie de Suelo",
     "volume": "Volumen Cerrado",
     "ridgeAngle": "Ángulo de la Cumbrera",
+    "cultivationArea": "Superficie de Cultivo",
+    "totalPlants": "Plantas Totales",
     "vpd": "Déficit de Presión de Vapor",
     "dli": "Integral Diaria de Luz",
     "et0": "ET₀ de Referencia",
@@ -47,5 +49,33 @@
     "latitude": "Latitud",
     "longitude": "Longitud",
     "elevation": "Elevación"
+  },
+  "equipment": {
+    "title": "Equipo Climático",
+    "cooling": "Refrigeración",
+    "heating": "Calefacción",
+    "ventilation": "Ventilación",
+    "coolingOptions": {
+      "none": "Ninguno",
+      "fan_and_pad": "Ventilador y Panel",
+      "evaporative": "Evaporativo",
+      "mechanical_ac": "Aire Acondicionado",
+      "high_pressure_fog": "Niebla de Alta Presión"
+    },
+    "heatingOptions": {
+      "none": "Ninguno",
+      "hot_water_pipes": "Tuberías de Agua Caliente",
+      "unit_heater": "Calefactor Unitario",
+      "air_heater": "Calentador de Aire",
+      "geothermal": "Geotérmico"
+    },
+    "ventilationOptions": {
+      "natural_ridge": "Ventilación Natural en Cumbrera",
+      "natural_gable": "Ventilación Natural en Frontón",
+      "roof_vents": "Ventanas Motorizadas en Techo",
+      "side_vents": "Ventanas Laterales",
+      "forced_exhaust": "Ventiladores de Extracción",
+      "combined": "Combinado (Techo + Laterales)"
+    }
   }
 }

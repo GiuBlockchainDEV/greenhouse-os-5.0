@@ -7,8 +7,10 @@ from app.simulation.engine import SimulationEngine
 from app.simulation.fao56 import daylight_hours, estimate_solar_radiation
 from app.simulation.schemas import (
     ClimateInput,
+    ClimateEquipmentInput,
     CoveringMaterial,
     CropType,
+    CultivationLayoutInput,
     GeometryInput,
     CropInput,
     GrowthStage,
@@ -101,6 +103,17 @@ class RealtimeSimulationEngine:
                 system=payload.crop.system,
                 lai=payload.crop.lai,
                 growth_stage=payload.crop.growth_stage,
+                layout=CultivationLayoutInput(
+                    tier_count=payload.crop.layout.tier_count,
+                    gutter_length_m=payload.crop.layout.gutter_length_m,
+                    plants_per_tier=payload.crop.layout.plants_per_tier,
+                    aisle_width_m=payload.crop.layout.aisle_width_m,
+                ),
+            ),
+            equipment=ClimateEquipmentInput(
+                cooling=payload.equipment.cooling,
+                heating=payload.equipment.heating,
+                ventilation=payload.equipment.ventilation,
             ),
             external_temp_c=(t_max + t_min) / 2.0,
             external_rh_pct=rh,

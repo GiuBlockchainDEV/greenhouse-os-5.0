@@ -109,13 +109,31 @@ class GeometryInput(BaseModel):
     eave_height: float = Field(..., gt=0.0)
 
 
+class CultivationLayoutInput(BaseModel):
+    """Multi-tier cultivation layout (campate)."""
+
+    tier_count: int = Field(default=1, ge=1, le=6)
+    gutter_length_m: float = Field(default=30.0, gt=0.0)
+    plants_per_tier: int = Field(default=100, ge=1)
+    aisle_width_m: float = Field(default=0.8, ge=0.3, le=3.0)
+
+
+class ClimateEquipmentInput(BaseModel):
+    """Installed greenhouse climate control equipment."""
+
+    cooling: str = Field(default="none")
+    heating: str = Field(default="none")
+    ventilation: str = Field(default="natural_ridge")
+
+
 class CropInput(BaseModel):
     """Crop parameters for thermal and agronomic models."""
 
     type: str = Field(default="tomato")
-    system: str = Field(default="hydroponic_nft")
+    system: str = Field(default="nft")
     lai: float = Field(default=3.2, ge=0.0, le=10.0)
     growth_stage: str = Field(default="mid_season")
+    layout: CultivationLayoutInput = Field(default_factory=CultivationLayoutInput)
 
 
 class ThermalInput(BaseModel):
@@ -124,12 +142,14 @@ class ThermalInput(BaseModel):
     geometry: GeometryInput
     materials: CoveringMaterial
     crop: CropInput
+    equipment: ClimateEquipmentInput = Field(default_factory=ClimateEquipmentInput)
     external_temp_c: float = Field(..., ge=-20.0, le=55.0)
     external_rh_pct: float = Field(..., ge=0.0, le=100.0)
     wind_speed_m_s: float = Field(default=2.0, ge=0.0)
     solar_radiation_mj_m2_day: float = Field(default=15.0, ge=0.0)
     daylight_hours: float = Field(default=12.0, ge=0.0)
     et0_mm_day: float = Field(default=4.0, ge=0.0)
+    heating_setpoint_c: float = Field(default=22.0, ge=10.0, le=35.0)
 
 
 class ThermalBalance(BaseModel):

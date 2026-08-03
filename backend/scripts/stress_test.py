@@ -36,7 +36,23 @@ WS_PAYLOAD = {
         "location": {"lat": 41.9028, "lon": 12.4964},
         "geometry": {"length": 30, "width": 10, "ridge_height": 4.5, "eave_height": 3.0},
         "materials": {"covering_type": "glass", "transmittance": 0.85, "u_value": 5.8},
-        "crop": {"type": "tomato", "system": "hydroponic_nft", "lai": 3.2, "growth_stage": "mid_season"},
+        "crop": {
+            "type": "tomato",
+            "system": "nft",
+            "lai": 3.2,
+            "growth_stage": "mid_season",
+            "layout": {
+                "tier_count": 2,
+                "gutter_length_m": 30,
+                "plants_per_tier": 120,
+                "aisle_width_m": 0.8,
+            },
+        },
+        "equipment": {
+            "cooling": "fan_and_pad",
+            "heating": "hot_water_pipes",
+            "ventilation": "roof_vents",
+        },
     },
 }
 

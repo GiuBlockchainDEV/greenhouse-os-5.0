@@ -2,8 +2,14 @@ export type AIProviderType = "openai" | "anthropic" | "gemini" | "ollama";
 
 export interface GreenhouseAIContext {
   crop_type: string;
+  cultivation_system: string;
   growth_stage: string;
   lai: number;
+  tier_count: number;
+  plants_per_tier: number;
+  cooling_system: string;
+  heating_system: string;
+  ventilation_system: string;
   length_m: number;
   width_m: number;
   covering_type: string;

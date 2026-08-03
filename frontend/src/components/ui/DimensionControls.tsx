@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
 
@@ -153,6 +154,8 @@ export function DimensionControls() {
           ))}
         </select>
       </section>
+
+      <CultivationClimateControls />
 
       <button
         type="button"

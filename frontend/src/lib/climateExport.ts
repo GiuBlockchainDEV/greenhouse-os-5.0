@@ -21,6 +21,11 @@ export async function exportClimateComputer(
     ventilation_ach: sim?.ventilation_ach ?? 2.0,
     crop_type: state.crop.type,
     growth_stage: state.crop.growthStage,
+    cultivation_system: state.crop.system,
+    tier_count: state.crop.layout.tierCount,
+    cooling_system: state.climateEquipment.cooling,
+    heating_system: state.climateEquipment.heating,
+    ventilation_system: state.climateEquipment.ventilation,
   };
 
   const response = await fetch("/api/v1/export/climate-computer", {
@@ -80,6 +85,17 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
       cultivation_system: state.crop.system,
       lai: state.crop.lai,
       growth_stage: state.crop.growthStage,
+      layout: {
+        tier_count: state.crop.layout.tierCount,
+        gutter_length_m: state.crop.layout.gutterLengthM,
+        plants_per_tier: state.crop.layout.plantsPerTier,
+        aisle_width_m: state.crop.layout.aisleWidthM,
+      },
+    },
+    climate_equipment: {
+      cooling: state.climateEquipment.cooling,
+      heating: state.climateEquipment.heating,
+      ventilation: state.climateEquipment.ventilation,
     },
   };
 

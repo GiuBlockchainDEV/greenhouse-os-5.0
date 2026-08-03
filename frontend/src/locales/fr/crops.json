@@ -8,23 +8,34 @@
     "cannabis": "Chanvre"
   },
   "systems": {
+    "soil": "Sol",
+    "substrate": "Substrat / Laine de Roche",
+    "growbed": "Growbed / Lit Filtrant",
+    "nft": "NFT (Nutrient Film)",
+    "dwc": "DWC (Culture en Eau Profonde)",
+    "drip": "Irrigation Goutte à Goutte",
+    "aeroponic": "Aéroponie",
+    "ebb_flow": "Ebb & Flow",
     "hydroponic_nft": "Hydroponie NFT",
-    "hydroponic_drip": "Hydroponie Goutte-à-Goutte",
-    "substrate": "Substrat",
-    "soil": "Sol"
+    "hydroponic_drip": "Hydroponie Goutte à Goutte"
   },
   "stages": {
     "seedling": "Semis",
-    "early_vegetative": "Végétatif Précoce",
+    "early_vegetative": "Végétative Précoce",
     "mid_season": "Mi-Saison",
-    "late_vegetative": "Végétatif Tardif",
-    "generative": "Génératif",
+    "late_vegetative": "Végétative Tardive",
+    "generative": "Générative",
     "harvest": "Récolte"
   },
   "labels": {
     "cropType": "Type de Culture",
-    "cultivationSystem": "Système de Culture",
+    "cultivationSystem": "Méthode de Culture",
     "lai": "Indice de Surface Foliaire",
-    "growthStage": "Stade de Croissance"
+    "growthStage": "Stade de Croissance",
+    "tierLayout": "Disposition des Niveaux",
+    "tierCount": "Nombre de Niveaux",
+    "plantsPerTier": "Plantes par Niveau",
+    "aisleWidth": "Largeur de l'Allée",
+    "tiersShort": "niveaux"
   }
 }

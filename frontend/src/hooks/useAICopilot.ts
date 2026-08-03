@@ -22,8 +22,14 @@ function buildContextFromStore(): GreenhouseAIContext {
 
   return {
     crop_type: state.crop.type,
+    cultivation_system: state.crop.system,
     growth_stage: state.crop.growthStage,
     lai: state.crop.lai,
+    tier_count: state.crop.layout.tierCount,
+    plants_per_tier: state.crop.layout.plantsPerTier,
+    cooling_system: state.climateEquipment.cooling,
+    heating_system: state.climateEquipment.heating,
+    ventilation_system: state.climateEquipment.ventilation,
     length_m: state.dimensions.length,
     width_m: state.dimensions.width,
     covering_type: state.covering.type,

@@ -16,8 +16,14 @@ class GreenhouseContext(BaseModel):
     """Greenhouse state passed to AI for context-aware responses."""
 
     crop_type: str = Field(default="tomato")
+    cultivation_system: str = Field(default="nft")
     growth_stage: str = Field(default="mid_season")
     lai: float = Field(default=3.2, ge=0.0)
+    tier_count: int = Field(default=1, ge=1, le=6)
+    plants_per_tier: int = Field(default=100, ge=1)
+    cooling_system: str = Field(default="none")
+    heating_system: str = Field(default="none")
+    ventilation_system: str = Field(default="natural_ridge")
     length_m: float = Field(default=30.0, gt=0.0)
     width_m: float = Field(default=10.0, gt=0.0)
     covering_type: str = Field(default="glass")

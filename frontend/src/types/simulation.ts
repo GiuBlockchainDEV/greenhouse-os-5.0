@@ -31,11 +31,25 @@ export interface WSMaterials {
   u_value: number;
 }
 
+export interface WSCultivationLayout {
+  tier_count: number;
+  gutter_length_m: number;
+  plants_per_tier: number;
+  aisle_width_m: number;
+}
+
 export interface WSCrop {
   type: string;
   system: string;
   lai: number;
   growth_stage: string;
+  layout: WSCultivationLayout;
+}
+
+export interface WSClimateEquipment {
+  cooling: string;
+  heating: string;
+  ventilation: string;
 }
 
 export interface WSClimateOverride {
@@ -51,6 +65,7 @@ export interface WSUpdatePayload {
     geometry: WSGeometry;
     materials: WSMaterials;
     crop: WSCrop;
+    equipment: WSClimateEquipment;
     climate?: WSClimateOverride;
   };
 }

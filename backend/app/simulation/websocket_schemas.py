@@ -34,11 +34,25 @@ class WSMaterials(BaseModel):
     u_value: float = Field(default=5.8, ge=0.0)
 
 
+class WSCultivationLayout(BaseModel):
+    tier_count: int = Field(default=1, ge=1, le=6)
+    gutter_length_m: float = Field(default=30.0, gt=0.0)
+    plants_per_tier: int = Field(default=100, ge=1)
+    aisle_width_m: float = Field(default=0.8, ge=0.3, le=3.0)
+
+
 class WSCrop(BaseModel):
     type: str = Field(default="tomato")
-    system: str = Field(default="hydroponic_nft")
+    system: str = Field(default="nft")
     lai: float = Field(default=3.2, ge=0.0, le=10.0)
     growth_stage: str = Field(default="mid_season")
+    layout: WSCultivationLayout = Field(default_factory=WSCultivationLayout)
+
+
+class WSClimateEquipment(BaseModel):
+    cooling: str = Field(default="none")
+    heating: str = Field(default="none")
+    ventilation: str = Field(default="natural_ridge")
 
 
 class WSClimateOverride(BaseModel):
@@ -54,6 +68,7 @@ class WSUpdateData(BaseModel):
     geometry: WSGeometry
     materials: WSMaterials = Field(default_factory=WSMaterials)
     crop: WSCrop = Field(default_factory=WSCrop)
+    equipment: WSClimateEquipment = Field(default_factory=WSClimateEquipment)
     climate: WSClimateOverride = Field(default_factory=WSClimateOverride)
 
 

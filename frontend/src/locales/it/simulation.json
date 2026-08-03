@@ -3,6 +3,8 @@
     "floorArea": "Superficie Coperta",
     "volume": "Volume Totale",
     "ridgeAngle": "Angolo della Colmo",
+    "cultivationArea": "Superficie Coltivata",
+    "totalPlants": "Piante Totali",
     "vpd": "Deficit di Pressione di Vapore",
     "dli": "Integrale Luminosa Giornaliera",
     "et0": "ET₀ di Riferimento",
@@ -47,5 +49,33 @@
     "latitude": "Latitudine",
     "longitude": "Longitudine",
     "elevation": "Altitudine"
+  },
+  "equipment": {
+    "title": "Impianto Climatico",
+    "cooling": "Raffrescamento",
+    "heating": "Riscaldamento",
+    "ventilation": "Ventilazione",
+    "coolingOptions": {
+      "none": "Nessuno",
+      "fan_and_pad": "Fan & Pad",
+      "evaporative": "Evaporativo",
+      "mechanical_ac": "Climatizzatore",
+      "high_pressure_fog": "Nebbia ad Alta Pressione"
+    },
+    "heatingOptions": {
+      "none": "Nessuno",
+      "hot_water_pipes": "Tubi Acqua Calda",
+      "unit_heater": "Generatore d'Aria",
+      "air_heater": "Riscaldatore ad Aria",
+      "geothermal": "Geotermico"
+    },
+    "ventilationOptions": {
+      "natural_ridge": "Colmo Naturale",
+      "natural_gable": "Frontone Naturale",
+      "roof_vents": "Serrande sul Colmo",
+      "side_vents": "Serrande Laterali",
+      "forced_exhaust": "Ventole di Estrazione",
+      "combined": "Combinato (Colmo + Laterali)"
+    }
   }
 }

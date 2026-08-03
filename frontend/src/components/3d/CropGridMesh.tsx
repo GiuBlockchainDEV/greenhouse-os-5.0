@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
-import type { CropType } from "@/types/greenhouse";
+import type { CropType, CultivationSystem } from "@/types/greenhouse";
 
 const CROP_COLORS: Record<CropType, string> = {
   tomato: "#2d8a4e",
@@ -22,6 +22,17 @@ const CROP_SPACING: Record<CropType, number> = {
   cannabis: 0.6,
 };
 
+const SYSTEM_SPACING: Record<CultivationSystem, number> = {
+  soil: 0.4,
+  substrate: 0.35,
+  growbed: 0.3,
+  nft: 0.25,
+  dwc: 0.3,
+  drip: 0.45,
+  aeroponic: 0.35,
+  ebb_flow: 0.3,
+};
+
 const STAGE_SCALE: Record<string, number> = {
   seedling: 0.4,
   early_vegetative: 0.6,
@@ -33,6 +44,7 @@ const STAGE_SCALE: Record<string, number> = {
 
 interface PlantInstance {
   x: number;
+  y: number;
   z: number;
   scale: number;
   rotation: number;
@@ -41,29 +53,42 @@ interface PlantInstance {
 function computePlantGrid(
   length: number,
   width: number,
+  eaveHeight: number,
   cropType: CropType,
+  system: CultivationSystem,
   lai: number,
   growthStage: string,
+  tierCount: number,
 ): PlantInstance[] {
-  const spacing = CROP_SPACING[cropType];
-  const cols = Math.max(1, Math.floor(width / spacing));
-  const rows = Math.max(1, Math.floor(length / spacing));
+  const spacing = SYSTEM_SPACING[system] ?? CROP_SPACING[cropType];
+  const tiers = Math.max(tierCount, 1);
+  const tierHeight = Math.min(1.2, Math.max((eaveHeight - 0.6) / tiers, 0.35));
+
   const stageScale = STAGE_SCALE[growthStage] ?? 1.0;
   const baseScale = (0.25 + lai * 0.12) * stageScale;
 
   const plants: PlantInstance[] = [];
-  const offsetX = -length / 2 + spacing / 2;
-  const offsetZ = -width / 2 + spacing / 2;
+  const usableWidth = width / tiers;
 
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const jitter = ((row * cols + col) % 7) * 0.02 - 0.06;
-      plants.push({
-        x: offsetX + row * spacing + jitter,
-        z: offsetZ + col * spacing + jitter,
-        scale: baseScale * (0.85 + ((row + col) % 5) * 0.05),
-        rotation: ((row * 3 + col * 7) % 360) * (Math.PI / 180),
-      });
+  for (let tier = 0; tier < tiers; tier++) {
+    const tierOffsetZ = -width / 2 + usableWidth * tier + usableWidth / 2;
+    const cols = Math.max(1, Math.floor(usableWidth / spacing));
+    const rows = Math.max(1, Math.floor(length / spacing));
+    const offsetX = -length / 2 + spacing / 2;
+    const offsetZ = tierOffsetZ - (cols * spacing) / 2 + spacing / 2;
+    const y = 0.28 + tier * tierHeight;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const jitter = ((tier * rows * cols + row * cols + col) % 7) * 0.02 - 0.06;
+        plants.push({
+          x: offsetX + row * spacing + jitter,
+          y,
+          z: offsetZ + col * spacing + jitter,
+          scale: baseScale * (0.85 + ((row + col + tier) % 5) * 0.05),
+          rotation: ((row * 3 + col * 7 + tier * 11) % 360) * (Math.PI / 180),
+        });
+      }
     }
   }
 
@@ -76,7 +101,7 @@ function applyInstanceMatrices(
 ): void {
   const dummy = new THREE.Object3D();
   plants.forEach((plant, index) => {
-    dummy.position.set(plant.x, 0.28, plant.z);
+    dummy.position.set(plant.x, plant.y, plant.z);
     dummy.rotation.y = plant.rotation;
     dummy.scale.setScalar(plant.scale);
     dummy.updateMatrix();
@@ -95,11 +120,23 @@ export function CropGridMesh() {
       computePlantGrid(
         dimensions.length,
         dimensions.width,
+        dimensions.eaveHeight,
         crop.type,
+        crop.system,
         crop.lai,
         crop.growthStage,
+        crop.layout.tierCount,
       ),
-    [dimensions.length, dimensions.width, crop.type, crop.lai, crop.growthStage],
+    [
+      dimensions.length,
+      dimensions.width,
+      dimensions.eaveHeight,
+      crop.type,
+      crop.system,
+      crop.lai,
+      crop.growthStage,
+      crop.layout.tierCount,
+    ],
   );
 
   const foliageGeometry = useMemo(() => new THREE.ConeGeometry(0.18, 0.55, 6), []);

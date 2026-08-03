@@ -10,6 +10,7 @@ export function HUDOverlay() {
   const name = useGreenhouseStore((state) => state.name);
   const metrics = useGreenhouseStore((state) => state.metrics);
   const crop = useGreenhouseStore((state) => state.crop);
+  const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const location = useGreenhouseStore((state) => state.location);
 
   return (
@@ -20,7 +21,12 @@ export function HUDOverlay() {
           {location.lat.toFixed(4)}°, {location.lon.toFixed(4)}°
         </p>
         <p className="mt-2 text-xs text-white/60">
-          {tCrops(`types.${crop.type}`)} · {tCrops(`stages.${crop.growthStage}`)}
+          {tCrops(`types.${crop.type}`)} · {tCrops(`systems.${crop.system}`)} ·{" "}
+          {tCrops(`stages.${crop.growthStage}`)}
+        </p>
+        <p className="mt-1 text-xs text-white/50">
+          {crop.layout.tierCount} {tCrops("labels.tiersShort")} ·{" "}
+          {tSim(`equipment.coolingOptions.${climateEquipment.cooling}`)}
         </p>
       </div>
 
@@ -31,6 +37,16 @@ export function HUDOverlay() {
             <dd className="font-mono font-medium text-white">
               {metrics.floorAreaM2} {tCommon("units.squareMeters")}
             </dd>
+          </div>
+          <div>
+            <dt className="text-greenhouse-400">{tSim("metrics.cultivationArea")}</dt>
+            <dd className="font-mono font-medium text-white">
+              {metrics.cultivationAreaM2} {tCommon("units.squareMeters")}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-greenhouse-400">{tSim("metrics.totalPlants")}</dt>
+            <dd className="font-mono font-medium text-white">{metrics.totalPlants}</dd>
           </div>
           <div>
             <dt className="text-greenhouse-400">{tSim("metrics.volume")}</dt>

@@ -8,10 +8,16 @@
     "cannabis": "Cannabis"
   },
   "systems": {
+    "soil": "Soil",
+    "substrate": "Substrate / Rockwool",
+    "growbed": "Growbed / Media Bed",
+    "nft": "NFT (Nutrient Film)",
+    "dwc": "DWC (Deep Water Culture)",
+    "drip": "Drip Irrigation",
+    "aeroponic": "Aeroponics",
+    "ebb_flow": "Ebb & Flow",
     "hydroponic_nft": "NFT Hydroponic",
-    "hydroponic_drip": "Drip Hydroponic",
-    "substrate": "Substrate",
-    "soil": "Soil"
+    "hydroponic_drip": "Drip Hydroponic"
   },
   "stages": {
     "seedling": "Seedling",
@@ -23,8 +29,13 @@
   },
   "labels": {
     "cropType": "Crop Type",
-    "cultivationSystem": "Cultivation System",
+    "cultivationSystem": "Cultivation Method",
     "lai": "Leaf Area Index",
-    "growthStage": "Growth Stage"
+    "growthStage": "Growth Stage",
+    "tierLayout": "Tier Layout (Campate)",
+    "tierCount": "Number of Tiers",
+    "plantsPerTier": "Plants per Tier",
+    "aisleWidth": "Aisle Width",
+    "tiersShort": "tiers"
   }
 }

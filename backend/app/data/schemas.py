@@ -19,11 +19,25 @@ class CoveringMaterialDB(BaseModel):
     u_value: float
 
 
+class CultivationLayoutDB(BaseModel):
+    tier_count: int = Field(default=1, ge=1, le=6)
+    gutter_length_m: float = Field(default=30.0)
+    plants_per_tier: int = Field(default=100, ge=1)
+    aisle_width_m: float = Field(default=0.8)
+
+
+class ClimateEquipmentDB(BaseModel):
+    cooling: str = Field(default="none")
+    heating: str = Field(default="none")
+    ventilation: str = Field(default="natural_ridge")
+
+
 class CropConfigDB(BaseModel):
     crop_type: str
     cultivation_system: str
     lai: float
     growth_stage: str
+    layout: CultivationLayoutDB = Field(default_factory=CultivationLayoutDB)
 
 
 class GreenhouseCreate(BaseModel):
@@ -34,6 +48,7 @@ class GreenhouseCreate(BaseModel):
     dimensions: GreenhouseDimensionsDB
     covering_material: CoveringMaterialDB
     crop_config: CropConfigDB
+    climate_equipment: ClimateEquipmentDB = Field(default_factory=ClimateEquipmentDB)
     is_public: bool = False
 
 

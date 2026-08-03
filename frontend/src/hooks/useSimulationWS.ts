@@ -43,6 +43,17 @@ function buildUpdatePayload(): WSUpdatePayload {
         system: state.crop.system,
         lai: state.crop.lai,
         growth_stage: state.crop.growthStage,
+        layout: {
+          tier_count: state.crop.layout.tierCount,
+          gutter_length_m: state.crop.layout.gutterLengthM,
+          plants_per_tier: state.crop.layout.plantsPerTier,
+          aisle_width_m: state.crop.layout.aisleWidthM,
+        },
+      },
+      equipment: {
+        cooling: state.climateEquipment.cooling,
+        heating: state.climateEquipment.heating,
+        ventilation: state.climateEquipment.ventilation,
       },
     },
   };
@@ -173,6 +184,7 @@ export function useSimulationWS(): UseSimulationWSReturn {
         state.dimensions !== prev.dimensions ||
         state.covering !== prev.covering ||
         state.crop !== prev.crop ||
+        state.climateEquipment !== prev.climateEquipment ||
         state.location !== prev.location;
 
       if (!changed) return;
