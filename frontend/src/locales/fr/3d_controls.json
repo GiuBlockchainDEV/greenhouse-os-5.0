@@ -5,6 +5,18 @@
     "ridgeHeight": "Hauteur de Faîtage",
     "eaveHeight": "Hauteur de Gouttière"
   },
+  "structure": {
+    "title": "Structure de la Serre",
+    "bayCount": "Nombre de Travées",
+    "bayWidth": "Largeur de Travée",
+    "totalWidth": "Largeur Totale",
+    "archType": "Profil de l'Arc",
+    "apexAuto": "Calculé automatiquement depuis la travée",
+    "archTypes": {
+      "triangular": "Triangulaire (Faîtage)",
+      "semicircular": "Semi-circulaire (Tunnel)"
+    }
+  },
   "covering": {
     "title": "Matériau de Couverture",
     "glass": "Verre",

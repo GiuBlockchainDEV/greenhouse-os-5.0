@@ -75,6 +75,11 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
       ridge_height: state.dimensions.ridgeHeight,
       eave_height: state.dimensions.eaveHeight,
     },
+    structure: {
+      bay_count: state.structure.bayCount,
+      bay_width_m: state.structure.bayWidthM,
+      arch_type: state.structure.archType,
+    },
     covering_material: {
       type: state.covering.type,
       transmittance: state.covering.transmittance,

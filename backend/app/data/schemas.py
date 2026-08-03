@@ -13,6 +13,12 @@ class GreenhouseDimensionsDB(BaseModel):
     eave_height: float
 
 
+class GreenhouseStructureDB(BaseModel):
+    bay_count: int = Field(default=1, ge=1, le=20)
+    bay_width_m: float = Field(default=10.0, gt=0.0)
+    arch_type: str = Field(default="triangular")
+
+
 class CoveringMaterialDB(BaseModel):
     type: str
     transmittance: float
@@ -46,6 +52,7 @@ class GreenhouseCreate(BaseModel):
     latitude: float = Field(..., ge=-90.0, le=90.0)
     longitude: float = Field(..., ge=-180.0, le=180.0)
     dimensions: GreenhouseDimensionsDB
+    structure: GreenhouseStructureDB = Field(default_factory=GreenhouseStructureDB)
     covering_material: CoveringMaterialDB
     crop_config: CropConfigDB
     climate_equipment: ClimateEquipmentDB = Field(default_factory=ClimateEquipmentDB)

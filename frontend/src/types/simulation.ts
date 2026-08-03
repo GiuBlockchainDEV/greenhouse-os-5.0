@@ -23,6 +23,9 @@ export interface WSGeometry {
   width: number;
   ridge_height: number;
   eave_height: number;
+  bay_count: number;
+  bay_width_m: number;
+  arch_type: string;
 }
 
 export interface WSMaterials {

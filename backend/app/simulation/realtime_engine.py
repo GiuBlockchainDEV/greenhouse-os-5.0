@@ -92,6 +92,9 @@ class RealtimeSimulationEngine:
                 width=payload.geometry.width,
                 ridge_height=payload.geometry.ridge_height,
                 eave_height=payload.geometry.eave_height,
+                bay_count=payload.geometry.bay_count,
+                bay_width_m=payload.geometry.bay_width_m,
+                arch_type=payload.geometry.arch_type,
             ),
             materials=CoveringMaterial(
                 type=payload.materials.covering_type,

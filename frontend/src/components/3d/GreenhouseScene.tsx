@@ -11,7 +11,7 @@ import type { GreenhouseDimensions } from "@/types/greenhouse";
 
 const DIMENSION_LIMITS = {
   length: { min: 6, max: 120 },
-  width: { min: 4, max: 40 },
+  width: { min: 4, max: 120 },
   height: { min: 2, max: 12 },
 } as const;
 

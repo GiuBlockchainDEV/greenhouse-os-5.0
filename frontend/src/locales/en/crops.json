@@ -32,10 +32,10 @@
     "cultivationSystem": "Cultivation Method",
     "lai": "Leaf Area Index",
     "growthStage": "Growth Stage",
-    "tierLayout": "Tier Layout (Campate)",
-    "tierCount": "Number of Tiers",
-    "plantsPerTier": "Plants per Tier",
+    "tierLayout": "Growing Levels",
+    "tierCount": "Vertical Levels",
+    "plantsPerTier": "Plants per Level",
     "aisleWidth": "Aisle Width",
-    "tiersShort": "tiers"
+    "tiersShort": "levels"
   }
 }

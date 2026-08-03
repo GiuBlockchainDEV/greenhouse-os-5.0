@@ -6,7 +6,9 @@ export function HUDOverlay() {
   const { t: tCommon } = useTranslation("common");
   const { t: tSim } = useTranslation("simulation");
   const { t: tCrops } = useTranslation("crops");
+  const { t: tControls } = useTranslation("3d_controls");
 
+  const structure = useGreenhouseStore((state) => state.structure);
   const name = useGreenhouseStore((state) => state.name);
   const metrics = useGreenhouseStore((state) => state.metrics);
   const crop = useGreenhouseStore((state) => state.crop);
@@ -25,6 +27,10 @@ export function HUDOverlay() {
           {tCrops(`stages.${crop.growthStage}`)}
         </p>
         <p className="mt-1 text-xs text-white/50">
+          {structure.bayCount} {tControls("structure.bayCount").toLowerCase()} ·{" "}
+          {tControls(`structure.archTypes.${structure.archType}`)}
+        </p>
+        <p className="mt-1 text-xs text-white/40">
           {crop.layout.tierCount} {tCrops("labels.tiersShort")} ·{" "}
           {tSim(`equipment.coolingOptions.${climateEquipment.cooling}`)}
         </p>

@@ -2,16 +2,22 @@ import { useTranslation } from "react-i18next";
 
 import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
-import type { CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
+import type { ArchType, CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
 
 const DIMENSION_LIMITS = {
   length: { min: 6, max: 120, step: 1 },
-  width: { min: 4, max: 40, step: 0.5 },
   ridgeHeight: { min: 2.5, max: 12, step: 0.1 },
   eaveHeight: { min: 2, max: 10, step: 0.1 },
 } as const;
 
+const STRUCTURE_LIMITS = {
+  bayCount: { min: 1, max: 15, step: 1 },
+  bayWidthM: { min: 4, max: 12, step: 0.5 },
+} as const;
+
 type DimensionKey = keyof typeof DIMENSION_LIMITS;
+
+const ARCH_TYPES: ArchType[] = ["triangular", "semicircular"];
 
 const COVERING_TYPES: CoveringMaterial["type"][] = [
   "glass",
@@ -37,9 +43,19 @@ interface SliderRowProps {
   max: number;
   step: number;
   onChange: (value: number) => void;
+  disabled?: boolean;
 }
 
-function SliderRow({ label, value, unit, min, max, step, onChange }: SliderRowProps) {
+function SliderRow({
+  label,
+  value,
+  unit,
+  min,
+  max,
+  step,
+  onChange,
+  disabled = false,
+}: SliderRowProps) {
   return (
     <label className="flex flex-col gap-1">
       <span className="flex justify-between text-xs text-greenhouse-300">
@@ -54,8 +70,9 @@ function SliderRow({ label, value, unit, min, max, step, onChange }: SliderRowPr
         max={max}
         step={step}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-greenhouse-700 accent-greenhouse-400"
+        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-greenhouse-700 accent-greenhouse-400 disabled:opacity-40"
       />
     </label>
   );
@@ -66,9 +83,12 @@ export function DimensionControls() {
   const { t: tControls } = useTranslation("3d_controls");
   const { t: tCrops } = useTranslation("crops");
 
+  const structure = useGreenhouseStore((state) => state.structure);
   const dimensions = useGreenhouseStore((state) => state.dimensions);
+  const metrics = useGreenhouseStore((state) => state.metrics);
   const covering = useGreenhouseStore((state) => state.covering);
   const crop = useGreenhouseStore((state) => state.crop);
+  const setStructure = useGreenhouseStore((state) => state.setStructure);
   const setDimensions = useGreenhouseStore((state) => state.setDimensions);
   const setCovering = useGreenhouseStore((state) => state.setCovering);
   const setCrop = useGreenhouseStore((state) => state.setCrop);
@@ -76,7 +96,7 @@ export function DimensionControls() {
 
   const handleDimensionChange = (key: DimensionKey, value: number) => {
     const update: DimensionUpdate = { [key]: value };
-    if (key === "eaveHeight" && value > dimensions.ridgeHeight) {
+    if (key === "eaveHeight" && structure.archType === "triangular" && value > dimensions.ridgeHeight) {
       update.ridgeHeight = value + 0.5;
     }
     if (key === "ridgeHeight" && value < dimensions.eaveHeight) {
@@ -93,7 +113,70 @@ export function DimensionControls() {
       </div>
 
       <section className="flex flex-col gap-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+          {tControls("structure.title")}
+        </h4>
+        <SliderRow
+          label={tControls("structure.bayCount")}
+          value={structure.bayCount}
+          unit=""
+          min={STRUCTURE_LIMITS.bayCount.min}
+          max={STRUCTURE_LIMITS.bayCount.max}
+          step={STRUCTURE_LIMITS.bayCount.step}
+          onChange={(value) => setStructure({ bayCount: value })}
+        />
+        <SliderRow
+          label={tControls("structure.bayWidth")}
+          value={structure.bayWidthM}
+          unit={tCommon("units.meters")}
+          min={STRUCTURE_LIMITS.bayWidthM.min}
+          max={STRUCTURE_LIMITS.bayWidthM.max}
+          step={STRUCTURE_LIMITS.bayWidthM.step}
+          onChange={(value) => setStructure({ bayWidthM: value })}
+        />
+        <div className="rounded-lg border border-greenhouse-700/60 bg-greenhouse-900/50 px-3 py-2">
+          <p className="text-xs text-greenhouse-400">{tControls("structure.totalWidth")}</p>
+          <p className="font-mono text-sm text-white">
+            {metrics.totalWidthM} {tCommon("units.meters")}
+          </p>
+        </div>
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-greenhouse-300">{tControls("structure.archType")}</span>
+          <select
+            value={structure.archType}
+            onChange={(event) =>
+              setStructure({ archType: event.target.value as ArchType })
+            }
+            className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+          >
+            {ARCH_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {tControls(`structure.archTypes.${type}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </section>
+
+      <section className="flex flex-col gap-3 border-t border-greenhouse-700 pt-4">
         {(Object.keys(DIMENSION_LIMITS) as DimensionKey[]).map((key) => {
+          if (key === "ridgeHeight" && structure.archType === "semicircular") {
+            return (
+              <div
+                key={key}
+                className="rounded-lg border border-greenhouse-700/60 bg-greenhouse-900/50 px-3 py-2"
+              >
+                <p className="text-xs text-greenhouse-400">{tControls(`dimensions.${key}`)}</p>
+                <p className="font-mono text-sm text-white">
+                  {dimensions.ridgeHeight.toFixed(1)} {tCommon("units.meters")}
+                </p>
+                <p className="mt-1 text-[10px] text-greenhouse-500">
+                  {tControls("structure.apexAuto")}
+                </p>
+              </div>
+            );
+          }
+
           const limits = DIMENSION_LIMITS[key];
           return (
             <SliderRow

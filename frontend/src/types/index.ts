@@ -1,4 +1,5 @@
 export type {
+  ArchType,
   ClimateEquipment,
   CoveringMaterial,
   CropConfig,
@@ -10,8 +11,10 @@ export type {
   GeoLocation,
   GreenhouseDimensions,
   GreenhouseState,
+  GreenhouseStructure,
   GrowthStage,
   HeatingSystem,
+  StructureUpdate,
   SupportedLocale,
   VentilationSystem,
   VolumeMetrics,

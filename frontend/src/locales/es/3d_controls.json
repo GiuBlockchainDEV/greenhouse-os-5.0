@@ -5,6 +5,18 @@
     "ridgeHeight": "Altura de Cumbrera",
     "eaveHeight": "Altura de Alero"
   },
+  "structure": {
+    "title": "Estructura del Invernadero",
+    "bayCount": "Número de Módulos (Campatas)",
+    "bayWidth": "Ancho del Módulo",
+    "totalWidth": "Ancho Total",
+    "archType": "Perfil del Arco",
+    "apexAuto": "Calculado automáticamente del módulo",
+    "archTypes": {
+      "triangular": "Triangular (Dos Aguas)",
+      "semicircular": "Semicircular (Túnel)"
+    }
+  },
   "covering": {
     "title": "Material de Cubierta",
     "glass": "Vidrio",

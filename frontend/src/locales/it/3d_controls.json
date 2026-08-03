@@ -5,6 +5,18 @@
     "ridgeHeight": "Altezza Colmo",
     "eaveHeight": "Altezza Gronda"
   },
+  "structure": {
+    "title": "Struttura Serra",
+    "bayCount": "Numero di Campate",
+    "bayWidth": "Larghezza Campata",
+    "totalWidth": "Larghezza Totale",
+    "archType": "Tipo di Arco",
+    "apexAuto": "Calcolata automaticamente dalla campata",
+    "archTypes": {
+      "triangular": "Triangolare (Capannone)",
+      "semicircular": "Semicircolare (Tunnel)"
+    }
+  },
   "covering": {
     "title": "Materiale di Copertura",
     "glass": "Vetro",

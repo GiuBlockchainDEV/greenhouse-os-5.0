@@ -1,5 +1,17 @@
 export type SupportedLocale = "en" | "it" | "es" | "fr";
 
+export type ArchType = "triangular" | "semicircular";
+
+/** Structural bay configuration — campate that scale greenhouse width. */
+export interface GreenhouseStructure {
+  /** Number of structural bays (campate) side-by-side. */
+  bayCount: number;
+  /** Width of each single bay in meters. Total width = bayCount × bayWidthM. */
+  bayWidthM: number;
+  /** Roof arch profile: pitched (triangular) or tunnel (semicircular). */
+  archType: ArchType;
+}
+
 export interface GreenhouseDimensions {
   length: number;
   width: number;
@@ -41,7 +53,7 @@ export type CultivationSystem =
   | "ebb_flow";
 
 export interface CultivationLayout {
-  /** Number of vertical tiers / campate (1 = single level). */
+  /** Number of vertical growing levels (livelli), not structural bays. */
   tierCount: number;
   /** Length of each gutter or bed run in meters. */
   gutterLengthM: number;
@@ -96,6 +108,7 @@ export interface GeoLocation {
 export interface GreenhouseState {
   name: string;
   location: GeoLocation;
+  structure: GreenhouseStructure;
   dimensions: GreenhouseDimensions;
   covering: CoveringMaterial;
   crop: CropConfig;
@@ -109,10 +122,18 @@ export interface DimensionUpdate {
   eaveHeight?: number;
 }
 
+export interface StructureUpdate {
+  bayCount?: number;
+  bayWidthM?: number;
+  archType?: ArchType;
+}
+
 export interface VolumeMetrics {
   floorAreaM2: number;
   volumeM3: number;
   ridgeAngleDeg: number;
   cultivationAreaM2: number;
   totalPlants: number;
+  totalWidthM: number;
+  bayCount: number;
 }

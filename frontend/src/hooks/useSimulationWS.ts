@@ -32,6 +32,9 @@ function buildUpdatePayload(): WSUpdatePayload {
         width: state.dimensions.width,
         ridge_height: state.dimensions.ridgeHeight,
         eave_height: state.dimensions.eaveHeight,
+        bay_count: state.structure.bayCount,
+        bay_width_m: state.structure.bayWidthM,
+        arch_type: state.structure.archType,
       },
       materials: {
         covering_type: state.covering.type,
@@ -182,6 +185,7 @@ export function useSimulationWS(): UseSimulationWSReturn {
     const unsubscribe = useGreenhouseStore.subscribe((state, prev) => {
       const changed =
         state.dimensions !== prev.dimensions ||
+        state.structure !== prev.structure ||
         state.covering !== prev.covering ||
         state.crop !== prev.crop ||
         state.climateEquipment !== prev.climateEquipment ||

@@ -32,10 +32,10 @@
     "cultivationSystem": "Metodo di Coltivazione",
     "lai": "Indice di Area Fogliare",
     "growthStage": "Fase di Crescita",
-    "tierLayout": "Layout Campate",
-    "tierCount": "Numero di Campate",
-    "plantsPerTier": "Piante per Campata",
+    "tierLayout": "Layout Livelli",
+    "tierCount": "Numero di Livelli",
+    "plantsPerTier": "Piante per Livello",
     "aisleWidth": "Larghezza Corsello",
-    "tiersShort": "campate"
+    "tiersShort": "livelli"
   }
 }

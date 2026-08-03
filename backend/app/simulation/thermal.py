@@ -14,6 +14,7 @@ from app.simulation.cultivation import (
     effective_lai,
     normalize_cultivation_system,
 )
+from app.simulation.geometry import compute_envelope
 from app.simulation.schemas import ThermalBalance, ThermalInput, ThermalResult
 from app.simulation.vpd import calculate_vpd_kpa
 
@@ -109,9 +110,15 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     eave_height = params.geometry.eave_height
     ridge_height = params.geometry.ridge_height
 
-    floor_area = _floor_area(length, width)
-    envelope_area = _envelope_area(length, width, eave_height, ridge_height)
-    volume = _volume(length, width, eave_height, ridge_height)
+    floor_area, envelope_area, volume = compute_envelope(
+        length,
+        width,
+        eave_height,
+        ridge_height,
+        arch_type=params.geometry.arch_type,
+        bay_count=params.geometry.bay_count,
+        bay_width=params.geometry.bay_width_m,
+    )
 
     t_external = params.external_temp_c
     rh_external = params.external_rh_pct

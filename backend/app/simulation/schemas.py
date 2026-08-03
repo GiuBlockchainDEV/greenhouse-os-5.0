@@ -107,10 +107,13 @@ class GeometryInput(BaseModel):
     width: float = Field(..., gt=0.0)
     ridge_height: float = Field(..., gt=0.0)
     eave_height: float = Field(..., gt=0.0)
+    bay_count: int = Field(default=1, ge=1, le=20)
+    bay_width_m: float = Field(default=10.0, gt=0.0, le=20.0)
+    arch_type: str = Field(default="triangular")
 
 
 class CultivationLayoutInput(BaseModel):
-    """Multi-tier cultivation layout (campate)."""
+    """Multi-tier vertical cultivation layout (livelli)."""
 
     tier_count: int = Field(default=1, ge=1, le=6)
     gutter_length_m: float = Field(default=30.0, gt=0.0)
