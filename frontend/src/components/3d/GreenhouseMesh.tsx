@@ -58,9 +58,9 @@ function createSemicircularBayRoof(
     const x = row === 0 ? -halfLength : halfLength;
     for (let seg = 0; seg <= segments; seg++) {
       const theta = (Math.PI * seg) / segments;
-      const localZ = radius * Math.cos(theta);
+      const z = zCenter + radius * Math.cos(theta);
       const y = eaveHeight + radius * Math.sin(theta);
-      positions.push(x, y, zCenter + localZ - radius);
+      positions.push(x, y, z);
     }
   }
 
