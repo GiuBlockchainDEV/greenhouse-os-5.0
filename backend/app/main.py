@@ -4,6 +4,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.ai.router import router as ai_router
 from app.simulation.engine import SimulationEngine
 from app.simulation.schemas import SimulationRequest, SimulationResponse
 from app.simulation.websocket_handler import simulation_websocket_handler
@@ -23,6 +24,8 @@ app.add_middleware(
 )
 
 _engine = SimulationEngine()
+
+app.include_router(ai_router, prefix=settings.api_prefix)
 
 
 @app.get("/health")

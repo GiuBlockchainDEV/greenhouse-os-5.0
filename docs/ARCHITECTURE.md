@@ -263,12 +263,34 @@ High-performance foliage rendering using `THREE.InstancedMesh`:
 
 ---
 
-## Planned Modules (Milestones 5–6)
+## Multi-AI Gateway (Milestone 5)
 
-| Milestone | Module | Technology |
-|-----------|--------|------------|
-| 5 | Multi-AI gateway | OpenAI, Anthropic, Gemini, Ollama |
-| 6 | Supabase RLS, dashboard | PostgreSQL, Priva/Ridder export |
+### Architecture
+
+```text
+AICopilotPanel → useAICopilot → POST /api/v1/ai/chat
+                                      │
+                                      ▼
+                               MultiAIGateway
+                    ┌──────────┬──────────┬──────────┬──────────┐
+                    │  OpenAI  │Anthropic │  Gemini  │  Ollama  │
+                    └──────────┴──────────┴──────────┴──────────┘
+                                      │ (fallback)
+                                      ▼
+                          Local Optimizer (FAO-56 rules)
+```
+
+Each provider implements `AIProvider.complete()`. When the selected provider is unavailable or fails, the gateway falls back to `local_optimizer.py` which produces deterministic Priva/Ridder-compatible setpoints from VPD, temperature, and crop stage.
+
+**Implementation:** `backend/app/ai/gateway.py`, `frontend/src/components/ai/AICopilotPanel.tsx`
+
+---
+
+## Planned Modules (Milestone 6)
+
+| Module | Technology |
+|--------|------------|
+| Supabase RLS, industrial dashboard | PostgreSQL, Priva/Ridder export |
 
 ---
 

@@ -13,6 +13,17 @@ export type {
 } from "./greenhouse";
 export type { GizmoMode, HeatmapMode } from "./viewport";
 export type {
+  AIChatRequest,
+  AIChatResponse,
+  AIProviderType,
+  ClimateSetpoint,
+  CopilotMessage,
+  CopilotStatus,
+  GreenhouseAIContext,
+  OptimizeClimateRequest,
+  ProviderInfo,
+} from "./ai";
+export type {
   WSClimateOverride,
   WSConnectionStatus,
   WSCrop,

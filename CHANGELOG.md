@@ -4,6 +4,18 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.0.0-milestone-5] - 2026-08-03
+
+### Added
+
+- **Decoupled Multi-AI gateway** (`backend/app/ai/`) — Abstract `AIProvider` interface
+- **Provider implementations** — OpenAI, Anthropic, Gemini (httpx), Ollama (local)
+- **Local optimizer fallback** — FAO-56 rule-based setpoints when APIs unavailable
+- **AI REST endpoints** — `GET /ai/providers`, `POST /ai/chat`, `POST /ai/optimize-climate`
+- **Frontend AICopilotPanel** — Chat UI with setpoint recommendations table
+- **ProviderSelector** — Runtime AI provider switching
+- **useAICopilot hook** — Chat state, optimize, and provider discovery
+
 ## [5.0.0-milestone-4] - 2026-08-03
 
 ### Added

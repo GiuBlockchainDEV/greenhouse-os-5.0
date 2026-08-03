@@ -11,6 +11,7 @@ import type {
   VolumeMetrics,
 } from "@/types/greenhouse";
 import type { GizmoMode, HeatmapMode } from "@/types/viewport";
+import type { AIProviderType } from "@/types/ai";
 import type {
   WSConnectionStatus,
   WSSimulationResults,
@@ -71,6 +72,7 @@ interface GreenhouseStore {
   simulationResults: SimulationData | null;
   gizmoMode: GizmoMode;
   heatmapMode: HeatmapMode;
+  aiProvider: AIProviderType;
   setLocale: (locale: SupportedLocale) => void;
   setName: (name: string) => void;
   setLocation: (location: Partial<GeoLocation>) => void;
@@ -81,6 +83,7 @@ interface GreenhouseStore {
   setSimulationResults: (results: SimulationData) => void;
   setGizmoMode: (mode: GizmoMode) => void;
   setHeatmapMode: (mode: HeatmapMode) => void;
+  setAiProvider: (provider: AIProviderType) => void;
   resetToDefaults: () => void;
 }
 
@@ -98,6 +101,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       simulationResults: null,
       gizmoMode: "off",
       heatmapMode: "off",
+      aiProvider: "openai",
 
       setLocale: (locale) => set({ locale }, false, "setLocale"),
 
@@ -141,6 +145,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       setGizmoMode: (gizmoMode) => set({ gizmoMode }, false, "setGizmoMode"),
 
       setHeatmapMode: (heatmapMode) => set({ heatmapMode }, false, "setHeatmapMode"),
+
+      setAiProvider: (aiProvider) => set({ aiProvider }, false, "setAiProvider"),
 
       resetToDefaults: () =>
         set(

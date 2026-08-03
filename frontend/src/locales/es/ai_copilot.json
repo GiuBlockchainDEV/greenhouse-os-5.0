@@ -2,9 +2,11 @@
   "panel": {
     "title": "Copiloto IA",
     "placeholder": "Pide al copiloto optimizar los setpoints climáticos...",
-    "comingSoon": "Gateway Multi-IA disponible en el Milestone 5"
+    "welcome": "Analizo los datos microclimáticos en vivo y sugiero ajustes compatibles con Priva/Ridder. Prueba Optimizar Clima o haz una pregunta."
   },
   "providers": {
+    "label": "Proveedor IA",
+    "unavailable": "fallback local",
     "openai": "OpenAI",
     "anthropic": "Anthropic",
     "gemini": "Google Gemini",
@@ -13,6 +15,17 @@
   "actions": {
     "optimize": "Optimizar Clima",
     "explain": "Explicar Métricas",
-    "send": "Enviar"
+    "send": "Enviar",
+    "clear": "Limpiar"
+  },
+  "status": {
+    "thinking": "Analizando microclima...",
+    "error": "Solicitud fallida. Verifica la conexión al backend."
+  },
+  "setpoints": {
+    "title": "Setpoints Recomendados"
+  },
+  "prompts": {
+    "explainMetrics": "Explica las métricas VPD, temperatura y ET0 actuales y si son óptimas para la etapa de crecimiento de mi cultivo."
   }
 }

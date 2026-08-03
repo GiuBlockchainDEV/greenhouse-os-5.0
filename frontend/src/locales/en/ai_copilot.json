@@ -2,9 +2,11 @@
   "panel": {
     "title": "AI Copilot",
     "placeholder": "Ask the copilot to optimize climate setpoints...",
-    "comingSoon": "Multi-AI gateway arriving in Milestone 5"
+    "welcome": "I analyze your live microclimate data and suggest Priva/Ridder-compatible setpoint adjustments. Try Optimize Climate or ask a question."
   },
   "providers": {
+    "label": "AI Provider",
+    "unavailable": "local fallback",
     "openai": "OpenAI",
     "anthropic": "Anthropic",
     "gemini": "Google Gemini",
@@ -13,6 +15,17 @@
   "actions": {
     "optimize": "Optimize Climate",
     "explain": "Explain Metrics",
-    "send": "Send"
+    "send": "Send",
+    "clear": "Clear"
+  },
+  "status": {
+    "thinking": "Analyzing microclimate...",
+    "error": "Request failed. Check backend connection."
+  },
+  "setpoints": {
+    "title": "Recommended Setpoints"
+  },
+  "prompts": {
+    "explainMetrics": "Explain the current VPD, temperature, and ET0 metrics and whether they are optimal for my crop stage."
   }
 }

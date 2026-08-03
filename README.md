@@ -149,6 +149,15 @@ The React Three Fiber viewport provides a **No-Form UX** foundation:
 
 ---
 
+## Multi-AI Copilot (Milestone 5)
+
+- **Decoupled AI Gateway** — OpenAI, Anthropic, Gemini, Ollama via unified `MultiAIGateway`
+- **Local Optimizer Fallback** — FAO-56 rule-based setpoints when API keys unavailable
+- **AICopilotPanel** — Chat UI with Optimize Climate and Explain Metrics actions
+- **ProviderSelector** — Switch AI provider at runtime
+
+---
+
 ## License
 
 Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts to Apache 2.0 on **2029-08-03**.
@@ -161,5 +170,5 @@ Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts t
 - [x] Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n
 - [x] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
 - [x] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
-- [ ] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot
+- [x] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot
 - [ ] Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish

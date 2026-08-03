@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { DimensionControls } from "@/components/ui/DimensionControls";
@@ -24,7 +25,7 @@ export function AppShell() {
         <LanguagePicker />
       </header>
 
-      <main className="grid flex-1 grid-cols-[320px_1fr] gap-4 overflow-hidden p-4">
+      <main className="grid flex-1 grid-cols-[320px_1fr_300px] gap-4 overflow-hidden p-4">
         <DimensionControls />
         <div className="relative min-h-0">
           <Viewport3D />
@@ -32,6 +33,7 @@ export function AppShell() {
           <HUDOverlay />
           <ClimateDashboard onReconnect={reconnect} />
         </div>
+        <AICopilotPanel />
       </main>
     </div>
   );

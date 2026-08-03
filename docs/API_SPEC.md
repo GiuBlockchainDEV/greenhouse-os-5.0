@@ -168,13 +168,100 @@ Client sends `{"event": "PING"}` every 30 s. Server responds with `{"event": "PO
 
 ---
 
-## Multi-AI Copilot (Planned — Milestone 5)
+## Multi-AI Copilot
 
-The AI gateway will expose:
+### `GET /api/v1/ai/providers`
 
+List configured AI providers and availability status.
+
+**Response 200:**
+
+```json
+[
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "default_model": "gpt-4o",
+    "available": false,
+    "requires_api_key": true
+  }
+]
 ```
-POST /api/v1/ai/chat
-POST /api/v1/ai/optimize-climate
+
+### `POST /api/v1/ai/chat`
+
+Natural-language copilot message with greenhouse context.
+
+**Request Body:**
+
+```json
+{
+  "provider": "openai",
+  "model": null,
+  "message": "How can I reduce VPD stress for my tomatoes?",
+  "context": {
+    "crop_type": "tomato",
+    "growth_stage": "mid_season",
+    "lai": 3.2,
+    "vpd_kpa": 1.8,
+    "internal_temp_c": 30.0,
+    "internal_rh_pct": 72.0
+  },
+  "locale": "en"
+}
 ```
+
+**Response 200:**
+
+```json
+{
+  "provider": "openai",
+  "model": "greenhouseos-local-optimizer",
+  "content": "GreenhouseOS Local Optimizer — analysis...",
+  "setpoints": [
+    {
+      "parameter": "ventilation_lee_side",
+      "current_value": 0.0,
+      "recommended_value": 25.0,
+      "unit": "%",
+      "rationale": "Increase ventilation to reduce VPD stress"
+    }
+  ],
+  "used_local_engine": true
+}
+```
+
+Falls back to the built-in FAO-56 rule-based optimizer when the selected provider is unavailable.
+
+### `POST /api/v1/ai/optimize-climate`
+
+Autonomous microclimate optimization with structured Priva/Ridder-compatible setpoints.
+
+**Request Body:**
+
+```json
+{
+  "provider": "anthropic",
+  "context": {
+    "crop_type": "tomato",
+    "growth_stage": "generative",
+    "vpd_kpa": 1.5,
+    "internal_temp_c": 28.4
+  },
+  "locale": "it"
+}
+```
+
+**Response 200:** Same schema as `/ai/chat`.
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | OpenAI API key |
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `GEMINI_API_KEY` | Google Gemini API key |
+| `OLLAMA_BASE_URL` | Ollama server URL (default `http://localhost:11434`) |
+| `OLLAMA_MODEL` | Ollama model name (default `llama3.2`) |
 
 Supported providers: OpenAI, Anthropic, Google Gemini, Ollama (local).
