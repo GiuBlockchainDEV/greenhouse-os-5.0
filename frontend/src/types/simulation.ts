@@ -26,6 +26,7 @@ export interface WSGeometry {
   bay_count: number;
   bay_width_m: number;
   arch_type: string;
+  bay_arch_types: string[];
 }
 
 export interface WSMaterials {

@@ -10,6 +10,10 @@
     "bayCount": "Numero di Campate",
     "bayWidth": "Larghezza Campata",
     "totalWidth": "Larghezza Totale",
+    "bayRoofsTitle": "Tetto per Campata",
+    "bayLabel": "Tetto campata {{n}}",
+    "baysShort": "campate",
+    "bayArchShort": "C{{n}}: {{type}}",
     "archType": "Tipo di Arco",
     "apexAuto": "Calcolata automaticamente dalla campata",
     "archTypes": {

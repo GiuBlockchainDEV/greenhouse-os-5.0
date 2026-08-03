@@ -10,6 +10,10 @@
     "bayCount": "Number of Bays (Campate)",
     "bayWidth": "Bay Width",
     "totalWidth": "Total Width",
+    "bayRoofsTitle": "Roof per Bay",
+    "bayLabel": "Bay {{n}} roof",
+    "baysShort": "bays",
+    "bayArchShort": "B{{n}}: {{type}}",
     "archType": "Arch Profile",
     "apexAuto": "Auto-calculated from bay width",
     "archTypes": {

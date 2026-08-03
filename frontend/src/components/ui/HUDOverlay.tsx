@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { normalizeBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 export function HUDOverlay() {
@@ -9,6 +10,7 @@ export function HUDOverlay() {
   const { t: tControls } = useTranslation("3d_controls");
 
   const structure = useGreenhouseStore((state) => state.structure);
+  const bayArchTypes = normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes);
   const name = useGreenhouseStore((state) => state.name);
   const metrics = useGreenhouseStore((state) => state.metrics);
   const crop = useGreenhouseStore((state) => state.crop);
@@ -27,8 +29,15 @@ export function HUDOverlay() {
           {tCrops(`stages.${crop.growthStage}`)}
         </p>
         <p className="mt-1 text-xs text-white/50">
-          {structure.bayCount} {tControls("structure.bayCount").toLowerCase()} ·{" "}
-          {tControls(`structure.archTypes.${structure.archType}`)}
+          {structure.bayCount} {tControls("structure.baysShort")} ·{" "}
+          {bayArchTypes
+            .map((type, index) =>
+              tControls("structure.bayArchShort", {
+                n: index + 1,
+                type: tControls(`structure.archTypes.${type}`),
+              }),
+            )
+            .join(" · ")}
         </p>
         <p className="mt-1 text-xs text-white/40">
           {crop.layout.tierCount} {tCrops("labels.tiersShort")} ·{" "}

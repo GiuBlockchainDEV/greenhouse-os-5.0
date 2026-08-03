@@ -10,6 +10,10 @@
     "bayCount": "Número de Módulos (Campatas)",
     "bayWidth": "Ancho del Módulo",
     "totalWidth": "Ancho Total",
+    "bayRoofsTitle": "Techo por Módulo",
+    "bayLabel": "Techo módulo {{n}}",
+    "baysShort": "módulos",
+    "bayArchShort": "M{{n}}: {{type}}",
     "archType": "Perfil del Arco",
     "apexAuto": "Calculado automáticamente del módulo",
     "archTypes": {

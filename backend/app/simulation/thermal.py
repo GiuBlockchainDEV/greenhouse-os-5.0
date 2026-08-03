@@ -118,6 +118,7 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         arch_type=params.geometry.arch_type,
         bay_count=params.geometry.bay_count,
         bay_width=params.geometry.bay_width_m,
+        bay_arch_types=params.geometry.bay_arch_types,
     )
 
     t_external = params.external_temp_c

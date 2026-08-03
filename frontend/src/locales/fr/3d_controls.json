@@ -10,6 +10,10 @@
     "bayCount": "Nombre de Travées",
     "bayWidth": "Largeur de Travée",
     "totalWidth": "Largeur Totale",
+    "bayRoofsTitle": "Toit par Travée",
+    "bayLabel": "Toit travée {{n}}",
+    "baysShort": "travées",
+    "bayArchShort": "T{{n}}: {{type}}",
     "archType": "Profil de l'Arc",
     "apexAuto": "Calculé automatiquement depuis la travée",
     "archTypes": {

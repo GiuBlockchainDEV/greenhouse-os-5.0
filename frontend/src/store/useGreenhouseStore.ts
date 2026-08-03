@@ -1,7 +1,14 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+import {
+  bayApexHeight,
+  maxBayApexHeight,
+  normalizeBayArchTypes,
+  structureHasArchType,
+} from "@/lib/structureUtils";
 import type {
+  ArchType,
   ClimateEquipment,
   CoveringMaterial,
   CropConfig,
@@ -26,7 +33,7 @@ type SimulationData = WSSimulationResults["data"];
 const DEFAULT_STRUCTURE: GreenhouseStructure = {
   bayCount: 1,
   bayWidthM: 10,
-  archType: "triangular",
+  bayArchTypes: ["triangular"],
 };
 
 const DEFAULT_DIMENSIONS: GreenhouseDimensions = {
@@ -69,23 +76,24 @@ const DEFAULT_LOCATION: GeoLocation = {
   elevationM: 21,
 };
 
-function apexHeight(
-  structure: GreenhouseStructure,
-  eaveHeight: number,
-  ridgeHeight: number,
-): number {
-  if (structure.archType === "semicircular") {
-    return eaveHeight + structure.bayWidthM / 2;
-  }
-  return ridgeHeight;
+function withNormalizedStructure(structure: GreenhouseStructure): GreenhouseStructure {
+  return {
+    ...structure,
+    bayArchTypes: normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes),
+  };
 }
 
 function syncDimensionsFromStructure(
   structure: GreenhouseStructure,
   dimensions: GreenhouseDimensions,
 ): GreenhouseDimensions {
-  const width = structure.bayCount * structure.bayWidthM;
-  const ridgeHeight = apexHeight(structure, dimensions.eaveHeight, dimensions.ridgeHeight);
+  const normalized = withNormalizedStructure(structure);
+  const width = normalized.bayCount * normalized.bayWidthM;
+  const ridgeHeight = maxBayApexHeight(
+    normalized,
+    dimensions.eaveHeight,
+    dimensions.ridgeHeight,
+  );
   return { ...dimensions, width, ridgeHeight };
 }
 
@@ -94,31 +102,31 @@ function computeVolumeMetrics(
   dimensions: GreenhouseDimensions,
   crop: CropConfig = DEFAULT_CROP,
 ): VolumeMetrics {
+  const normalized = withNormalizedStructure(structure);
   const { length, eaveHeight, ridgeHeight } = dimensions;
-  const width = structure.bayCount * structure.bayWidthM;
-  const apex = apexHeight(structure, eaveHeight, ridgeHeight);
+  const width = normalized.bayCount * normalized.bayWidthM;
 
-  const floorAreaM2 = length * width;
-  let volumeM3: number;
-
-  if (structure.archType === "semicircular") {
-    const radius = structure.bayWidthM / 2;
-    const semicircleArea = (Math.PI * radius * radius) / 2;
-    volumeM3 =
-      structure.bayCount *
-      (structure.bayWidthM * length * eaveHeight + semicircleArea * length);
-  } else {
-    const roofRise = Math.max(apex - eaveHeight, 0);
-    volumeM3 = floorAreaM2 * eaveHeight + (floorAreaM2 * roofRise) / 2;
+  let volumeM3 = 0;
+  for (const archType of normalized.bayArchTypes) {
+    const bayFloor = normalized.bayWidthM * length;
+    if (archType === "semicircular") {
+      const radius = normalized.bayWidthM / 2;
+      const semicircleArea = (Math.PI * radius * radius) / 2;
+      volumeM3 += bayFloor * eaveHeight + semicircleArea * length;
+    } else {
+      const roofRise = Math.max(ridgeHeight - eaveHeight, 0);
+      volumeM3 += bayFloor * eaveHeight + (bayFloor * roofRise) / 2;
+    }
   }
 
+  const floorAreaM2 = length * width;
+  const triangularBay = normalized.bayArchTypes.find((type) => type === "triangular");
   const ridgeAngleDeg =
-    structure.archType === "semicircular"
-      ? 0
-      : structure.bayWidthM > 0
-        ? (Math.atan((2 * Math.max(apex - eaveHeight, 0)) / structure.bayWidthM) * 180) /
-          Math.PI
-        : 0;
+    triangularBay && normalized.bayWidthM > 0
+      ? (Math.atan((2 * Math.max(ridgeHeight - eaveHeight, 0)) / normalized.bayWidthM) *
+          180) /
+        Math.PI
+      : 0;
 
   const tierCount = Math.max(crop.layout.tierCount, 1);
   const aisleWidth = crop.layout.aisleWidthM;
@@ -136,7 +144,7 @@ function computeVolumeMetrics(
     cultivationAreaM2: Number(cultivationAreaM2.toFixed(2)),
     totalPlants,
     totalWidthM: Number(width.toFixed(2)),
-    bayCount: structure.bayCount,
+    bayCount: normalized.bayCount,
   };
 }
 
@@ -159,6 +167,7 @@ interface GreenhouseStore {
   setName: (name: string) => void;
   setLocation: (location: Partial<GeoLocation>) => void;
   setStructure: (update: StructureUpdate) => void;
+  setBayArchType: (bayIndex: number, archType: ArchType) => void;
   setDimensions: (update: DimensionUpdate) => void;
   setCovering: (covering: Partial<CoveringMaterial>) => void;
   setCrop: (crop: Partial<CropConfig>) => void;
@@ -202,28 +211,36 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         ),
 
       setStructure: (update) => {
-        const structure = { ...get().structure, ...update };
-        const dimensions = syncDimensionsFromStructure(structure, get().dimensions);
+        const merged = withNormalizedStructure({ ...get().structure, ...update });
+        const dimensions = syncDimensionsFromStructure(merged, get().dimensions);
         set(
           {
-            structure,
+            structure: merged,
             dimensions,
-            metrics: computeVolumeMetrics(structure, dimensions, get().crop),
+            metrics: computeVolumeMetrics(merged, dimensions, get().crop),
           },
           false,
           "setStructure",
         );
       },
 
+      setBayArchType: (bayIndex, archType) => {
+        const structure = withNormalizedStructure(get().structure);
+        const bayArchTypes = [...structure.bayArchTypes];
+        bayArchTypes[bayIndex] = archType;
+        get().setStructure({ bayArchTypes });
+      },
+
       setDimensions: (update) => {
-        const dimensions = syncDimensionsFromStructure(get().structure, {
+        const structure = withNormalizedStructure(get().structure);
+        const dimensions = syncDimensionsFromStructure(structure, {
           ...get().dimensions,
           ...update,
         });
         set(
           {
             dimensions,
-            metrics: computeVolumeMetrics(get().structure, dimensions, get().crop),
+            metrics: computeVolumeMetrics(structure, dimensions, get().crop),
           },
           false,
           "setDimensions",
@@ -238,11 +255,12 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         ),
 
       setCrop: (crop) => {
+        const structure = withNormalizedStructure(get().structure);
         const nextCrop = { ...get().crop, ...crop };
         set(
           {
             crop: nextCrop,
-            metrics: computeVolumeMetrics(get().structure, get().dimensions, nextCrop),
+            metrics: computeVolumeMetrics(structure, get().dimensions, nextCrop),
           },
           false,
           "setCrop",
@@ -250,6 +268,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       },
 
       setCropLayout: (layout) => {
+        const structure = withNormalizedStructure(get().structure);
         const nextCrop = {
           ...get().crop,
           layout: { ...get().crop.layout, ...layout },
@@ -257,7 +276,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         set(
           {
             crop: nextCrop,
-            metrics: computeVolumeMetrics(get().structure, get().dimensions, nextCrop),
+            metrics: computeVolumeMetrics(structure, get().dimensions, nextCrop),
           },
           false,
           "setCropLayout",
@@ -307,4 +326,4 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
   ),
 );
 
-export { computeVolumeMetrics, syncDimensionsFromStructure };
+export { computeVolumeMetrics, syncDimensionsFromStructure, structureHasArchType, bayApexHeight };

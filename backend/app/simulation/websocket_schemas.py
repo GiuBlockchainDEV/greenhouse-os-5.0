@@ -29,6 +29,7 @@ class WSGeometry(BaseModel):
     bay_count: int = Field(default=1, ge=1, le=20)
     bay_width_m: float = Field(default=10.0, gt=0.0, le=20.0)
     arch_type: str = Field(default="triangular")
+    bay_arch_types: list[str] = Field(default_factory=lambda: ["triangular"])
 
 
 class WSMaterials(BaseModel):
