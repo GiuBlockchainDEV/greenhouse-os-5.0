@@ -16,7 +16,6 @@ function createRoofGeometry(
 ): THREE.BufferGeometry {
   const halfLength = length / 2;
   const halfWidth = width / 2;
-  const roofRise = Math.max(ridgeHeight - eaveHeight, 0.01);
 
   const vertices = new Float32Array([
     -halfLength, eaveHeight, -halfWidth,
