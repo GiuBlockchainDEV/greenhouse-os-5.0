@@ -1,0 +1,30 @@
+{
+  "types": {
+    "tomato": "Tomate",
+    "cucumber": "Concombre",
+    "pepper": "Poivron",
+    "lettuce": "Laitue",
+    "strawberry": "Fraise",
+    "cannabis": "Chanvre"
+  },
+  "systems": {
+    "hydroponic_nft": "Hydroponie NFT",
+    "hydroponic_drip": "Hydroponie Goutte-à-Goutte",
+    "substrate": "Substrat",
+    "soil": "Sol"
+  },
+  "stages": {
+    "seedling": "Semis",
+    "early_vegetative": "Végétatif Précoce",
+    "mid_season": "Mi-Saison",
+    "late_vegetative": "Végétatif Tardif",
+    "generative": "Génératif",
+    "harvest": "Récolte"
+  },
+  "labels": {
+    "cropType": "Type de Culture",
+    "cultivationSystem": "Système de Culture",
+    "lai": "Indice de Surface Foliaire",
+    "growthStage": "Stade de Croissance"
+  }
+}

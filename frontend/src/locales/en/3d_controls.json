@@ -1,0 +1,27 @@
+{
+  "dimensions": {
+    "length": "Length",
+    "width": "Width",
+    "ridgeHeight": "Ridge Height",
+    "eaveHeight": "Eave Height"
+  },
+  "covering": {
+    "title": "Covering Material",
+    "glass": "Glass",
+    "polycarbonate": "Polycarbonate",
+    "polyethylene": "Polyethylene",
+    "etfe": "ETFE",
+    "transmittance": "Transmittance",
+    "uValue": "U-Value"
+  },
+  "viewport": {
+    "title": "3D Viewport",
+    "hint": "Drag to orbit · Scroll to zoom · Right-click to pan",
+    "grid": "Ground Grid"
+  },
+  "gizmo": {
+    "translate": "Move",
+    "rotate": "Rotate",
+    "scale": "Scale"
+  }
+}

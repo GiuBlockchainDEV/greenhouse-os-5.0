@@ -1,0 +1,18 @@
+{
+  "panel": {
+    "title": "Copilota IA",
+    "placeholder": "Chiedi al copilota di ottimizzare i setpoint climatici...",
+    "comingSoon": "Gateway Multi-IA disponibile nella Milestone 5"
+  },
+  "providers": {
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "gemini": "Google Gemini",
+    "ollama": "Ollama (Locale)"
+  },
+  "actions": {
+    "optimize": "Ottimizza Clima",
+    "explain": "Spiega Metriche",
+    "send": "Invia"
+  }
+}

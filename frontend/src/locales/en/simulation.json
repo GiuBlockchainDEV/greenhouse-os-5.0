@@ -1,0 +1,20 @@
+{
+  "metrics": {
+    "floorArea": "Floor Area",
+    "volume": "Enclosed Volume",
+    "ridgeAngle": "Ridge Angle",
+    "vpd": "Vapor Pressure Deficit",
+    "dli": "Daily Light Integral",
+    "et0": "Reference ET₀"
+  },
+  "status": {
+    "idle": "Simulation idle",
+    "ready": "Ready for simulation",
+    "running": "Calculating..."
+  },
+  "location": {
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "elevation": "Elevation"
+  }
+}

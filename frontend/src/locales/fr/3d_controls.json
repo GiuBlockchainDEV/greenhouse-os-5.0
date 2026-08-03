@@ -1,0 +1,27 @@
+{
+  "dimensions": {
+    "length": "Longueur",
+    "width": "Largeur",
+    "ridgeHeight": "Hauteur de Faîtage",
+    "eaveHeight": "Hauteur de Gouttière"
+  },
+  "covering": {
+    "title": "Matériau de Couverture",
+    "glass": "Verre",
+    "polycarbonate": "Polycarbonate",
+    "polyethylene": "Polyéthylène",
+    "etfe": "ETFE",
+    "transmittance": "Transmitance",
+    "uValue": "Valeur U"
+  },
+  "viewport": {
+    "title": "Viewport 3D",
+    "hint": "Glisser pour orbiter · Molette pour zoom · Clic droit pour pan",
+    "grid": "Grille du Sol"
+  },
+  "gizmo": {
+    "translate": "Déplacer",
+    "rotate": "Pivoter",
+    "scale": "Redimensionner"
+  }
+}

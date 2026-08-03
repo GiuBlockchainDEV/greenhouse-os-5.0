@@ -1,0 +1,25 @@
+{
+  "app": {
+    "title": "GreenhouseOS 5.0",
+    "subtitle": "3D Virtual Twin Platform"
+  },
+  "nav": {
+    "viewport": "3D Viewport",
+    "simulation": "Simulation",
+    "settings": "Settings"
+  },
+  "actions": {
+    "reset": "Reset to Defaults",
+    "save": "Save Design"
+  },
+  "labels": {
+    "language": "Language",
+    "loading": "Loading..."
+  },
+  "units": {
+    "meters": "m",
+    "squareMeters": "m²",
+    "cubicMeters": "m³",
+    "degrees": "°"
+  }
+}

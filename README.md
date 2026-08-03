@@ -64,6 +64,16 @@ docker build -t greenhouseos-backend .
 docker run -p 8000:8000 greenhouseos-backend
 ```
 
+### Frontend (3D Viewport)
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5173
+```
+
+The frontend proxies `/api` requests to the backend at `localhost:8000`.
+
 ---
 
 ## Project Structure
@@ -83,6 +93,15 @@ greenhouse-os-2.0/
     │   └── simulation/             # FAO-56, VPD, DLI engines
     ├── requirements.txt
     └── Dockerfile
+└── frontend/
+    ├── src/
+    │   ├── i18n.ts                 # react-i18next setup
+    │   ├── locales/                # en, it, es, fr namespaces
+    │   ├── store/                  # Zustand greenhouse store
+    │   ├── components/3d/          # Viewport3D, GreenhouseMesh
+    │   └── components/ui/          # HUDOverlay, LanguagePicker
+    ├── package.json
+    └── vite.config.ts
 ```
 
 ---
@@ -100,6 +119,18 @@ All calculations use strict **Pydantic v2** schemas with full input validation.
 
 ---
 
+## 3D Frontend (Milestone 2)
+
+The React Three Fiber viewport provides a **No-Form UX** foundation:
+
+- **Viewport3D** — OrbitControls, infinite grid, dynamic camera framing
+- **GreenhouseMesh** — Parametric gable-roof greenhouse driven by Zustand geometry state
+- **Zustand Store** — Reactive dimensions, covering, crop, location with derived volume metrics
+- **i18n** — Full multilingual support (en, it, es, fr) across 5 namespaces via react-i18next
+- **DimensionControls** — Live slider-based geometry editing with instant 3D updates
+
+---
+
 ## License
 
 Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts to Apache 2.0 on **2029-08-03**.
@@ -109,7 +140,7 @@ Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts t
 ## Roadmap
 
 - [x] Milestone 1 — Project Setup, Living Docs & Core FAO Physics Engine
-- [ ] Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n
+- [x] Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n
 - [ ] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
 - [ ] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
 - [ ] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot

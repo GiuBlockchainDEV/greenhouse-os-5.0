@@ -1,0 +1,20 @@
+{
+  "metrics": {
+    "floorArea": "Superficie de Suelo",
+    "volume": "Volumen Cerrado",
+    "ridgeAngle": "Ángulo de la Cumbrera",
+    "vpd": "Déficit de Presión de Vapor",
+    "dli": "Integral Diaria de Luz",
+    "et0": "ET₀ de Referencia"
+  },
+  "status": {
+    "idle": "Simulación inactiva",
+    "ready": "Lista para simular",
+    "running": "Calculando..."
+  },
+  "location": {
+    "latitude": "Latitud",
+    "longitude": "Longitud",
+    "elevation": "Elevación"
+  }
+}

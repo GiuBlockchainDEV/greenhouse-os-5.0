@@ -4,6 +4,18 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.0.0-milestone-2] - 2026-08-03
+
+### Added
+
+- **Vite + React 18 + TypeScript (strict)** frontend scaffold with Tailwind CSS
+- **React Three Fiber viewport** (`Viewport3D`) with OrbitControls, grid, and adaptive camera
+- **Parametric GreenhouseMesh** — Gable-roof geometry synced to store dimensions and covering transmittance
+- **Zustand store** (`useGreenhouseStore`) — Geometry, covering, crop, location, derived volume metrics
+- **Multilingual i18n** — react-i18next with en, it, es, fr locales across 5 namespaces
+- **UI components** — LanguagePicker, HUDOverlay (floor area/volume/ridge angle), DimensionControls
+- **TypeScript types** — Strict interfaces for greenhouse geometry, crops, and covering materials
+
 ## [5.0.0-milestone-1] - 2026-08-03
 
 ### Added

@@ -1,0 +1,25 @@
+{
+  "app": {
+    "title": "GreenhouseOS 5.0",
+    "subtitle": "Plataforma de Gemelo Virtual 3D"
+  },
+  "nav": {
+    "viewport": "Viewport 3D",
+    "simulation": "Simulación",
+    "settings": "Configuración"
+  },
+  "actions": {
+    "reset": "Restablecer Valores",
+    "save": "Guardar Diseño"
+  },
+  "labels": {
+    "language": "Idioma",
+    "loading": "Cargando..."
+  },
+  "units": {
+    "meters": "m",
+    "squareMeters": "m²",
+    "cubicMeters": "m³",
+    "degrees": "°"
+  }
+}

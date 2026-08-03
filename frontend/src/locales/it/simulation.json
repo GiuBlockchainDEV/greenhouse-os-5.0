@@ -1,0 +1,20 @@
+{
+  "metrics": {
+    "floorArea": "Superficie Coperta",
+    "volume": "Volume Totale",
+    "ridgeAngle": "Angolo della Colmo",
+    "vpd": "Deficit di Pressione di Vapore",
+    "dli": "Integrale Luminosa Giornaliera",
+    "et0": "ET₀ di Riferimento"
+  },
+  "status": {
+    "idle": "Simulazione inattiva",
+    "ready": "Pronta per la simulazione",
+    "running": "Calcolo in corso..."
+  },
+  "location": {
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
+    "elevation": "Altitudine"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "app": {
+    "title": "GreenhouseOS 5.0",
+    "subtitle": "Plateforme de Jumeau Virtuel 3D"
+  },
+  "nav": {
+    "viewport": "Viewport 3D",
+    "simulation": "Simulation",
+    "settings": "Paramètres"
+  },
+  "actions": {
+    "reset": "Réinitialiser",
+    "save": "Enregistrer le Design"
+  },
+  "labels": {
+    "language": "Langue",
+    "loading": "Chargement..."
+  },
+  "units": {
+    "meters": "m",
+    "squareMeters": "m²",
+    "cubicMeters": "m³",
+    "degrees": "°"
+  }
+}

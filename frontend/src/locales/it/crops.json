@@ -1,0 +1,30 @@
+{
+  "types": {
+    "tomato": "Pomodoro",
+    "cucumber": "Cetriolo",
+    "pepper": "Peperone",
+    "lettuce": "Lattuga",
+    "strawberry": "Fragola",
+    "cannabis": "Canapa"
+  },
+  "systems": {
+    "hydroponic_nft": "Idroponica NFT",
+    "hydroponic_drip": "Idroponica a Goccia",
+    "substrate": "Substrato",
+    "soil": "Suolo"
+  },
+  "stages": {
+    "seedling": "Semenzale",
+    "early_vegetative": "Vegetativa Iniziale",
+    "mid_season": "Metà Stagione",
+    "late_vegetative": "Vegetativa Tardiva",
+    "generative": "Generativa",
+    "harvest": "Raccolta"
+  },
+  "labels": {
+    "cropType": "Tipo di Coltura",
+    "cultivationSystem": "Sistema di Coltivazione",
+    "lai": "Indice di Area Fogliare",
+    "growthStage": "Fase di Crescita"
+  }
+}

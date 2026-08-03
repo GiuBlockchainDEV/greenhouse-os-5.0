@@ -1,0 +1,30 @@
+{
+  "types": {
+    "tomato": "Tomate",
+    "cucumber": "Pepino",
+    "pepper": "Pimiento",
+    "lettuce": "Lechuga",
+    "strawberry": "Fresa",
+    "cannabis": "Cáñamo"
+  },
+  "systems": {
+    "hydroponic_nft": "Hidroponía NFT",
+    "hydroponic_drip": "Hidroponía por Goteo",
+    "substrate": "Sustrato",
+    "soil": "Suelo"
+  },
+  "stages": {
+    "seedling": "Plántula",
+    "early_vegetative": "Vegetativo Temprano",
+    "mid_season": "Media Temporada",
+    "late_vegetative": "Vegetativo Tardío",
+    "generative": "Generativo",
+    "harvest": "Cosecha"
+  },
+  "labels": {
+    "cropType": "Tipo de Cultivo",
+    "cultivationSystem": "Sistema de Cultivo",
+    "lai": "Índice de Área Foliar",
+    "growthStage": "Etapa de Crecimiento"
+  }
+}

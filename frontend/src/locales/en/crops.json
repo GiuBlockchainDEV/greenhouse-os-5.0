@@ -1,0 +1,30 @@
+{
+  "types": {
+    "tomato": "Tomato",
+    "cucumber": "Cucumber",
+    "pepper": "Pepper",
+    "lettuce": "Lettuce",
+    "strawberry": "Strawberry",
+    "cannabis": "Cannabis"
+  },
+  "systems": {
+    "hydroponic_nft": "NFT Hydroponic",
+    "hydroponic_drip": "Drip Hydroponic",
+    "substrate": "Substrate",
+    "soil": "Soil"
+  },
+  "stages": {
+    "seedling": "Seedling",
+    "early_vegetative": "Early Vegetative",
+    "mid_season": "Mid Season",
+    "late_vegetative": "Late Vegetative",
+    "generative": "Generative",
+    "harvest": "Harvest"
+  },
+  "labels": {
+    "cropType": "Crop Type",
+    "cultivationSystem": "Cultivation System",
+    "lai": "Leaf Area Index",
+    "growthStage": "Growth Stage"
+  }
+}

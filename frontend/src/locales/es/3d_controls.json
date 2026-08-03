@@ -1,0 +1,27 @@
+{
+  "dimensions": {
+    "length": "Longitud",
+    "width": "Ancho",
+    "ridgeHeight": "Altura de Cumbrera",
+    "eaveHeight": "Altura de Alero"
+  },
+  "covering": {
+    "title": "Material de Cubierta",
+    "glass": "Vidrio",
+    "polycarbonate": "Policarbonato",
+    "polyethylene": "Polietileno",
+    "etfe": "ETFE",
+    "transmittance": "Transmitancia",
+    "uValue": "Valor U"
+  },
+  "viewport": {
+    "title": "Viewport 3D",
+    "hint": "Arrastra para orbitar · Scroll para zoom · Clic derecho para pan",
+    "grid": "Cuadrícula del Suelo"
+  },
+  "gizmo": {
+    "translate": "Mover",
+    "rotate": "Rotar",
+    "scale": "Escalar"
+  }
+}

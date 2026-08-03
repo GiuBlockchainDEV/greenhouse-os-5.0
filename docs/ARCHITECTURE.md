@@ -116,7 +116,7 @@ SimulationRequest (JSON)
 SimulationEngine.run()
     ├── calculate_et0()        → ET0Result
     ├── calculate_vpd_kpa()    → VPD + stress index
-    └── calculate_dli()      → DLI + adequacy index
+    └── calculate_dli()        → DLI + adequacy index
     │
     ▼
 SimulationResponse (JSON)
@@ -124,11 +124,72 @@ SimulationResponse (JSON)
 
 ---
 
-## Planned Modules (Milestones 2–6)
+## Frontend Architecture (Milestone 2)
+
+### State Management (Zustand)
+
+The `useGreenhouseStore` holds all greenhouse design parameters as a single reactive source of truth:
+
+| Slice | Fields | Derived |
+|-------|--------|---------|
+| Geometry | length, width, ridgeHeight, eaveHeight | floorAreaM2, volumeM3, ridgeAngleDeg |
+| Covering | type, transmittance, uValue | Glass opacity in 3D mesh |
+| Crop | type, system, lai, growthStage | HUD labels via i18n |
+| Location | lat, lon, elevationM | HUD coordinates |
+
+**Implementation:** `frontend/src/store/useGreenhouseStore.ts`
+
+### 3D Rendering Pipeline
+
+```text
+Viewport3D (Canvas)
+    ├── OrbitControls (damped camera)
+    ├── Grid (infinite ground plane)
+    └── GreenhouseMesh
+            ├── Glass walls (meshPhysicalMaterial + transmission)
+            ├── Gable roof (custom BufferGeometry)
+            └── Structural frame (ridge beam + arch ribs)
+```
+
+Dimension changes in the Zustand store trigger React re-renders, which rebuild the roof geometry via `useMemo` and update wall/roof scales.
+
+**Implementation:** `frontend/src/components/3d/`
+
+### Internationalization
+
+| Locale | Code | Namespaces |
+|--------|------|------------|
+| English | en | common, simulation, crops, 3d_controls, ai_copilot |
+| Italian | it | common, simulation, crops, 3d_controls, ai_copilot |
+| Spanish | es | common, simulation, crops, 3d_controls, ai_copilot |
+| French | fr | common, simulation, crops, 3d_controls, ai_copilot |
+
+Locale selection syncs between the Zustand store and `i18next.changeLanguage()`.
+
+**Implementation:** `frontend/src/i18n.ts`, `frontend/src/locales/`
+
+### Frontend Module Map
+
+```text
+frontend/src/
+├── i18n.ts                        # react-i18next initialization
+├── store/useGreenhouseStore.ts    # Zustand store with devtools
+├── types/greenhouse.ts            # Strict TypeScript interfaces
+├── components/3d/
+│   ├── Viewport3D.tsx             # R3F Canvas + scene setup
+│   └── GreenhouseMesh.tsx         # Parametric greenhouse geometry
+└── components/ui/
+    ├── LanguagePicker.tsx         # Locale selector
+    ├── HUDOverlay.tsx             # Metrics overlay
+    └── DimensionControls.tsx      # No-Form slider controls
+```
+
+---
+
+## Planned Modules (Milestones 3–6)
 
 | Milestone | Module | Technology |
 |-----------|--------|------------|
-| 2 | 3D Viewport, Zustand, i18n | React Three Fiber, Zustand, react-i18next |
 | 3 | Thermal balance, WebSocket | FastAPI WebSocket, thermal engine |
 | 4 | Gizmos, GLSL heatmaps | TransformControls, custom shaders |
 | 5 | Multi-AI gateway | OpenAI, Anthropic, Gemini, Ollama |

@@ -1,0 +1,18 @@
+{
+  "panel": {
+    "title": "Copilote IA",
+    "placeholder": "Demandez au copilote d'optimiser les consignes climatiques...",
+    "comingSoon": "Passerelle Multi-IA disponible au Milestone 5"
+  },
+  "providers": {
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "gemini": "Google Gemini",
+    "ollama": "Ollama (Local)"
+  },
+  "actions": {
+    "optimize": "Optimiser le Climat",
+    "explain": "Expliquer les Métriques",
+    "send": "Envoyer"
+  }
+}

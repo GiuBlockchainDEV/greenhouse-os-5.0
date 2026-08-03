@@ -1,0 +1,18 @@
+{
+  "panel": {
+    "title": "AI Copilot",
+    "placeholder": "Ask the copilot to optimize climate setpoints...",
+    "comingSoon": "Multi-AI gateway arriving in Milestone 5"
+  },
+  "providers": {
+    "openai": "OpenAI",
+    "anthropic": "Anthropic",
+    "gemini": "Google Gemini",
+    "ollama": "Ollama (Local)"
+  },
+  "actions": {
+    "optimize": "Optimize Climate",
+    "explain": "Explain Metrics",
+    "send": "Send"
+  }
+}

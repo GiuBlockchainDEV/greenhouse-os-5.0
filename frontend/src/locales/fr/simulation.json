@@ -1,0 +1,20 @@
+{
+  "metrics": {
+    "floorArea": "Surface au Sol",
+    "volume": "Volume Fermé",
+    "ridgeAngle": "Angle de Faîtage",
+    "vpd": "Déficit de Pression de Vapeur",
+    "dli": "Intégrale Quotidienne de Lumière",
+    "et0": "ET₀ de Référence"
+  },
+  "status": {
+    "idle": "Simulation inactive",
+    "ready": "Prête pour la simulation",
+    "running": "Calcul en cours..."
+  },
+  "location": {
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "elevation": "Altitude"
+  }
+}
