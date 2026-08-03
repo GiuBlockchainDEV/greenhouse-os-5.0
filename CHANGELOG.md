@@ -4,6 +4,22 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.0.0-milestone-3] - 2026-08-03
+
+### Added
+
+- **Thermal energy balance engine** (`backend/app/simulation/thermal.py`)
+  - Solar gain through covering transmittance
+  - Crop transpiration flux from FAO-56 ET0 × Kc × LAI
+  - Natural ventilation and envelope conduction losses
+  - Quasi-steady-state internal temperature solver
+  - Spatial heatmap matrix generation
+- **Real-time simulation pipeline** (`backend/app/simulation/realtime_engine.py`) — FAO-56 + thermal in <50 ms
+- **WebSocket gateway** (`WS /ws/simulation`) with PING/PONG keepalive and validation
+- **Frontend `useSimulationWS` hook** — Auto-reconnect, debounced store sync, 30 s heartbeat
+- **ClimateDashboard** — Live thermal balance and microclimate overlay
+- **Simulation types** — Strict TypeScript interfaces for WebSocket payloads
+
 ## [5.0.0-milestone-2] - 2026-08-03
 
 ### Added

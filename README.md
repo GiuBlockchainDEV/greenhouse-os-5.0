@@ -131,6 +131,15 @@ The React Three Fiber viewport provides a **No-Form UX** foundation:
 
 ---
 
+## Real-Time Simulation (Milestone 3)
+
+- **Thermal Engine** — Greenhouse energy balance (solar gain, transpiration, ventilation, conduction)
+- **WebSocket Pipeline** — `WS /ws/simulation` with <50 ms calculation loop
+- **useSimulationWS** — Auto-reconnect hook with exponential backoff (1s → 30s)
+- **ClimateDashboard** — Live thermal balance and microclimate metrics overlay
+
+---
+
 ## License
 
 Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts to Apache 2.0 on **2029-08-03**.
@@ -141,7 +150,7 @@ Licensed under the [Business Source License 1.1](LICENSE) (BUSL-1.1). Converts t
 
 - [x] Milestone 1 — Project Setup, Living Docs & Core FAO Physics Engine
 - [x] Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n
-- [ ] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
+- [x] Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine
 - [ ] Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh
 - [ ] Milestone 5 — Decoupled Multi-AI Gateway & Natural Language Copilot
 - [ ] Milestone 6 — Supabase Data Layer, Industrial Dashboard & Launch Polish

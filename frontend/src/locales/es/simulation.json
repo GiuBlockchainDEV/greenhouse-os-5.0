@@ -5,12 +5,27 @@
     "ridgeAngle": "Ángulo de la Cumbrera",
     "vpd": "Déficit de Presión de Vapor",
     "dli": "Integral Diaria de Luz",
-    "et0": "ET₀ de Referencia"
+    "et0": "ET₀ de Referencia",
+    "internalTemp": "Temp. Interna",
+    "externalTemp": "Temp. Externa",
+    "internalRh": "HR Interna"
+  },
+  "thermal": {
+    "qSolar": "Ganancia Solar",
+    "qTranspiration": "Transpiración",
+    "qVentilation": "Pérdida Ventilación",
+    "qConduction": "Pérdida Conducción",
+    "qNet": "Balance Neto"
+  },
+  "actions": {
+    "reconnect": "Reconectar"
   },
   "status": {
     "idle": "Simulación inactiva",
-    "ready": "Lista para simular",
-    "running": "Calculando..."
+    "ready": "Simulación en vivo activa",
+    "running": "Conectando...",
+    "disconnected": "Desconectado",
+    "error": "Error de conexión"
   },
   "location": {
     "latitude": "Latitud",

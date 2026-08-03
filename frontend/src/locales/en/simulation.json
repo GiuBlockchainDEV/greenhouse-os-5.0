@@ -5,12 +5,27 @@
     "ridgeAngle": "Ridge Angle",
     "vpd": "Vapor Pressure Deficit",
     "dli": "Daily Light Integral",
-    "et0": "Reference ET₀"
+    "et0": "Reference ET₀",
+    "internalTemp": "Internal Temp",
+    "externalTemp": "External Temp",
+    "internalRh": "Internal RH"
+  },
+  "thermal": {
+    "qSolar": "Solar Gain",
+    "qTranspiration": "Transpiration",
+    "qVentilation": "Ventilation Loss",
+    "qConduction": "Conduction Loss",
+    "qNet": "Net Balance"
+  },
+  "actions": {
+    "reconnect": "Reconnect"
   },
   "status": {
     "idle": "Simulation idle",
-    "ready": "Ready for simulation",
-    "running": "Calculating..."
+    "ready": "Live simulation active",
+    "running": "Connecting...",
+    "disconnected": "Disconnected",
+    "error": "Connection error"
   },
   "location": {
     "latitude": "Latitude",

@@ -1,12 +1,15 @@
 import { useTranslation } from "react-i18next";
 
 import { Viewport3D } from "@/components/3d/Viewport3D";
+import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
+import { useSimulationWS } from "@/hooks/useSimulationWS";
 
 export function AppShell() {
   const { t } = useTranslation("common");
+  const { reconnect } = useSimulationWS();
 
   return (
     <div className="flex h-screen flex-col bg-greenhouse-900 text-white">
@@ -25,6 +28,7 @@ export function AppShell() {
         <div className="relative min-h-0">
           <Viewport3D />
           <HUDOverlay />
+          <ClimateDashboard onReconnect={reconnect} />
         </div>
       </main>
     </div>

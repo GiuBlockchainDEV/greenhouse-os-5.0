@@ -98,3 +98,57 @@ class SimulationResponse(BaseModel):
     agronomic: AgronomicMetrics
     crop_type: CropType
     growth_stage: GrowthStage
+
+
+class GeometryInput(BaseModel):
+    """Greenhouse structural dimensions."""
+
+    length: float = Field(..., gt=0.0)
+    width: float = Field(..., gt=0.0)
+    ridge_height: float = Field(..., gt=0.0)
+    eave_height: float = Field(..., gt=0.0)
+
+
+class CropInput(BaseModel):
+    """Crop parameters for thermal and agronomic models."""
+
+    type: str = Field(default="tomato")
+    system: str = Field(default="hydroponic_nft")
+    lai: float = Field(default=3.2, ge=0.0, le=10.0)
+    growth_stage: str = Field(default="mid_season")
+
+
+class ThermalInput(BaseModel):
+    """Inputs for greenhouse energy balance calculation."""
+
+    geometry: GeometryInput
+    materials: CoveringMaterial
+    crop: CropInput
+    external_temp_c: float = Field(..., ge=-20.0, le=55.0)
+    external_rh_pct: float = Field(..., ge=0.0, le=100.0)
+    wind_speed_m_s: float = Field(default=2.0, ge=0.0)
+    solar_radiation_mj_m2_day: float = Field(default=15.0, ge=0.0)
+    daylight_hours: float = Field(default=12.0, ge=0.0)
+    et0_mm_day: float = Field(default=4.0, ge=0.0)
+
+
+class ThermalBalance(BaseModel):
+    """Energy balance fluxes referenced to floor area (W/m²)."""
+
+    q_solar: float
+    q_transpiration: float
+    q_ventilation: float
+    q_conduction: float
+    q_net_delta: float
+
+
+class ThermalResult(BaseModel):
+    """Thermal simulation output with spatial heatmap."""
+
+    thermal_balance: ThermalBalance
+    internal_temp_c: float
+    external_temp_c: float
+    internal_rh_pct: float
+    vpd_kpa: float
+    ventilation_ach: float
+    heatmap_matrix: list[list[float]]

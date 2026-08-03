@@ -186,11 +186,48 @@ frontend/src/
 
 ---
 
-## Planned Modules (Milestones 3–6)
+## Real-Time Simulation (Milestone 3)
+
+### Greenhouse Energy Balance
+
+$$
+Q_{net} = Q_{solar} + Q_{transpiration} + Q_{ventilation} + Q_{conduction} \approx 0
+$$
+
+| Flux | Unit | Description |
+|------|------|-------------|
+| $Q_{solar}$ | W/m² | Transmitted solar gain through covering |
+| $Q_{transpiration}$ | W/m² | Latent heat from crop ET (FAO-56 × Kc × LAI) |
+| $Q_{ventilation}$ | W/m² | Sensible heat loss via air exchange (ACH) |
+| $Q_{conduction}$ | W/m² | Envelope heat loss via U-value |
+
+Internal temperature solved at quasi-steady state from net energy gain and total conductance.
+
+**Implementation:** `backend/app/simulation/thermal.py`
+
+### WebSocket Pipeline
+
+```text
+Client                          Server
+  │                               │
+  ├── UPDATE_SIMULATION ─────────►│ RealtimeSimulationEngine.run()
+  │                               │   ├── FAO-56 ET0 (~0.3 ms)
+  │                               │   └── Thermal balance (~0.4 ms)
+  │◄── SIMULATION_RESULTS ────────┤
+  │                               │
+  ├── PING ──────────────────────►│
+  │◄── PONG ───────────────────────┤
+```
+
+**Endpoint:** `WS /ws/simulation`  
+**Frontend hook:** `frontend/src/hooks/useSimulationWS.ts`
+
+---
+
+## Planned Modules (Milestones 4–6)
 
 | Milestone | Module | Technology |
 |-----------|--------|------------|
-| 3 | Thermal balance, WebSocket | FastAPI WebSocket, thermal engine |
 | 4 | Gizmos, GLSL heatmaps | TransformControls, custom shaders |
 | 5 | Multi-AI gateway | OpenAI, Anthropic, Gemini, Ollama |
 | 6 | Supabase RLS, dashboard | PostgreSQL, Priva/Ridder export |

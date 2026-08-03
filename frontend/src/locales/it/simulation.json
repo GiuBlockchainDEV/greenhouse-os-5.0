@@ -5,12 +5,27 @@
     "ridgeAngle": "Angolo della Colmo",
     "vpd": "Deficit di Pressione di Vapore",
     "dli": "Integrale Luminosa Giornaliera",
-    "et0": "ET₀ di Riferimento"
+    "et0": "ET₀ di Riferimento",
+    "internalTemp": "Temp. Interna",
+    "externalTemp": "Temp. Esterna",
+    "internalRh": "UR Interna"
+  },
+  "thermal": {
+    "qSolar": "Guadagno Solare",
+    "qTranspiration": "Traspirazione",
+    "qVentilation": "Perdita Ventilazione",
+    "qConduction": "Perdita Conduzione",
+    "qNet": "Bilancio Netto"
+  },
+  "actions": {
+    "reconnect": "Riconnetti"
   },
   "status": {
     "idle": "Simulazione inattiva",
-    "ready": "Pronta per la simulazione",
-    "running": "Calcolo in corso..."
+    "ready": "Simulazione live attiva",
+    "running": "Connessione...",
+    "disconnected": "Disconnesso",
+    "error": "Errore di connessione"
   },
   "location": {
     "latitude": "Latitudine",

@@ -105,11 +105,15 @@ Execute FAO-56 Penman-Monteith ET0 with VPD and DLI agronomic metrics.
 
 ---
 
-## WebSocket (Planned — Milestone 3)
+## WebSocket — Real-Time Simulation
 
-Real-time simulation will use the following event schema:
+### `WS /ws/simulation`
 
-### Client → Server: `UPDATE_SIMULATION`
+High-speed WebSocket pipeline for live greenhouse simulation. Target: **<50 ms** per update.
+
+**Connection:** `ws://localhost:8000/ws/simulation` (proxied via Vite at `/ws/simulation`)
+
+#### Client → Server: `UPDATE_SIMULATION`
 
 ```json
 {
@@ -142,8 +146,23 @@ Real-time simulation will use the following event schema:
       "vpd_kpa": 1.25,
       "et0_fao56": 4.85
     },
-    "heatmap_matrix": []
+    "heatmap_matrix": [[28.1, 28.4], [27.9, 28.2]],
+    "computation_ms": 0.74,
+    "ventilation_ach": 2.3
   }
+}
+```
+
+#### Keepalive: `PING` / `PONG`
+
+Client sends `{"event": "PING"}` every 30 s. Server responds with `{"event": "PONG"}`.
+
+#### Error Response
+
+```json
+{
+  "event": "ERROR",
+  "message": "Validation error: 2 field(s)"
 }
 ```
 

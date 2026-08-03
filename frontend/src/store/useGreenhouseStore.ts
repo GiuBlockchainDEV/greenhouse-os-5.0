@@ -10,6 +10,12 @@ import type {
   SupportedLocale,
   VolumeMetrics,
 } from "@/types/greenhouse";
+import type {
+  WSConnectionStatus,
+  WSSimulationResults,
+} from "@/types/simulation";
+
+type SimulationData = WSSimulationResults["data"];
 
 const DEFAULT_DIMENSIONS: GreenhouseDimensions = {
   length: 30,
@@ -60,12 +66,16 @@ interface GreenhouseStore {
   covering: CoveringMaterial;
   crop: CropConfig;
   metrics: VolumeMetrics;
+  simulationStatus: WSConnectionStatus;
+  simulationResults: SimulationData | null;
   setLocale: (locale: SupportedLocale) => void;
   setName: (name: string) => void;
   setLocation: (location: Partial<GeoLocation>) => void;
   setDimensions: (update: DimensionUpdate) => void;
   setCovering: (covering: Partial<CoveringMaterial>) => void;
   setCrop: (crop: Partial<CropConfig>) => void;
+  setSimulationStatus: (status: WSConnectionStatus) => void;
+  setSimulationResults: (results: SimulationData) => void;
   resetToDefaults: () => void;
 }
 
@@ -79,6 +89,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       covering: DEFAULT_COVERING,
       crop: DEFAULT_CROP,
       metrics: computeVolumeMetrics(DEFAULT_DIMENSIONS),
+      simulationStatus: "idle",
+      simulationResults: null,
 
       setLocale: (locale) => set({ locale }, false, "setLocale"),
 
@@ -112,6 +124,12 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       setCrop: (crop) =>
         set({ crop: { ...get().crop, ...crop } }, false, "setCrop"),
+
+      setSimulationStatus: (simulationStatus) =>
+        set({ simulationStatus }, false, "setSimulationStatus"),
+
+      setSimulationResults: (simulationResults) =>
+        set({ simulationResults }, false, "setSimulationResults"),
 
       resetToDefaults: () =>
         set(

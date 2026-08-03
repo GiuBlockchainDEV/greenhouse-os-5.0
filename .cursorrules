@@ -225,7 +225,7 @@ After executing and self-verifying a set of components or milestone tasks:
 - [x] **Milestone 2 — 3D Canvas Foundation, Zustand Store & i18n**
   Build React Three Fiber viewport, dynamic geometry state management via Zustand, and multilingual infrastructure (en, it, es, fr).
 
-- [ ] **Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine**
+- [x] **Milestone 3 — Thermodynamic Core & Real-Time WebSocket Engine**
   Build energy balance physics module, FastAPI backend, high-speed WebSocket pipeline (<50 ms calculation loop), and frontend auto-reconnect hooks.
 
 - [ ] **Milestone 4 — Interactive No-Form 3D Controls, GLSL Heatmaps & Instanced Mesh**
