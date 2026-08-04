@@ -134,23 +134,6 @@ function BayRoof({
   );
 }
 
-function BayDivider({
-  length,
-  height,
-  z,
-}: {
-  length: number;
-  height: number;
-  z: number;
-}) {
-  return (
-    <mesh position={[0, height / 2, z]}>
-      <boxGeometry args={[length, height, 0.06]} />
-      <meshStandardMaterial color={FRAME_COLOR} metalness={0.6} roughness={0.3} />
-    </mesh>
-  );
-}
-
 export function GreenhouseMesh() {
   const dimensions = useGreenhouseStore((state) => state.dimensions);
   const structure = useGreenhouseStore((state) => state.structure);
@@ -164,20 +147,9 @@ export function GreenhouseMesh() {
         index,
         archType: bayArchType,
         zCenter: bayCenterZ(index, bayWidthM, width),
-        apex: ridgeHeight,
       })),
-    [archType, bayCount, bayWidthM, width, ridgeHeight],
+    [archType, bayCount, bayWidthM, width],
   );
-
-  const bayDividerPositions = useMemo(() => {
-    if (bayCount <= 1) return [];
-    return Array.from({ length: bayCount - 1 }, (_, index) => {
-      const z = -width / 2 + (index + 1) * bayWidthM;
-      const leftApex = bays[index]?.apex ?? eaveHeight;
-      const rightApex = bays[index + 1]?.apex ?? eaveHeight;
-      return { z, height: Math.max(leftApex, rightApex) };
-    });
-  }, [bayCount, bayWidthM, bays, eaveHeight, width]);
 
   const glassOpacity = 0.12 + covering.transmittance * 0.2;
 
@@ -255,10 +227,6 @@ export function GreenhouseMesh() {
           archType={bay.archType}
           glassOpacity={glassOpacity}
         />
-      ))}
-
-      {bayDividerPositions.map(({ z, height }) => (
-        <BayDivider key={`divider-${z}`} length={length} height={height} z={z} />
       ))}
 
       {Array.from({ length: Math.floor(length / 3) + 1 }, (_, index) => {
