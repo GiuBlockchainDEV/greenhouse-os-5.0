@@ -42,7 +42,9 @@ class WSCultivationLayout(BaseModel):
     tier_count: int = Field(default=1, ge=1, le=6)
     gutter_length_m: float = Field(default=30.0, gt=0.0)
     plants_per_tier: int = Field(default=100, ge=1)
-    aisle_width_m: float = Field(default=0.8, ge=0.3, le=3.0)
+    pathway_width_m: float = Field(default=1.2, ge=0.6, le=3.0)
+    side_clearance_m: float = Field(default=0.6, ge=0.2, le=2.0)
+    aisle_width_m: float | None = Field(default=None, ge=0.3, le=3.0)
 
 
 class WSCrop(BaseModel):

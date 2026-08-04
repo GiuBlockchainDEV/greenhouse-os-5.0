@@ -35,7 +35,8 @@
     "tierLayout": "Growing Levels",
     "tierCount": "Vertical Levels",
     "plantsPerTier": "Plants per Level",
-    "aisleWidth": "Aisle Width",
+    "pathwayWidth": "Pathway Width",
+    "sideClearance": "Side Clearance",
     "tiersShort": "levels"
   }
 }

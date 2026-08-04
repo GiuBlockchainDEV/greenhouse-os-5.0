@@ -30,7 +30,9 @@ class CultivationLayoutDB(BaseModel):
     tier_count: int = Field(default=1, ge=1, le=6)
     gutter_length_m: float = Field(default=30.0)
     plants_per_tier: int = Field(default=100, ge=1)
-    aisle_width_m: float = Field(default=0.8)
+    pathway_width_m: float = Field(default=1.2)
+    side_clearance_m: float = Field(default=0.6)
+    aisle_width_m: float | None = Field(default=None)
 
 
 class ClimateEquipmentDB(BaseModel):

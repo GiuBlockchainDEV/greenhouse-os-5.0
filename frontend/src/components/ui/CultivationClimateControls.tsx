@@ -181,13 +181,22 @@ export function CultivationClimateControls() {
           onChange={(value) => setCropLayout({ plantsPerTier: value })}
         />
         <SliderRow
-          label={tCrops("labels.aisleWidth")}
-          value={crop.layout.aisleWidthM}
+          label={tCrops("labels.pathwayWidth")}
+          value={crop.layout.pathwayWidthM}
           unit={tCommon("units.meters")}
-          min={0.4}
+          min={0.8}
           max={2.5}
           step={0.1}
-          onChange={(value) => setCropLayout({ aisleWidthM: value })}
+          onChange={(value) => setCropLayout({ pathwayWidthM: value })}
+        />
+        <SliderRow
+          label={tCrops("labels.sideClearance")}
+          value={crop.layout.sideClearanceM}
+          unit={tCommon("units.meters")}
+          min={0.3}
+          max={1.5}
+          step={0.1}
+          onChange={(value) => setCropLayout({ sideClearanceM: value })}
         />
       </section>
 

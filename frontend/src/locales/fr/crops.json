@@ -35,7 +35,8 @@
     "tierLayout": "Disposition des Niveaux",
     "tierCount": "Nombre de Niveaux",
     "plantsPerTier": "Plantes par Niveau",
-    "aisleWidth": "Largeur de l'Allée",
+    "pathwayWidth": "Largeur de l'Allée",
+    "sideClearance": "Marge Latérale",
     "tiersShort": "niveaux"
   }
 }

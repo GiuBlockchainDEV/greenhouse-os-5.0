@@ -35,7 +35,8 @@
     "tierLayout": "Layout Livelli",
     "tierCount": "Numero di Livelli",
     "plantsPerTier": "Piante per Livello",
-    "aisleWidth": "Larghezza Corsello",
+    "pathwayWidth": "Larghezza Corsello",
+    "sideClearance": "Margine Laterale",
     "tiersShort": "livelli"
   }
 }

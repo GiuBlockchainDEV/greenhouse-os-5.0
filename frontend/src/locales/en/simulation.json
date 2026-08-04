@@ -4,6 +4,8 @@
     "volume": "Enclosed Volume",
     "ridgeAngle": "Ridge Angle",
     "cultivationArea": "Cultivation Area",
+    "bedCoverage": "Bed Coverage",
+    "pathwayArea": "Pathway Area",
     "totalPlants": "Total Plants",
     "vpd": "Vapor Pressure Deficit",
     "dli": "Daily Light Integral",

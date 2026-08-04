@@ -55,7 +55,8 @@ function buildUpdatePayload(): WSUpdatePayload {
           tier_count: state.crop.layout.tierCount,
           gutter_length_m: state.crop.layout.gutterLengthM,
           plants_per_tier: state.crop.layout.plantsPerTier,
-          aisle_width_m: state.crop.layout.aisleWidthM,
+          pathway_width_m: state.crop.layout.pathwayWidthM,
+          side_clearance_m: state.crop.layout.sideClearanceM,
         },
       },
       equipment: {

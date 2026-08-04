@@ -111,6 +111,8 @@ class RealtimeSimulationEngine:
                     tier_count=payload.crop.layout.tier_count,
                     gutter_length_m=payload.crop.layout.gutter_length_m,
                     plants_per_tier=payload.crop.layout.plants_per_tier,
+                    pathway_width_m=payload.crop.layout.pathway_width_m,
+                    side_clearance_m=payload.crop.layout.side_clearance_m,
                     aisle_width_m=payload.crop.layout.aisle_width_m,
                 ),
             ),

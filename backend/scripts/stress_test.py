@@ -45,7 +45,8 @@ WS_PAYLOAD = {
                 "tier_count": 2,
                 "gutter_length_m": 30,
                 "plants_per_tier": 120,
-                "aisle_width_m": 0.8,
+                "pathway_width_m": 1.2,
+                "side_clearance_m": 0.6,
             },
         },
         "equipment": {

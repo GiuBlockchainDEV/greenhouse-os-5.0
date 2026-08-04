@@ -35,7 +35,8 @@
     "tierLayout": "Disposición de Niveles",
     "tierCount": "Número de Niveles",
     "plantsPerTier": "Plantas por Nivel",
-    "aisleWidth": "Ancho del Pasillo",
+    "pathwayWidth": "Ancho del Pasillo",
+    "sideClearance": "Margen Lateral",
     "tiersShort": "niveles"
   }
 }

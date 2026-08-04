@@ -4,6 +4,8 @@
     "volume": "Volume Fermé",
     "ridgeAngle": "Angle de Faîtage",
     "cultivationArea": "Surface de Culture",
+    "bedCoverage": "Couverture des Planches",
+    "pathwayArea": "Surface des Allées",
     "totalPlants": "Plantes Totales",
     "vpd": "Déficit de Pression de Vapeur",
     "dli": "Intégrale Quotidienne de Lumière",

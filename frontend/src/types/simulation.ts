@@ -39,7 +39,8 @@ export interface WSCultivationLayout {
   tier_count: number;
   gutter_length_m: number;
   plants_per_tier: number;
-  aisle_width_m: number;
+  pathway_width_m: number;
+  side_clearance_m: number;
 }
 
 export interface WSCrop {

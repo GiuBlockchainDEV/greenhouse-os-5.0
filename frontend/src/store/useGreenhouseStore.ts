@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 import { roofRiseM } from "@/lib/structureUtils";
+import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import type {
   ClimateEquipment,
   CoveringMaterial,
@@ -47,7 +48,8 @@ const DEFAULT_LAYOUT: CultivationLayout = {
   tierCount: 1,
   gutterLengthM: 30,
   plantsPerTier: 120,
-  aisleWidthM: 0.8,
+  pathwayWidthM: 1.2,
+  sideClearanceM: 0.6,
 };
 
 const DEFAULT_CROP: CropConfig = {
@@ -104,23 +106,30 @@ function computeVolumeMetrics(
       ? (Math.atan((2 * roofRise) / structure.bayWidthM) * 180) / Math.PI
       : 0;
 
-  const tierCount = Math.max(crop.layout.tierCount, 1);
-  const aisleWidth = crop.layout.aisleWidthM;
-  const usableWidth = Math.max(
-    width - aisleWidth * Math.max(tierCount - 1, 0),
-    width * 0.6,
-  );
-  const cultivationAreaM2 = length * usableWidth * tierCount;
-  const totalPlants = tierCount * crop.layout.plantsPerTier;
+  const cultivation = computeCultivationLayout({
+    length,
+    totalWidth: width,
+    bayCount: structure.bayCount,
+    bayWidthM: structure.bayWidthM,
+    eaveHeight,
+    system: crop.system,
+    layout: crop.layout,
+    lai: crop.lai,
+    growthStage: crop.growthStage,
+  });
 
   return {
     floorAreaM2: Number(floorAreaM2.toFixed(2)),
     volumeM3: Number(volumeM3.toFixed(2)),
     ridgeAngleDeg: Number(ridgeAngleDeg.toFixed(1)),
-    cultivationAreaM2: Number(cultivationAreaM2.toFixed(2)),
-    totalPlants,
+    cultivationAreaM2: Number(cultivation.cultivationAreaM2.toFixed(2)),
+    pathwayAreaM2: Number(cultivation.pathwayAreaM2.toFixed(2)),
+    totalPlants: cultivation.totalPlants,
     totalWidthM: Number(width.toFixed(2)),
     bayCount: structure.bayCount,
+    bedCoveragePct: Number(
+      ((cultivation.cultivationAreaM2 / Math.max(crop.layout.tierCount, 1) / floorAreaM2) * 100).toFixed(1),
+    ),
   };
 }
 

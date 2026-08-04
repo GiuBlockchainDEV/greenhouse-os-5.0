@@ -59,8 +59,10 @@ export interface CultivationLayout {
   gutterLengthM: number;
   /** Plants per tier (approximate). */
   plantsPerTier: number;
-  /** Aisle width between tier rows in meters. */
-  aisleWidthM: number;
+  /** Central pathway width per bay (corsello) — not cultivable. */
+  pathwayWidthM: number;
+  /** Clearance from walls and bay edges. */
+  sideClearanceM: number;
 }
 
 export type CoolingSystem =
@@ -133,7 +135,9 @@ export interface VolumeMetrics {
   volumeM3: number;
   ridgeAngleDeg: number;
   cultivationAreaM2: number;
+  pathwayAreaM2: number;
   totalPlants: number;
   totalWidthM: number;
   bayCount: number;
+  bedCoveragePct: number;
 }

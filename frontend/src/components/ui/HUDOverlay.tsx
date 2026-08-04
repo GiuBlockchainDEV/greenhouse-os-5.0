@@ -61,10 +61,15 @@ export function HUDOverlay() {
             </dd>
           </div>
           <div>
-            <dt className="text-greenhouse-400">{tSim("metrics.ridgeAngle")}</dt>
+            <dt className="text-greenhouse-400">{tSim("metrics.bedCoverage")}</dt>
             <dd className="font-mono font-medium text-white">
-              {metrics.ridgeAngleDeg}
-              {tCommon("units.degrees")}
+              {metrics.bedCoveragePct}%
+            </dd>
+          </div>
+          <div>
+            <dt className="text-greenhouse-400">{tSim("metrics.pathwayArea")}</dt>
+            <dd className="font-mono font-medium text-white">
+              {metrics.pathwayAreaM2} {tCommon("units.squareMeters")}
             </dd>
           </div>
         </dl>

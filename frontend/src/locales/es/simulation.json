@@ -4,6 +4,8 @@
     "volume": "Volumen Cerrado",
     "ridgeAngle": "Ángulo de la Cumbrera",
     "cultivationArea": "Superficie de Cultivo",
+    "bedCoverage": "Cobertura de Camas",
+    "pathwayArea": "Área de Pasillos",
     "totalPlants": "Plantas Totales",
     "vpd": "Déficit de Presión de Vapor",
     "dli": "Integral Diaria de Luz",

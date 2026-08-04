@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
+import {
+  computeCultivationLayout,
+  type BedZone,
+  type PlantSlot,
+} from "@/lib/cultivationLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { CropType, CultivationSystem } from "@/types/greenhouse";
 
@@ -13,92 +18,18 @@ const CROP_COLORS: Record<CropType, string> = {
   cannabis: "#6b8e23",
 };
 
-const CROP_SPACING: Record<CropType, number> = {
-  tomato: 0.5,
-  cucumber: 0.45,
-  pepper: 0.4,
-  lettuce: 0.25,
-  strawberry: 0.3,
-  cannabis: 0.6,
+const BED_COLORS: Record<CultivationSystem, string> = {
+  soil: "#3d5c3a",
+  substrate: "#4a6741",
+  growbed: "#5c4a32",
+  nft: "#6b7280",
+  dwc: "#2563eb",
+  drip: "#3d5c3a",
+  aeroponic: "#7c3aed",
+  ebb_flow: "#5c4a32",
 };
 
-const SYSTEM_SPACING: Record<CultivationSystem, number> = {
-  soil: 0.4,
-  substrate: 0.35,
-  growbed: 0.3,
-  nft: 0.25,
-  dwc: 0.3,
-  drip: 0.45,
-  aeroponic: 0.35,
-  ebb_flow: 0.3,
-};
-
-const STAGE_SCALE: Record<string, number> = {
-  seedling: 0.4,
-  early_vegetative: 0.6,
-  mid_season: 1.0,
-  late_vegetative: 1.1,
-  generative: 1.0,
-  harvest: 0.85,
-};
-
-interface PlantInstance {
-  x: number;
-  y: number;
-  z: number;
-  scale: number;
-  rotation: number;
-}
-
-function computePlantGrid(
-  length: number,
-  width: number,
-  eaveHeight: number,
-  cropType: CropType,
-  system: CultivationSystem,
-  lai: number,
-  growthStage: string,
-  tierCount: number,
-): PlantInstance[] {
-  const spacing = SYSTEM_SPACING[system] ?? CROP_SPACING[cropType];
-  const tiers = Math.max(tierCount, 1);
-  const tierHeight = Math.min(1.2, Math.max((eaveHeight - 0.6) / tiers, 0.35));
-
-  const stageScale = STAGE_SCALE[growthStage] ?? 1.0;
-  const baseScale = (0.25 + lai * 0.12) * stageScale;
-
-  const plants: PlantInstance[] = [];
-  const usableWidth = width / tiers;
-
-  for (let tier = 0; tier < tiers; tier++) {
-    const tierOffsetZ = -width / 2 + usableWidth * tier + usableWidth / 2;
-    const cols = Math.max(1, Math.floor(usableWidth / spacing));
-    const rows = Math.max(1, Math.floor(length / spacing));
-    const offsetX = -length / 2 + spacing / 2;
-    const offsetZ = tierOffsetZ - (cols * spacing) / 2 + spacing / 2;
-    const y = 0.28 + tier * tierHeight;
-
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const jitter = ((tier * rows * cols + row * cols + col) % 7) * 0.02 - 0.06;
-        plants.push({
-          x: offsetX + row * spacing + jitter,
-          y,
-          z: offsetZ + col * spacing + jitter,
-          scale: baseScale * (0.85 + ((row + col + tier) % 5) * 0.05),
-          rotation: ((row * 3 + col * 7 + tier * 11) % 360) * (Math.PI / 180),
-        });
-      }
-    }
-  }
-
-  return plants;
-}
-
-function applyInstanceMatrices(
-  mesh: THREE.InstancedMesh,
-  plants: PlantInstance[],
-): void {
+function applyInstanceMatrices(mesh: THREE.InstancedMesh, plants: PlantSlot[]): void {
   const dummy = new THREE.Object3D();
   plants.forEach((plant, index) => {
     dummy.position.set(plant.x, plant.y, plant.z);
@@ -110,32 +41,61 @@ function applyInstanceMatrices(
   mesh.instanceMatrix.needsUpdate = true;
 }
 
+function CultivationBeds({ beds, system }: { beds: BedZone[]; system: CultivationSystem }) {
+  const color = BED_COLORS[system];
+
+  return (
+    <group>
+      {beds.map((bed) => {
+        const width = bed.xMax - bed.xMin;
+        const depth = bed.zMax - bed.zMin;
+        const centerX = (bed.xMin + bed.xMax) / 2;
+        const centerZ = (bed.zMin + bed.zMax) / 2;
+        const isGutter = system === "nft" || system === "aeroponic";
+
+        return (
+          <mesh
+            key={`bed-${bed.bayIndex}-${bed.bedIndex}`}
+            position={[centerX, bed.elevationM + bed.depthM / 2, centerZ]}
+          >
+            <boxGeometry args={[width, bed.depthM, isGutter ? 0.35 : depth]} />
+            <meshStandardMaterial color={color} roughness={0.85} metalness={0.15} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
 export function CropGridMesh() {
   const dimensions = useGreenhouseStore((s) => s.dimensions);
+  const structure = useGreenhouseStore((s) => s.structure);
   const crop = useGreenhouseStore((s) => s.crop);
   const meshRef = useRef<THREE.InstancedMesh>(null);
 
-  const plants = useMemo(
+  const layoutResult = useMemo(
     () =>
-      computePlantGrid(
-        dimensions.length,
-        dimensions.width,
-        dimensions.eaveHeight,
-        crop.type,
-        crop.system,
-        crop.lai,
-        crop.growthStage,
-        crop.layout.tierCount,
-      ),
+      computeCultivationLayout({
+        length: dimensions.length,
+        totalWidth: dimensions.width,
+        bayCount: structure.bayCount,
+        bayWidthM: structure.bayWidthM,
+        eaveHeight: dimensions.eaveHeight,
+        system: crop.system,
+        layout: crop.layout,
+        lai: crop.lai,
+        growthStage: crop.growthStage,
+      }),
     [
       dimensions.length,
       dimensions.width,
       dimensions.eaveHeight,
-      crop.type,
+      structure.bayCount,
+      structure.bayWidthM,
       crop.system,
+      crop.layout,
       crop.lai,
       crop.growthStage,
-      crop.layout.tierCount,
     ],
   );
 
@@ -144,25 +104,28 @@ export function CropGridMesh() {
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
-    applyInstanceMatrices(mesh, plants);
-  }, [plants]);
+    applyInstanceMatrices(mesh, layoutResult.plants);
+  }, [layoutResult.plants]);
 
-  if (plants.length === 0) {
+  if (layoutResult.plants.length === 0) {
     return null;
   }
 
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[foliageGeometry, undefined, plants.length]}
-      castShadow
-      receiveShadow
-    >
-      <meshStandardMaterial
-        color={CROP_COLORS[crop.type]}
-        roughness={0.7}
-        metalness={0.05}
-      />
-    </instancedMesh>
+    <group>
+      <CultivationBeds beds={layoutResult.beds} system={crop.system} />
+      <instancedMesh
+        ref={meshRef}
+        args={[foliageGeometry, undefined, layoutResult.plants.length]}
+        castShadow
+        receiveShadow
+      >
+        <meshStandardMaterial
+          color={CROP_COLORS[crop.type]}
+          roughness={0.7}
+          metalness={0.05}
+        />
+      </instancedMesh>
+    </group>
   );
 }
