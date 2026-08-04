@@ -1,9 +1,7 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
-import { normalizeBayArchTypes } from "@/lib/structureUtils";
-import { structureHasArchType, useGreenhouseStore } from "@/store/useGreenhouseStore";
+import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType, CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
 
 const DIMENSION_LIMITS = {
@@ -91,24 +89,14 @@ export function DimensionControls() {
   const covering = useGreenhouseStore((state) => state.covering);
   const crop = useGreenhouseStore((state) => state.crop);
   const setStructure = useGreenhouseStore((state) => state.setStructure);
-  const setBayArchType = useGreenhouseStore((state) => state.setBayArchType);
   const setDimensions = useGreenhouseStore((state) => state.setDimensions);
   const setCovering = useGreenhouseStore((state) => state.setCovering);
   const setCrop = useGreenhouseStore((state) => state.setCrop);
   const resetToDefaults = useGreenhouseStore((state) => state.resetToDefaults);
 
-  const bayArchTypes = useMemo(
-    () => normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes),
-    [structure.bayCount, structure.bayArchTypes],
-  );
-
-  const hasTriangularBay = structureHasArchType(structure, "triangular");
-  const hasSemicircularBay = structureHasArchType(structure, "semicircular");
-  const allSemicircular = hasSemicircularBay && !hasTriangularBay;
-
   const handleDimensionChange = (key: DimensionKey, value: number) => {
     const update: DimensionUpdate = { [key]: value };
-    if (key === "eaveHeight" && hasTriangularBay && value > dimensions.ridgeHeight) {
+    if (key === "eaveHeight" && value > dimensions.ridgeHeight) {
       update.ridgeHeight = value + 0.5;
     }
     if (key === "ridgeHeight" && value < dimensions.eaveHeight) {
@@ -152,51 +140,27 @@ export function DimensionControls() {
             {metrics.totalWidthM} {tCommon("units.meters")}
           </p>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <p className="text-xs text-greenhouse-300">{tControls("structure.bayRoofsTitle")}</p>
-          {bayArchTypes.map((archType, index) => (
-            <label key={`bay-arch-${index}`} className="flex flex-col gap-1">
-              <span className="text-xs text-greenhouse-400">
-                {tControls("structure.bayLabel", { n: index + 1 })}
-              </span>
-              <select
-                value={archType}
-                onChange={(event) =>
-                  setBayArchType(index, event.target.value as ArchType)
-                }
-                className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
-              >
-                {ARCH_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {tControls(`structure.archTypes.${type}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-greenhouse-300">{tControls("structure.archType")}</span>
+          <select
+            value={structure.archType}
+            onChange={(event) =>
+              setStructure({ archType: event.target.value as ArchType })
+            }
+            className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+          >
+            {ARCH_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {tControls(`structure.archTypes.${type}`)}
+              </option>
+            ))}
+          </select>
+          <p className="text-[10px] text-greenhouse-500">{tControls("structure.archAllBays")}</p>
+        </label>
       </section>
 
       <section className="flex flex-col gap-3 border-t border-greenhouse-700 pt-4">
         {(Object.keys(DIMENSION_LIMITS) as DimensionKey[]).map((key) => {
-          if (key === "ridgeHeight" && allSemicircular) {
-            return (
-              <div
-                key={key}
-                className="rounded-lg border border-greenhouse-700/60 bg-greenhouse-900/50 px-3 py-2"
-              >
-                <p className="text-xs text-greenhouse-400">{tControls(`dimensions.${key}`)}</p>
-                <p className="font-mono text-sm text-white">
-                  {dimensions.ridgeHeight.toFixed(1)} {tCommon("units.meters")}
-                </p>
-                <p className="mt-1 text-[10px] text-greenhouse-500">
-                  {tControls("structure.apexAuto")}
-                </p>
-              </div>
-            );
-          }
-
           const limits = DIMENSION_LIMITS[key];
           return (
             <SliderRow

@@ -1,5 +1,5 @@
 import type { ClimateComputerExport, ClimateComputerFormat } from "@/types/supabase";
-import { normalizeBayArchTypes } from "@/lib/structureUtils";
+import { expandBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 interface ExportParams {
@@ -79,9 +79,10 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
     structure: {
       bay_count: state.structure.bayCount,
       bay_width_m: state.structure.bayWidthM,
-      bay_arch_types: normalizeBayArchTypes(
+      arch_type: state.structure.archType,
+      bay_arch_types: expandBayArchTypes(
         state.structure.bayCount,
-        state.structure.bayArchTypes,
+        state.structure.archType,
       ),
     },
     covering_material: {

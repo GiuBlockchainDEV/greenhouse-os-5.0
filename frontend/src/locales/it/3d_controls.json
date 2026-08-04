@@ -15,6 +15,7 @@
     "baysShort": "campate",
     "bayArchShort": "C{{n}}: {{type}}",
     "archType": "Tipo di Arco",
+    "archAllBays": "Si applica a tutte le campate",
     "apexAuto": "Calcolata automaticamente dalla campata",
     "archTypes": {
       "triangular": "Triangolare (Capannone)",

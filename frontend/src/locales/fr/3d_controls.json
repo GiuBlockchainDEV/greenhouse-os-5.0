@@ -15,6 +15,7 @@
     "baysShort": "travées",
     "bayArchShort": "T{{n}}: {{type}}",
     "archType": "Profil de l'Arc",
+    "archAllBays": "S'applique à toutes les travées",
     "apexAuto": "Calculé automatiquement depuis la travée",
     "archTypes": {
       "triangular": "Triangulaire (Faîtage)",

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { normalizeBayArchTypes } from "@/lib/structureUtils";
+import { expandBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   WSConnectionStatus,
@@ -35,10 +35,10 @@ function buildUpdatePayload(): WSUpdatePayload {
         eave_height: state.dimensions.eaveHeight,
         bay_count: state.structure.bayCount,
         bay_width_m: state.structure.bayWidthM,
-        arch_type: state.structure.bayArchTypes[0] ?? "triangular",
-        bay_arch_types: normalizeBayArchTypes(
+        arch_type: state.structure.archType,
+        bay_arch_types: expandBayArchTypes(
           state.structure.bayCount,
-          state.structure.bayArchTypes,
+          state.structure.archType,
         ),
       },
       materials: {

@@ -34,7 +34,7 @@ WS_PAYLOAD = {
     "event": "UPDATE_SIMULATION",
     "data": {
         "location": {"lat": 41.9028, "lon": 12.4964},
-        "geometry": {"length": 30, "width": 20, "ridge_height": 4.5, "eave_height": 3.0, "bay_count": 2, "bay_width_m": 10, "arch_type": "triangular", "bay_arch_types": ["triangular", "semicircular"]},
+        "geometry": {"length": 30, "width": 20, "ridge_height": 5.0, "eave_height": 3.0, "bay_count": 2, "bay_width_m": 10, "arch_type": "semicircular", "bay_arch_types": ["semicircular", "semicircular"]},
         "materials": {"covering_type": "glass", "transmittance": 0.85, "u_value": 5.8},
         "crop": {
             "type": "tomato",

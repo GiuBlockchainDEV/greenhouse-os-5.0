@@ -15,6 +15,7 @@
     "baysShort": "módulos",
     "bayArchShort": "M{{n}}: {{type}}",
     "archType": "Perfil del Arco",
+    "archAllBays": "Se aplica a todos los módulos",
     "apexAuto": "Calculado automáticamente del módulo",
     "archTypes": {
       "triangular": "Triangular (Dos Aguas)",

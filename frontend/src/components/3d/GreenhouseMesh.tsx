@@ -5,7 +5,8 @@ import * as THREE from "three";
 import {
   bayApexHeight,
   bayCenterZ,
-  normalizeBayArchTypes,
+  expandBayArchTypes,
+  roofRiseM,
 } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType } from "@/types/greenhouse";
@@ -46,10 +47,12 @@ function createSemicircularBayRoof(
   length: number,
   bayWidth: number,
   eaveHeight: number,
+  ridgeHeight: number,
   zCenter: number,
-  segments = 20,
+  segments = 24,
 ): THREE.BufferGeometry {
-  const radius = bayWidth / 2;
+  const rise = roofRiseM(eaveHeight, ridgeHeight);
+  const halfBay = bayWidth / 2;
   const halfLength = length / 2;
   const positions: number[] = [];
   const indices: number[] = [];
@@ -58,8 +61,8 @@ function createSemicircularBayRoof(
     const x = row === 0 ? -halfLength : halfLength;
     for (let seg = 0; seg <= segments; seg++) {
       const theta = (Math.PI * seg) / segments;
-      const z = zCenter + radius * Math.cos(theta);
-      const y = eaveHeight + radius * Math.sin(theta);
+      const z = zCenter + halfBay * Math.cos(theta);
+      const y = eaveHeight + rise * Math.sin(theta);
       positions.push(x, y, z);
     }
   }
@@ -101,7 +104,7 @@ function BayRoof({
 }: BayRoofProps) {
   const geometry = useMemo(() => {
     if (archType === "semicircular") {
-      return createSemicircularBayRoof(length, bayWidth, eaveHeight, zCenter);
+      return createSemicircularBayRoof(length, bayWidth, eaveHeight, ridgeHeight, zCenter);
     }
     return createTriangularBayRoof(length, bayWidth, eaveHeight, ridgeHeight, zCenter);
   }, [archType, bayWidth, eaveHeight, length, ridgeHeight, zCenter]);
@@ -153,22 +156,17 @@ export function GreenhouseMesh() {
   const structure = useGreenhouseStore((state) => state.structure);
   const covering = useGreenhouseStore((state) => state.covering);
   const { length, width, ridgeHeight, eaveHeight } = dimensions;
-  const { bayCount, bayWidthM, bayArchTypes } = structure;
-
-  const normalizedArchTypes = useMemo(
-    () => normalizeBayArchTypes(bayCount, bayArchTypes),
-    [bayCount, bayArchTypes],
-  );
+  const { bayCount, bayWidthM, archType } = structure;
 
   const bays = useMemo(
     () =>
-      normalizedArchTypes.map((archType, index) => ({
+      expandBayArchTypes(bayCount, archType).map((bayArchType, index) => ({
         index,
-        archType,
+        archType: bayArchType,
         zCenter: bayCenterZ(index, bayWidthM, width),
-        apex: bayApexHeight(archType, eaveHeight, ridgeHeight, bayWidthM),
+        apex: ridgeHeight,
       })),
-    [normalizedArchTypes, bayCount, bayWidthM, width, eaveHeight, ridgeHeight],
+    [archType, bayCount, bayWidthM, width, ridgeHeight],
   );
 
   const bayDividerPositions = useMemo(() => {

@@ -8,8 +8,8 @@ export interface GreenhouseStructure {
   bayCount: number;
   /** Width of each single bay in meters. Total width = bayCount × bayWidthM. */
   bayWidthM: number;
-  /** Per-bay roof profile — each campata has its own triangular or semicircular roof. */
-  bayArchTypes: ArchType[];
+  /** Roof profile shared by all campate (triangular or semicircular). */
+  archType: ArchType;
 }
 
 export interface GreenhouseDimensions {
@@ -125,7 +125,7 @@ export interface DimensionUpdate {
 export interface StructureUpdate {
   bayCount?: number;
   bayWidthM?: number;
-  bayArchTypes?: ArchType[];
+  archType?: ArchType;
 }
 
 export interface VolumeMetrics {

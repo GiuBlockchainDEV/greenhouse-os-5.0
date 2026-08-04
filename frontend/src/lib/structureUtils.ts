@@ -2,39 +2,22 @@
 
 import type { ArchType, GreenhouseStructure } from "@/types/greenhouse";
 
-export function normalizeBayArchTypes(
-  bayCount: number,
-  types: ArchType[],
-): ArchType[] {
-  const normalized = types.slice(0, bayCount);
-  const fallback = normalized[normalized.length - 1] ?? "triangular";
-  while (normalized.length < bayCount) {
-    normalized.push(fallback);
-  }
-  return normalized;
+/** Expand a single arch type to one entry per bay (all campate share the same roof). */
+export function expandBayArchTypes(bayCount: number, archType: ArchType): ArchType[] {
+  return Array.from({ length: Math.max(bayCount, 1) }, () => archType);
+}
+
+export function roofRiseM(eaveHeight: number, ridgeHeight: number): number {
+  return Math.max(ridgeHeight - eaveHeight, 0.01);
 }
 
 export function bayApexHeight(
-  archType: ArchType,
-  eaveHeight: number,
+  _archType: ArchType,
+  _eaveHeight: number,
   ridgeHeight: number,
-  bayWidthM: number,
+  _bayWidthM: number,
 ): number {
-  if (archType === "semicircular") {
-    return eaveHeight + bayWidthM / 2;
-  }
   return ridgeHeight;
-}
-
-export function maxBayApexHeight(
-  structure: GreenhouseStructure,
-  eaveHeight: number,
-  ridgeHeight: number,
-): number {
-  const types = normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes);
-  return Math.max(
-    ...types.map((type) => bayApexHeight(type, eaveHeight, ridgeHeight, structure.bayWidthM)),
-  );
 }
 
 export function bayCenterZ(
@@ -45,11 +28,6 @@ export function bayCenterZ(
   return -totalWidth / 2 + bayWidthM / 2 + bayIndex * bayWidthM;
 }
 
-export function structureHasArchType(
-  structure: GreenhouseStructure,
-  archType: ArchType,
-): boolean {
-  return normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes).includes(
-    archType,
-  );
+export function structureArchType(structure: GreenhouseStructure): ArchType {
+  return structure.archType;
 }

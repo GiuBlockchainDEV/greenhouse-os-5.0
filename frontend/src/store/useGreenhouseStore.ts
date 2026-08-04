@@ -1,14 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import {
-  bayApexHeight,
-  maxBayApexHeight,
-  normalizeBayArchTypes,
-  structureHasArchType,
-} from "@/lib/structureUtils";
+import { roofRiseM } from "@/lib/structureUtils";
 import type {
-  ArchType,
   ClimateEquipment,
   CoveringMaterial,
   CropConfig,
@@ -33,7 +27,7 @@ type SimulationData = WSSimulationResults["data"];
 const DEFAULT_STRUCTURE: GreenhouseStructure = {
   bayCount: 1,
   bayWidthM: 10,
-  bayArchTypes: ["triangular"],
+  archType: "triangular",
 };
 
 const DEFAULT_DIMENSIONS: GreenhouseDimensions = {
@@ -76,25 +70,12 @@ const DEFAULT_LOCATION: GeoLocation = {
   elevationM: 21,
 };
 
-function withNormalizedStructure(structure: GreenhouseStructure): GreenhouseStructure {
-  return {
-    ...structure,
-    bayArchTypes: normalizeBayArchTypes(structure.bayCount, structure.bayArchTypes),
-  };
-}
-
 function syncDimensionsFromStructure(
   structure: GreenhouseStructure,
   dimensions: GreenhouseDimensions,
 ): GreenhouseDimensions {
-  const normalized = withNormalizedStructure(structure);
-  const width = normalized.bayCount * normalized.bayWidthM;
-  const ridgeHeight = maxBayApexHeight(
-    normalized,
-    dimensions.eaveHeight,
-    dimensions.ridgeHeight,
-  );
-  return { ...dimensions, width, ridgeHeight };
+  const width = structure.bayCount * structure.bayWidthM;
+  return { ...dimensions, width };
 }
 
 function computeVolumeMetrics(
@@ -102,30 +83,25 @@ function computeVolumeMetrics(
   dimensions: GreenhouseDimensions,
   crop: CropConfig = DEFAULT_CROP,
 ): VolumeMetrics {
-  const normalized = withNormalizedStructure(structure);
   const { length, eaveHeight, ridgeHeight } = dimensions;
-  const width = normalized.bayCount * normalized.bayWidthM;
+  const width = structure.bayCount * structure.bayWidthM;
+  const roofRise = roofRiseM(eaveHeight, ridgeHeight);
 
   let volumeM3 = 0;
-  for (const archType of normalized.bayArchTypes) {
-    const bayFloor = normalized.bayWidthM * length;
-    if (archType === "semicircular") {
-      const radius = normalized.bayWidthM / 2;
-      const semicircleArea = (Math.PI * radius * radius) / 2;
-      volumeM3 += bayFloor * eaveHeight + semicircleArea * length;
+  for (let bay = 0; bay < structure.bayCount; bay++) {
+    const bayFloor = structure.bayWidthM * length;
+    if (structure.archType === "semicircular") {
+      const archArea = (Math.PI * structure.bayWidthM * roofRise) / 4;
+      volumeM3 += bayFloor * eaveHeight + archArea * length;
     } else {
-      const roofRise = Math.max(ridgeHeight - eaveHeight, 0);
       volumeM3 += bayFloor * eaveHeight + (bayFloor * roofRise) / 2;
     }
   }
 
   const floorAreaM2 = length * width;
-  const triangularBay = normalized.bayArchTypes.find((type) => type === "triangular");
   const ridgeAngleDeg =
-    triangularBay && normalized.bayWidthM > 0
-      ? (Math.atan((2 * Math.max(ridgeHeight - eaveHeight, 0)) / normalized.bayWidthM) *
-          180) /
-        Math.PI
+    structure.bayWidthM > 0
+      ? (Math.atan((2 * roofRise) / structure.bayWidthM) * 180) / Math.PI
       : 0;
 
   const tierCount = Math.max(crop.layout.tierCount, 1);
@@ -144,7 +120,7 @@ function computeVolumeMetrics(
     cultivationAreaM2: Number(cultivationAreaM2.toFixed(2)),
     totalPlants,
     totalWidthM: Number(width.toFixed(2)),
-    bayCount: normalized.bayCount,
+    bayCount: structure.bayCount,
   };
 }
 
@@ -167,7 +143,6 @@ interface GreenhouseStore {
   setName: (name: string) => void;
   setLocation: (location: Partial<GeoLocation>) => void;
   setStructure: (update: StructureUpdate) => void;
-  setBayArchType: (bayIndex: number, archType: ArchType) => void;
   setDimensions: (update: DimensionUpdate) => void;
   setCovering: (covering: Partial<CoveringMaterial>) => void;
   setCrop: (crop: Partial<CropConfig>) => void;
@@ -211,28 +186,21 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         ),
 
       setStructure: (update) => {
-        const merged = withNormalizedStructure({ ...get().structure, ...update });
-        const dimensions = syncDimensionsFromStructure(merged, get().dimensions);
+        const structure = { ...get().structure, ...update };
+        const dimensions = syncDimensionsFromStructure(structure, get().dimensions);
         set(
           {
-            structure: merged,
+            structure,
             dimensions,
-            metrics: computeVolumeMetrics(merged, dimensions, get().crop),
+            metrics: computeVolumeMetrics(structure, dimensions, get().crop),
           },
           false,
           "setStructure",
         );
       },
 
-      setBayArchType: (bayIndex, archType) => {
-        const structure = withNormalizedStructure(get().structure);
-        const bayArchTypes = [...structure.bayArchTypes];
-        bayArchTypes[bayIndex] = archType;
-        get().setStructure({ bayArchTypes });
-      },
-
       setDimensions: (update) => {
-        const structure = withNormalizedStructure(get().structure);
+        const structure = get().structure;
         const dimensions = syncDimensionsFromStructure(structure, {
           ...get().dimensions,
           ...update,
@@ -255,7 +223,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         ),
 
       setCrop: (crop) => {
-        const structure = withNormalizedStructure(get().structure);
+        const structure = get().structure;
         const nextCrop = { ...get().crop, ...crop };
         set(
           {
@@ -268,7 +236,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       },
 
       setCropLayout: (layout) => {
-        const structure = withNormalizedStructure(get().structure);
+        const structure = get().structure;
         const nextCrop = {
           ...get().crop,
           layout: { ...get().crop.layout, ...layout },
@@ -326,4 +294,4 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
   ),
 );
 
-export { computeVolumeMetrics, syncDimensionsFromStructure, structureHasArchType, bayApexHeight };
+export { computeVolumeMetrics, syncDimensionsFromStructure };

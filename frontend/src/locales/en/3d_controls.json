@@ -15,6 +15,7 @@
     "baysShort": "bays",
     "bayArchShort": "B{{n}}: {{type}}",
     "archType": "Arch Profile",
+    "archAllBays": "Applies to all bays",
     "apexAuto": "Auto-calculated from bay width",
     "archTypes": {
       "triangular": "Triangular (Gable)",
