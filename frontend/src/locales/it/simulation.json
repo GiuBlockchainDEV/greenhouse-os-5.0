@@ -54,9 +54,25 @@
   },
   "equipment": {
     "title": "Impianto Climatico",
+    "sizingTitle": "Dimensioni Impianto (Digital Twin)",
     "cooling": "Raffrescamento",
     "heating": "Riscaldamento",
     "ventilation": "Ventilazione",
+    "sizing": {
+      "exhaustFanCount": "Ventole Estrazione",
+      "exhaustFanDiameter": "Diametro Ventola",
+      "padWallWidth": "Larghezza Pad Wall",
+      "padWallHeight": "Altezza Pad Wall",
+      "acUnitCount": "Unità Climatizzatore",
+      "acUnitWidth": "Larghezza Climatizzatore",
+      "roofVentCount": "Serrande sul Colmo",
+      "roofVentWidth": "Larghezza Serranda",
+      "sideVentCount": "Serrande Laterali (per lato)",
+      "sideVentHeight": "Altezza Serranda Laterale",
+      "heaterUnitCount": "Generatori di Calore",
+      "pipeRowCount": "File di Tubi",
+      "fogLineCount": "Linee Nebulizzazione"
+    },
     "coolingOptions": {
       "none": "Nessuno",
       "fan_and_pad": "Fan & Pad",

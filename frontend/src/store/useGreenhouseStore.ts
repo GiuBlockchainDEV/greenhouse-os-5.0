@@ -3,8 +3,10 @@ import { devtools } from "zustand/middleware";
 
 import { roofRiseM } from "@/lib/structureUtils";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
+import { DEFAULT_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
 import type {
   ClimateEquipment,
+  ClimateEquipmentSizing,
   CoveringMaterial,
   CropConfig,
   CultivationLayout,
@@ -64,6 +66,7 @@ const DEFAULT_CLIMATE_EQUIPMENT: ClimateEquipment = {
   cooling: "fan_and_pad",
   heating: "hot_water_pipes",
   ventilation: "roof_vents",
+  sizing: DEFAULT_CLIMATE_SIZING,
 };
 
 const DEFAULT_LOCATION: GeoLocation = {
@@ -157,6 +160,7 @@ interface GreenhouseStore {
   setCrop: (crop: Partial<CropConfig>) => void;
   setCropLayout: (layout: Partial<CultivationLayout>) => void;
   setClimateEquipment: (equipment: Partial<ClimateEquipment>) => void;
+  setClimateEquipmentSizing: (sizing: Partial<ClimateEquipmentSizing>) => void;
   setSimulationStatus: (status: WSConnectionStatus) => void;
   setSimulationResults: (results: SimulationData) => void;
   setGizmoMode: (mode: GizmoMode) => void;
@@ -260,13 +264,30 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         );
       },
 
-      setClimateEquipment: (equipment) =>
+      setClimateEquipment: (equipment) => {
+        const current = get().climateEquipment;
+        const sizing = equipment.sizing
+          ? { ...current.sizing, ...equipment.sizing }
+          : current.sizing;
         set(
           {
-            climateEquipment: { ...get().climateEquipment, ...equipment },
+            climateEquipment: { ...current, ...equipment, sizing },
           },
           false,
           "setClimateEquipment",
+        );
+      },
+
+      setClimateEquipmentSizing: (sizing) =>
+        set(
+          {
+            climateEquipment: {
+              ...get().climateEquipment,
+              sizing: { ...get().climateEquipment.sizing, ...sizing },
+            },
+          },
+          false,
+          "setClimateEquipmentSizing",
         ),
 
       setSimulationStatus: (simulationStatus) =>

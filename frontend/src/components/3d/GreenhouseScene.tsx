@@ -3,6 +3,7 @@ import { TransformControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 
+import { ClimateEquipmentMesh } from "@/components/3d/ClimateEquipmentMesh";
 import { CropGridMesh } from "@/components/3d/CropGridMesh";
 import { GreenhouseMesh } from "@/components/3d/GreenhouseMesh";
 import { HeatmapPlane } from "@/components/3d/HeatmapShader";
@@ -86,6 +87,7 @@ export function GreenhouseScene({ orbitRef }: GreenhouseSceneProps) {
     <>
       <group ref={groupRef}>
         <GreenhouseMesh />
+        <ClimateEquipmentMesh />
         <CropGridMesh />
         <HeatmapPlane />
       </group>

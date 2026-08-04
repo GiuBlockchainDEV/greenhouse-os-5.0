@@ -87,10 +87,40 @@ export type VentilationSystem =
   | "forced_exhaust"
   | "combined";
 
+export interface ClimateEquipmentSizing {
+  /** Exhaust / circulation fan units (fan-and-pad, forced exhaust). */
+  exhaustFanCount: number;
+  /** Fan impeller diameter in meters. */
+  exhaustFanDiameterM: number;
+  /** Pad wall span along the gable width in meters. */
+  padWallWidthM: number;
+  /** Pad wall height in meters. */
+  padWallHeightM: number;
+  /** Roof-mounted or wall-mounted AC condenser units. */
+  acUnitCount: number;
+  /** AC unit cabinet width in meters. */
+  acUnitWidthM: number;
+  /** Motorized roof vent bays along the ridge. */
+  roofVentCount: number;
+  /** Individual roof vent opening width in meters. */
+  roofVentWidthM: number;
+  /** Side-wall louver sections per long wall. */
+  sideVentCount: number;
+  /** Side vent louver height in meters. */
+  sideVentHeightM: number;
+  /** Hanging or floor-mounted heater cabinets. */
+  heaterUnitCount: number;
+  /** Hot-water pipe rows running length-wise above the crop. */
+  pipeRowCount: number;
+  /** High-pressure fog lines under the roof. */
+  fogLineCount: number;
+}
+
 export interface ClimateEquipment {
   cooling: CoolingSystem;
   heating: HeatingSystem;
   ventilation: VentilationSystem;
+  sizing: ClimateEquipmentSizing;
 }
 
 export interface CropConfig {

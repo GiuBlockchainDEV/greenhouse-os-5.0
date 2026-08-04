@@ -54,9 +54,25 @@
   },
   "equipment": {
     "title": "Equipo Climático",
+    "sizingTitle": "Dimensiones del Equipo (Gemelo Digital)",
     "cooling": "Refrigeración",
     "heating": "Calefacción",
     "ventilation": "Ventilación",
+    "sizing": {
+      "exhaustFanCount": "Ventiladores de Extracción",
+      "exhaustFanDiameter": "Diámetro del Ventilador",
+      "padWallWidth": "Ancho del Panel Húmedo",
+      "padWallHeight": "Alto del Panel Húmedo",
+      "acUnitCount": "Unidades de AC",
+      "acUnitWidth": "Ancho de Unidad AC",
+      "roofVentCount": "Ventanas de Techo",
+      "roofVentWidth": "Ancho de Ventana de Techo",
+      "sideVentCount": "Ventanas Laterales (por pared)",
+      "sideVentHeight": "Alto de Ventana Lateral",
+      "heaterUnitCount": "Unidades de Calefacción",
+      "pipeRowCount": "Filas de Tuberías",
+      "fogLineCount": "Líneas de Niebla"
+    },
     "coolingOptions": {
       "none": "Ninguno",
       "fan_and_pad": "Ventilador y Panel",

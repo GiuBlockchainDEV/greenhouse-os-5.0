@@ -51,10 +51,27 @@ export interface WSCrop {
   layout: WSCultivationLayout;
 }
 
+export interface WSClimateEquipmentSizing {
+  exhaust_fan_count: number;
+  exhaust_fan_diameter_m: number;
+  pad_wall_width_m: number;
+  pad_wall_height_m: number;
+  ac_unit_count: number;
+  ac_unit_width_m: number;
+  roof_vent_count: number;
+  roof_vent_width_m: number;
+  side_vent_count: number;
+  side_vent_height_m: number;
+  heater_unit_count: number;
+  pipe_row_count: number;
+  fog_line_count: number;
+}
+
 export interface WSClimateEquipment {
   cooling: string;
   heating: string;
   ventilation: string;
+  sizing: WSClimateEquipmentSizing;
 }
 
 export interface WSClimateOverride {

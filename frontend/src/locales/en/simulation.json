@@ -54,9 +54,25 @@
   },
   "equipment": {
     "title": "Climate Equipment",
+    "sizingTitle": "Equipment Sizing (3D Twin)",
     "cooling": "Cooling System",
     "heating": "Heating System",
     "ventilation": "Ventilation",
+    "sizing": {
+      "exhaustFanCount": "Exhaust Fans",
+      "exhaustFanDiameter": "Fan Diameter",
+      "padWallWidth": "Pad Wall Width",
+      "padWallHeight": "Pad Wall Height",
+      "acUnitCount": "AC Units",
+      "acUnitWidth": "AC Unit Width",
+      "roofVentCount": "Roof Vents",
+      "roofVentWidth": "Roof Vent Width",
+      "sideVentCount": "Side Vents (per wall)",
+      "sideVentHeight": "Side Vent Height",
+      "heaterUnitCount": "Heater Units",
+      "pipeRowCount": "Pipe Rows",
+      "fogLineCount": "Fog Lines"
+    },
     "coolingOptions": {
       "none": "None",
       "fan_and_pad": "Fan & Pad",

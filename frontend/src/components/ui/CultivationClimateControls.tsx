@@ -122,6 +122,31 @@ export function CultivationClimateControls() {
   const setCrop = useGreenhouseStore((state) => state.setCrop);
   const setCropLayout = useGreenhouseStore((state) => state.setCropLayout);
   const setClimateEquipment = useGreenhouseStore((state) => state.setClimateEquipment);
+  const setClimateEquipmentSizing = useGreenhouseStore(
+    (state) => state.setClimateEquipmentSizing,
+  );
+  const sizing = climateEquipment.sizing;
+
+  const showFans =
+    climateEquipment.cooling === "fan_and_pad" ||
+    climateEquipment.ventilation === "forced_exhaust" ||
+    climateEquipment.ventilation === "combined";
+  const showPad =
+    climateEquipment.cooling === "fan_and_pad" ||
+    climateEquipment.cooling === "evaporative";
+  const showAc = climateEquipment.cooling === "mechanical_ac";
+  const showFog = climateEquipment.cooling === "high_pressure_fog";
+  const showRoofVents =
+    climateEquipment.ventilation === "roof_vents" ||
+    climateEquipment.ventilation === "combined";
+  const showSideVents =
+    climateEquipment.ventilation === "side_vents" ||
+    climateEquipment.ventilation === "combined";
+  const showPipes = climateEquipment.heating === "hot_water_pipes";
+  const showHeaters =
+    climateEquipment.heating === "unit_heater" ||
+    climateEquipment.heating === "air_heater";
+  const showGeothermal = climateEquipment.heating === "geothermal";
 
   return (
     <>
@@ -237,6 +262,168 @@ export function CultivationClimateControls() {
             setClimateEquipment({ ventilation: value as VentilationSystem })
           }
         />
+
+        {(showFans || showPad || showAc || showFog || showRoofVents || showSideVents || showPipes || showHeaters || showGeothermal) && (
+          <div className="mt-2 flex flex-col gap-2 rounded-lg border border-greenhouse-700/60 bg-greenhouse-950/40 p-3">
+            <h5 className="text-[11px] font-semibold uppercase tracking-wide text-greenhouse-500">
+              {tSim("equipment.sizingTitle")}
+            </h5>
+            {showFans && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.sizing.exhaustFanCount")}
+                  value={sizing.exhaustFanCount}
+                  unit=""
+                  min={1}
+                  max={12}
+                  step={1}
+                  onChange={(value) => setClimateEquipmentSizing({ exhaustFanCount: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.exhaustFanDiameter")}
+                  value={sizing.exhaustFanDiameterM}
+                  unit={tCommon("units.meters")}
+                  min={0.8}
+                  max={1.8}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ exhaustFanDiameterM: value })}
+                />
+              </>
+            )}
+            {showPad && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.sizing.padWallWidth")}
+                  value={sizing.padWallWidthM}
+                  unit={tCommon("units.meters")}
+                  min={2}
+                  max={20}
+                  step={0.5}
+                  onChange={(value) => setClimateEquipmentSizing({ padWallWidthM: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.padWallHeight")}
+                  value={sizing.padWallHeightM}
+                  unit={tCommon("units.meters")}
+                  min={1.2}
+                  max={3.5}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ padWallHeightM: value })}
+                />
+              </>
+            )}
+            {showAc && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.sizing.acUnitCount")}
+                  value={sizing.acUnitCount}
+                  unit=""
+                  min={1}
+                  max={8}
+                  step={1}
+                  onChange={(value) => setClimateEquipmentSizing({ acUnitCount: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.acUnitWidth")}
+                  value={sizing.acUnitWidthM}
+                  unit={tCommon("units.meters")}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ acUnitWidthM: value })}
+                />
+              </>
+            )}
+            {showFog && (
+              <SliderRow
+                label={tSim("equipment.sizing.fogLineCount")}
+                value={sizing.fogLineCount}
+                unit=""
+                min={1}
+                max={10}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ fogLineCount: value })}
+              />
+            )}
+            {showRoofVents && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.sizing.roofVentCount")}
+                  value={sizing.roofVentCount}
+                  unit=""
+                  min={1}
+                  max={12}
+                  step={1}
+                  onChange={(value) => setClimateEquipmentSizing({ roofVentCount: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.roofVentWidth")}
+                  value={sizing.roofVentWidthM}
+                  unit={tCommon("units.meters")}
+                  min={1}
+                  max={4}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ roofVentWidthM: value })}
+                />
+              </>
+            )}
+            {showSideVents && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.sizing.sideVentCount")}
+                  value={sizing.sideVentCount}
+                  unit=""
+                  min={1}
+                  max={10}
+                  step={1}
+                  onChange={(value) => setClimateEquipmentSizing({ sideVentCount: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.sideVentHeight")}
+                  value={sizing.sideVentHeightM}
+                  unit={tCommon("units.meters")}
+                  min={0.8}
+                  max={2.5}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ sideVentHeightM: value })}
+                />
+              </>
+            )}
+            {showPipes && (
+              <SliderRow
+                label={tSim("equipment.sizing.pipeRowCount")}
+                value={sizing.pipeRowCount}
+                unit=""
+                min={1}
+                max={8}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
+              />
+            )}
+            {showHeaters && (
+              <SliderRow
+                label={tSim("equipment.sizing.heaterUnitCount")}
+                value={sizing.heaterUnitCount}
+                unit=""
+                min={1}
+                max={8}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ heaterUnitCount: value })}
+              />
+            )}
+            {showGeothermal && (
+              <SliderRow
+                label={tSim("equipment.sizing.pipeRowCount")}
+                value={sizing.pipeRowCount}
+                unit=""
+                min={2}
+                max={8}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
+              />
+            )}
+          </div>
+        )}
       </section>
     </>
   );

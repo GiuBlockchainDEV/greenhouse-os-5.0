@@ -35,10 +35,27 @@ class CultivationLayoutDB(BaseModel):
     aisle_width_m: float | None = Field(default=None)
 
 
+class ClimateEquipmentSizingDB(BaseModel):
+    exhaust_fan_count: int = Field(default=4)
+    exhaust_fan_diameter_m: float = Field(default=1.2)
+    pad_wall_width_m: float = Field(default=8.0)
+    pad_wall_height_m: float = Field(default=2.0)
+    ac_unit_count: int = Field(default=2)
+    ac_unit_width_m: float = Field(default=1.8)
+    roof_vent_count: int = Field(default=3)
+    roof_vent_width_m: float = Field(default=2.5)
+    side_vent_count: int = Field(default=4)
+    side_vent_height_m: float = Field(default=1.5)
+    heater_unit_count: int = Field(default=2)
+    pipe_row_count: int = Field(default=3)
+    fog_line_count: int = Field(default=4)
+
+
 class ClimateEquipmentDB(BaseModel):
     cooling: str = Field(default="none")
     heating: str = Field(default="none")
     ventilation: str = Field(default="natural_ridge")
+    sizing: ClimateEquipmentSizingDB = Field(default_factory=ClimateEquipmentSizingDB)
 
 
 class CropConfigDB(BaseModel):

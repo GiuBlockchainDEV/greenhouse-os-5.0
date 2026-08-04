@@ -1,6 +1,7 @@
 export type {
   ArchType,
   ClimateEquipment,
+  ClimateEquipmentSizing,
   CoveringMaterial,
   CropConfig,
   CropType,
