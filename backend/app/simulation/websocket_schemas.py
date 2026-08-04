@@ -56,19 +56,19 @@ class WSCrop(BaseModel):
 
 
 class WSClimateEquipmentSizing(BaseModel):
-    exhaust_fan_count: int = Field(default=4, ge=1, le=12)
+    exhaust_fan_count: int = Field(default=4, ge=0, le=12)
     exhaust_fan_diameter_m: float = Field(default=1.2, ge=0.8, le=1.8)
     pad_wall_width_m: float = Field(default=8.0, ge=2.0, le=20.0)
     pad_wall_height_m: float = Field(default=2.0, ge=1.2, le=3.5)
-    ac_unit_count: int = Field(default=2, ge=1, le=8)
+    ac_unit_count: int = Field(default=2, ge=0, le=8)
     ac_unit_width_m: float = Field(default=1.8, ge=1.0, le=3.0)
-    roof_vent_count: int = Field(default=3, ge=1, le=12)
+    roof_vent_count: int = Field(default=3, ge=0, le=12)
     roof_vent_width_m: float = Field(default=2.5, ge=1.0, le=4.0)
-    side_vent_count: int = Field(default=4, ge=1, le=10)
+    side_vent_count: int = Field(default=4, ge=0, le=10)
     side_vent_height_m: float = Field(default=1.5, ge=0.8, le=2.5)
-    heater_unit_count: int = Field(default=2, ge=1, le=8)
-    pipe_row_count: int = Field(default=3, ge=1, le=8)
-    fog_line_count: int = Field(default=4, ge=1, le=10)
+    heater_unit_count: int = Field(default=2, ge=0, le=8)
+    pipe_row_count: int = Field(default=3, ge=0, le=8)
+    fog_line_count: int = Field(default=4, ge=0, le=10)
 
 
 class WSClimateEquipment(BaseModel):

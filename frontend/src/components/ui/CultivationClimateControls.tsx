@@ -274,7 +274,7 @@ export function CultivationClimateControls() {
                   label={tSim("equipment.sizing.exhaustFanCount")}
                   value={sizing.exhaustFanCount}
                   unit=""
-                  min={1}
+                  min={0}
                   max={12}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ exhaustFanCount: value })}
@@ -318,7 +318,7 @@ export function CultivationClimateControls() {
                   label={tSim("equipment.sizing.acUnitCount")}
                   value={sizing.acUnitCount}
                   unit=""
-                  min={1}
+                  min={0}
                   max={8}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ acUnitCount: value })}
@@ -339,7 +339,7 @@ export function CultivationClimateControls() {
                 label={tSim("equipment.sizing.fogLineCount")}
                 value={sizing.fogLineCount}
                 unit=""
-                min={1}
+                min={0}
                 max={10}
                 step={1}
                 onChange={(value) => setClimateEquipmentSizing({ fogLineCount: value })}
@@ -351,7 +351,7 @@ export function CultivationClimateControls() {
                   label={tSim("equipment.sizing.roofVentCount")}
                   value={sizing.roofVentCount}
                   unit=""
-                  min={1}
+                  min={0}
                   max={12}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ roofVentCount: value })}
@@ -373,7 +373,7 @@ export function CultivationClimateControls() {
                   label={tSim("equipment.sizing.sideVentCount")}
                   value={sizing.sideVentCount}
                   unit=""
-                  min={1}
+                  min={0}
                   max={10}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ sideVentCount: value })}
@@ -394,7 +394,7 @@ export function CultivationClimateControls() {
                 label={tSim("equipment.sizing.pipeRowCount")}
                 value={sizing.pipeRowCount}
                 unit=""
-                min={1}
+                min={0}
                 max={8}
                 step={1}
                 onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
@@ -405,7 +405,7 @@ export function CultivationClimateControls() {
                 label={tSim("equipment.sizing.heaterUnitCount")}
                 value={sizing.heaterUnitCount}
                 unit=""
-                min={1}
+                min={0}
                 max={8}
                 step={1}
                 onChange={(value) => setClimateEquipmentSizing({ heaterUnitCount: value })}
@@ -416,7 +416,7 @@ export function CultivationClimateControls() {
                 label={tSim("equipment.sizing.pipeRowCount")}
                 value={sizing.pipeRowCount}
                 unit=""
-                min={2}
+                min={0}
                 max={8}
                 step={1}
                 onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}

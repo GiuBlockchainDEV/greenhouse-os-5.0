@@ -183,14 +183,10 @@ export function computeClimateEquipmentLayout(params: {
     equipment.ventilation === "combined" ||
     equipment.ventilation === "natural_ridge";
 
-  if (showRoofVents) {
-    const ventCount =
-      equipment.ventilation === "natural_ridge"
-        ? Math.max(1, bayCount)
-        : sizing.roofVentCount;
+  if (showRoofVents && sizing.roofVentCount > 0) {
+    const ventCount = sizing.roofVentCount;
     for (let bayIndex = 0; bayIndex < bayCount; bayIndex++) {
-      const perBay =
-        equipment.ventilation === "natural_ridge" ? 1 : Math.ceil(ventCount / bayCount);
+      const perBay = Math.ceil(ventCount / bayCount);
       const zCenter = bayCenterZ(bayIndex, bayWidthM, width);
       const ventXs = spreadAlongAxis(perBay, length * 0.75, length * 0.12);
       ventXs.forEach((offsetX) => {
@@ -276,7 +272,7 @@ export function computeClimateEquipmentLayout(params: {
   }
 
   if (equipment.heating === "geothermal") {
-    const loopZs = spreadAlongAxis(Math.max(2, sizing.pipeRowCount), width, width * 0.15);
+    const loopZs = spreadAlongAxis(sizing.pipeRowCount, width, width * 0.15);
     loopZs.forEach((offsetZ) => {
       heaters.push({
         x: 0,
