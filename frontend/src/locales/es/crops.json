@@ -37,7 +37,10 @@
     "plantsPerTier": "Plantas por Nivel",
     "totalPlants": "Plantas Totales",
     "plantDensity": "Densidad de Plantación",
-    "pathwayWidth": "Ancho del Pasillo",
+    "bedLineCount": "Líneas de Cultivo (0 = auto)",
+    "bedLinesPerBay": "Líneas por Campo",
+    "totalBedLines": "Líneas Totales",
+    "pathwayWidth": "Pasillo entre Líneas",
     "sideClearance": "Margen Lateral",
     "tiersShort": "niveles"
   }

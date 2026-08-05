@@ -1,15 +1,17 @@
-/** Bed layout, pathways, and system-aware plant placement. */
+/** Bed layout perpendicular to fan airflow (−X), with parallel cultivation lines. */
 
 import {
   DWC_HOLE_SPACING_M,
   SUBSTRATE_SLAB_SPACING_M,
   SYSTEM_DEFAULT_DENSITY,
+  SYSTEM_LINE_WIDTH_M,
+  maxBedLinesForLength,
 } from "@/lib/cultivationConstants";
 import { plantScaleForSystem } from "@/lib/plantGeometry";
 import { bayCenterZ } from "@/lib/structureUtils";
 import type { CultivationLayout, CultivationSystem, CropType } from "@/types/greenhouse";
 
-export { DWC_HOLE_SPACING_M, SUBSTRATE_SLAB_SPACING_M };
+export { DWC_HOLE_SPACING_M, SUBSTRATE_SLAB_SPACING_M, SYSTEM_LINE_WIDTH_M };
 
 export const SYSTEM_BED_ELEVATION_M: Record<CultivationSystem, number> = {
   soil: 0.0,
@@ -56,8 +58,10 @@ export const SYSTEM_PLANT_SPACING_M: Record<CultivationSystem, number> = {
 export interface BedZone {
   bayIndex: number;
   bedIndex: number;
+  /** Short axis — line thickness along airflow direction (X). */
   xMin: number;
   xMax: number;
+  /** Long axis — bed/gutter run perpendicular to airflow (Z). */
   zMin: number;
   zMax: number;
   elevationM: number;
@@ -80,6 +84,8 @@ export interface CultivationLayoutResult {
   pathwayAreaM2: number;
   totalPlants: number;
   plantsPerTier: number;
+  /** Parallel cultivation lines per bay (computed). */
+  bedLineCount: number;
 }
 
 function computeBedZonesForBay(
@@ -90,49 +96,57 @@ function computeBedZonesForBay(
   sideClearanceM: number,
   pathwayWidthM: number,
   system: CultivationSystem,
+  requestedLineCount: number,
 ): BedZone[] {
   const bayCenter = bayCenterZ(bayIndex, bayWidthM, totalWidth);
   const bayZMin = bayCenter - bayWidthM / 2;
   const bayZMax = bayCenter + bayWidthM / 2;
 
-  const xMin = -length / 2 + sideClearanceM;
-  const xMax = length / 2 - sideClearanceM;
-  const usableWidth = bayWidthM - 2 * sideClearanceM;
+  const xMinBound = -length / 2 + sideClearanceM;
+  const xMaxBound = length / 2 - sideClearanceM;
+  const usableLength = xMaxBound - xMinBound;
 
-  if (usableWidth <= pathwayWidthM + 1.2) {
+  const zMin = bayZMin + sideClearanceM;
+  const zMax = bayZMax - sideClearanceM;
+  const runLength = zMax - zMin;
+
+  if (runLength < 1.0 || usableLength < 0.5) {
     return [];
   }
 
-  const bedWidth = (usableWidth - pathwayWidthM) / 2;
-  const leftZMin = bayZMin + sideClearanceM;
-  const leftZMax = leftZMin + bedWidth;
-  const rightZMax = bayZMax - sideClearanceM;
-  const rightZMin = rightZMax - bedWidth;
+  const lineWidth = SYSTEM_LINE_WIDTH_M[system];
+  const maxLines = maxBedLinesForLength(usableLength, lineWidth, pathwayWidthM);
+  if (maxLines === 0) {
+    return [];
+  }
+
+  const lineCount =
+    requestedLineCount > 0
+      ? Math.min(Math.max(1, requestedLineCount), maxLines)
+      : maxLines;
+
+  const blockWidth = lineCount * lineWidth + (lineCount - 1) * pathwayWidthM;
+  let xCursor = xMinBound + (usableLength - blockWidth) / 2;
+
   const elevationM = SYSTEM_BED_ELEVATION_M[system];
   const depthM = SYSTEM_BED_DEPTH_M[system];
+  const beds: BedZone[] = [];
 
-  return [
-    {
+  for (let i = 0; i < lineCount; i++) {
+    beds.push({
       bayIndex,
-      bedIndex: 0,
-      xMin,
-      xMax,
-      zMin: leftZMin,
-      zMax: leftZMax,
+      bedIndex: i,
+      xMin: xCursor,
+      xMax: xCursor + lineWidth,
+      zMin,
+      zMax,
       elevationM,
       depthM,
-    },
-    {
-      bayIndex,
-      bedIndex: 1,
-      xMin,
-      xMax,
-      zMin: rightZMin,
-      zMax: rightZMax,
-      elevationM,
-      depthM,
-    },
-  ];
+    });
+    xCursor += lineWidth + pathwayWidthM;
+  }
+
+  return beds;
 }
 
 function plantY(bed: BedZone, system: CultivationSystem, tier: number, tierStep: number): number {
@@ -159,9 +173,9 @@ function generateSlotsForBed(
   systemScale: number,
   slotOffset: number,
 ): PlantSlot[] {
-  const bedLength = bed.xMax - bed.xMin;
-  const bedWidth = bed.zMax - bed.zMin;
-  const centerZ = (bed.zMin + bed.zMax) / 2;
+  const bedRun = bed.zMax - bed.zMin;
+  const bedLine = bed.xMax - bed.xMin;
+  const centerX = (bed.xMin + bed.xMax) / 2;
   const y = plantY(bed, system, tier, tierStep);
   const slots: PlantSlot[] = [];
   let idx = slotOffset;
@@ -180,44 +194,44 @@ function generateSlotsForBed(
   switch (system) {
     case "nft":
     case "aeroponic": {
-      const count = Math.max(1, Math.floor(bedLength / spacing));
+      const count = Math.max(1, Math.floor(bedRun / spacing));
       for (let row = 0; row < count; row++) {
-        push(bed.xMin + spacing / 2 + row * spacing, centerZ);
+        push(centerX, bed.zMin + spacing / 2 + row * spacing);
       }
       break;
     }
     case "dwc": {
       const startX = bed.xMin + DWC_HOLE_SPACING_M * 0.7;
       const startZ = bed.zMin + DWC_HOLE_SPACING_M * 0.7;
-      for (let x = startX; x <= bed.xMax - 0.25; x += DWC_HOLE_SPACING_M) {
-        for (let z = startZ; z <= bed.zMax - 0.25; z += DWC_HOLE_SPACING_M) {
+      for (let z = startZ; z <= bed.zMax - 0.25; z += DWC_HOLE_SPACING_M) {
+        for (let x = startX; x <= bed.xMax - 0.25; x += DWC_HOLE_SPACING_M) {
           push(x, z);
         }
       }
       break;
     }
     case "substrate": {
-      const slabCount = Math.max(1, Math.floor(bedLength / SUBSTRATE_SLAB_SPACING_M));
+      const slabCount = Math.max(1, Math.floor(bedRun / SUBSTRATE_SLAB_SPACING_M));
       for (let i = 0; i < slabCount; i++) {
-        const x = bed.xMin + bedLength / (slabCount + 1) * (i + 1);
-        if (bedWidth > 1.2) {
-          push(x, centerZ - bedWidth * 0.2);
-          push(x, centerZ + bedWidth * 0.2, 0.95);
+        const z = bed.zMin + bedRun / (slabCount + 1) * (i + 1);
+        if (bedLine > 0.8) {
+          push(centerX - bedLine * 0.2, z);
+          push(centerX + bedLine * 0.2, z, 0.95);
         } else {
-          push(x, centerZ);
+          push(centerX, z);
         }
       }
       break;
     }
     default: {
-      const rows = Math.max(1, Math.floor(bedLength / spacing));
-      const cols = Math.max(1, Math.floor(bedWidth / spacing));
+      const rows = Math.max(1, Math.floor(bedRun / spacing));
+      const cols = Math.max(1, Math.floor(bedLine / spacing));
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const jitter = ((tier * rows * cols + row * cols + col) % 7) * 0.012 - 0.03;
           push(
-            bed.xMin + spacing / 2 + row * spacing + jitter,
-            bed.zMin + spacing / 2 + col * spacing + jitter,
+            bed.xMin + spacing / 2 + col * spacing + jitter,
+            bed.zMin + spacing / 2 + row * spacing + jitter,
             0.85 + ((row + col + tier) % 5) * 0.05,
           );
         }
@@ -283,9 +297,15 @@ export function computeCultivationLayout(params: {
         sideClearanceM,
         pathwayWidthM,
         system,
+        layout.bedLineCount,
       ),
     );
   }
+
+  const bedLineCount =
+    bayCount > 0
+      ? Math.round(beds.length / bayCount)
+      : 0;
 
   const plants: PlantSlot[] = [];
   let slotOffset = 0;
@@ -322,6 +342,7 @@ export function computeCultivationLayout(params: {
     pathwayAreaM2,
     totalPlants: plants.length,
     plantsPerTier,
+    bedLineCount,
   };
 }
 

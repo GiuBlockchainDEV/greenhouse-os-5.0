@@ -37,7 +37,10 @@
     "plantsPerTier": "Plantes par Niveau",
     "totalPlants": "Plantes Totales",
     "plantDensity": "Densité de Plantation",
-    "pathwayWidth": "Largeur de l'Allée",
+    "bedLineCount": "Lignes de Culture (0 = auto)",
+    "bedLinesPerBay": "Lignes par Travée",
+    "totalBedLines": "Lignes Totales",
+    "pathwayWidth": "Allée entre Lignes",
     "sideClearance": "Marge Latérale",
     "tiersShort": "niveaux"
   }

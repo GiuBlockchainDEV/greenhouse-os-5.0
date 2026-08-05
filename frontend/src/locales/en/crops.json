@@ -37,7 +37,10 @@
     "plantsPerTier": "Plants per Level",
     "totalPlants": "Total Plants",
     "plantDensity": "Plant Density",
-    "pathwayWidth": "Pathway Width",
+    "bedLineCount": "Cultivation Lines (0 = auto)",
+    "bedLinesPerBay": "Lines per Bay",
+    "totalBedLines": "Total Lines",
+    "pathwayWidth": "Pathway Between Lines",
     "sideClearance": "Side Clearance",
     "tiersShort": "levels"
   }

@@ -99,6 +99,8 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
         tier_count: state.crop.layout.tierCount,
         gutter_length_m: state.crop.layout.gutterLengthM,
         plants_per_tier: state.crop.layout.plantsPerTier,
+        plant_density: state.crop.layout.plantDensity,
+        bed_line_count: state.crop.layout.bedLineCount,
         pathway_width_m: state.crop.layout.pathwayWidthM,
         side_clearance_m: state.crop.layout.sideClearanceM,
       },

@@ -50,9 +50,10 @@ const DEFAULT_COVERING: CoveringMaterial = {
 
 const DEFAULT_LAYOUT: CultivationLayout = {
   tierCount: 1,
-  gutterLengthM: 30,
+  gutterLengthM: 8.8,
   plantsPerTier: 0,
   plantDensity: 1.0,
+  bedLineCount: 0,
   pathwayWidthM: 1.2,
   sideClearanceM: 0.6,
 };
@@ -133,6 +134,8 @@ function computeVolumeMetrics(
     pathwayAreaM2: Number(cultivation.pathwayAreaM2.toFixed(2)),
     totalPlants: cultivation.totalPlants,
     plantsPerTier: cultivation.plantsPerTier,
+    bedLineCount: cultivation.bedLineCount,
+    totalBedLines: cultivation.bedLineCount * structure.bayCount,
     totalWidthM: Number(width.toFixed(2)),
     bayCount: structure.bayCount,
     bedCoveragePct: Number(
@@ -166,7 +169,7 @@ function syncCropFromLayout(
       ...crop.layout,
       plantsPerTier: cultivation.plantsPerTier,
       gutterLengthM: Number(
-        Math.max(1, dimensions.length - 2 * crop.layout.sideClearanceM).toFixed(1),
+        Math.max(1, structure.bayWidthM - 2 * crop.layout.sideClearanceM).toFixed(1),
       ),
     },
   };

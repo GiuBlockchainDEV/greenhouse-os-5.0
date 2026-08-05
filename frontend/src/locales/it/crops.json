@@ -37,7 +37,10 @@
     "plantsPerTier": "Piante per Livello",
     "totalPlants": "Piante Totali",
     "plantDensity": "Densità Impianto",
-    "pathwayWidth": "Larghezza Corsello",
+    "bedLineCount": "Linee di Coltivazione (0 = auto)",
+    "bedLinesPerBay": "Linee per Campata",
+    "totalBedLines": "Linee Totali",
+    "pathwayWidth": "Larghezza Corsello tra Linee",
     "sideClearance": "Margine Laterale",
     "tiersShort": "livelli"
   }
