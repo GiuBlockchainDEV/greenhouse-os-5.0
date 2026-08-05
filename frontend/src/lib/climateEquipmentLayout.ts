@@ -125,7 +125,6 @@ function gableFanCenterY(
   archType: ArchType,
   eaveHeight: number,
   ridgeHeight: number,
-  bayWidthM: number,
 ): number {
   const rise = roofRiseM(eaveHeight, ridgeHeight);
   if (archType === "semicircular") {
@@ -229,7 +228,7 @@ export function computeClimateEquipmentLayout(params: {
       const zCenter = bayCenterZ(bayIndex, bayWidthM, width);
       roofExhaustFans.push({
         x: halfLength - 0.08,
-        y: gableFanCenterY(archType, eaveHeight, ridgeHeight, bayWidthM),
+        y: gableFanCenterY(archType, eaveHeight, ridgeHeight),
         z: zCenter,
         diameterM: Math.min(sizing.roofExhaustFanDiameterM, bayWidthM * 0.38),
         gableMount: true,
