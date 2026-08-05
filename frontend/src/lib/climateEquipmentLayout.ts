@@ -165,14 +165,14 @@ function distributeCirculationFansOnBeds(
     if (lineFanCount <= 0) continue;
 
     const lineBeds = beds.filter((bed) => bed.bedIndex === lineIdx);
-    if (lineBeds.length === 0) continue;
+    const firstBed = lineBeds[0];
+    if (!firstBed) continue;
 
-    const xMin = lineBeds[0].xMin;
-    const xMax = lineBeds[0].xMax;
-    const xPositions = evenlySpacedInRange(lineFanCount, xMin, xMax);
+    const xPositions = evenlySpacedInRange(lineFanCount, firstBed.xMin, firstBed.xMax);
 
     xPositions.forEach((x, fanIdx) => {
       const bed = lineBeds[fanIdx % lineBeds.length];
+      if (!bed) return;
       const centerZ = (bed.zMin + bed.zMax) / 2;
       fans.push({
         x,
