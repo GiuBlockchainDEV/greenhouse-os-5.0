@@ -55,12 +55,17 @@
   "equipment": {
     "title": "Équipement Climatique",
     "sizingTitle": "Dimensionnement (Jumeau Numérique)",
+    "circulationTitle": "Circulation d'Air Interne",
     "cooling": "Refroidissement",
     "heating": "Chauffage",
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Ventilateurs d'Extraction",
       "exhaustFanDiameter": "Diamètre Ventilateur",
+      "roofExhaustFanCount": "Ventilateurs de Toit",
+      "roofExhaustFanDiameter": "Diamètre Ventilateur Toit",
+      "circulationFanCount": "Ventilateurs de Circulation Internes",
+      "circulationFanDiameter": "Diamètre Circulation",
       "padWallWidth": "Largeur Mur de Pad",
       "padWallHeight": "Hauteur Mur de Pad",
       "acUnitCount": "Unités de Climatisation",

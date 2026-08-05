@@ -4,10 +4,12 @@ import * as THREE from "three";
 import {
   computeClimateEquipmentLayout,
   type AcUnitPlacement,
+  type CirculationFanPlacement,
   type FanPlacement,
   type FogLinePlacement,
   type HeaterPlacement,
   type PadWallPlacement,
+  type RoofExhaustFanPlacement,
   type VentPlacement,
 } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -18,6 +20,25 @@ const PAD_COLOR = "#0ea5e9";
 const AC_COLOR = "#94a3b8";
 const HEATER_COLOR = "#f97316";
 const FOG_COLOR = "#67e8f9";
+
+const CIRC_FAN_COLOR = "#38bdf8";
+
+function FanBlades({ radius, depth = 0.02 }: { radius: number; depth?: number }) {
+  return (
+    <>
+      {Array.from({ length: 6 }, (_, index) => (
+        <mesh
+          key={`blade-${index}`}
+          rotation={[0, 0, (Math.PI * 2 * index) / 6]}
+          position={[0, 0, depth / 2 + 0.04]}
+        >
+          <boxGeometry args={[radius * 1.5, 0.08, depth]} />
+          <meshStandardMaterial color={FRAME_COLOR} metalness={0.4} roughness={0.5} />
+        </mesh>
+      ))}
+    </>
+  );
+}
 
 function ExhaustFan({ fan }: { fan: FanPlacement }) {
   const radius = fan.diameterM / 2;
@@ -31,16 +52,62 @@ function ExhaustFan({ fan }: { fan: FanPlacement }) {
         <cylinderGeometry args={[radius * 0.85, radius * 0.85, 0.06, 16]} />
         <meshStandardMaterial color="#334155" metalness={0.5} roughness={0.4} />
       </mesh>
-      {Array.from({ length: 6 }, (_, index) => (
-        <mesh
-          key={`blade-${index}`}
-          rotation={[0, 0, (Math.PI * 2 * index) / 6]}
-          position={[0, 0, 0.24]}
-        >
-          <boxGeometry args={[radius * 1.5, 0.08, 0.02]} />
-          <meshStandardMaterial color={FRAME_COLOR} metalness={0.4} roughness={0.5} />
+      <FanBlades radius={radius} />
+    </group>
+  );
+}
+
+function RoofExhaustFan({ fan }: { fan: RoofExhaustFanPlacement }) {
+  const radius = fan.diameterM / 2;
+  return (
+    <group
+      position={[fan.x, fan.y, fan.z]}
+      rotation={[-fan.pitchX, -Math.PI / 2, 0]}
+    >
+      <mesh position={[0, 0.12, 0]}>
+        <boxGeometry args={[fan.diameterM + 0.2, 0.1, fan.diameterM + 0.2]} />
+        <meshStandardMaterial color={METAL_COLOR} metalness={0.65} roughness={0.35} />
+      </mesh>
+      <mesh>
+        <boxGeometry args={[fan.diameterM + 0.18, fan.diameterM + 0.18, 0.28]} />
+        <meshStandardMaterial color="#475569" metalness={0.6} roughness={0.38} />
+      </mesh>
+      <mesh position={[0, 0, 0.16]}>
+        <cylinderGeometry args={[radius * 0.82, radius * 0.82, 0.05, 16]} />
+        <meshStandardMaterial color="#334155" metalness={0.5} roughness={0.4} />
+      </mesh>
+      <FanBlades radius={radius} />
+    </group>
+  );
+}
+
+function CirculationFan({ fan }: { fan: CirculationFanPlacement }) {
+  const radius = fan.diameterM / 2;
+  return (
+    <group position={[fan.x, fan.y, fan.z]} rotation={[0, fan.yaw, 0]}>
+      <mesh position={[0, 0.42, 0]}>
+        <boxGeometry args={[0.22, 0.07, 0.22]} />
+        <meshStandardMaterial color={METAL_COLOR} metalness={0.55} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, 0.28, 0]}>
+        <cylinderGeometry args={[0.012, 0.012, 0.28, 6]} />
+        <meshStandardMaterial color="#334155" metalness={0.5} roughness={0.45} />
+      </mesh>
+      <group rotation={[0, 0, Math.PI / 2]}>
+        <mesh>
+          <boxGeometry args={[fan.diameterM + 0.12, fan.diameterM + 0.12, 0.32]} />
+          <meshStandardMaterial color={CIRC_FAN_COLOR} metalness={0.45} roughness={0.42} />
         </mesh>
-      ))}
+        <mesh position={[0, 0, 0.18]}>
+          <cylinderGeometry args={[radius * 0.88, radius * 0.88, 0.05, 14]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.45} roughness={0.4} />
+        </mesh>
+        <FanBlades radius={radius} />
+      </group>
+      <mesh position={[fan.diameterM * 0.35, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.04, 0.12, 6]} />
+        <meshStandardMaterial color={FRAME_COLOR} metalness={0.35} roughness={0.5} />
+      </mesh>
     </group>
   );
 }
@@ -253,6 +320,12 @@ export function ClimateEquipmentMesh() {
     <group>
       {layout.exhaustFans.map((fan, index) => (
         <ExhaustFan key={`fan-${index}`} fan={fan} />
+      ))}
+      {layout.roofExhaustFans.map((fan, index) => (
+        <RoofExhaustFan key={`roof-fan-${index}`} fan={fan} />
+      ))}
+      {layout.circulationFans.map((fan, index) => (
+        <CirculationFan key={`circ-fan-${index}`} fan={fan} />
       ))}
       {layout.padWalls.map((pad, index) => (
         <PadWall key={`pad-${index}`} pad={pad} />

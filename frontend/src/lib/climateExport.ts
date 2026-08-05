@@ -112,6 +112,10 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
       sizing: {
         exhaust_fan_count: state.climateEquipment.sizing.exhaustFanCount,
         exhaust_fan_diameter_m: state.climateEquipment.sizing.exhaustFanDiameterM,
+        roof_exhaust_fan_count: state.climateEquipment.sizing.roofExhaustFanCount,
+        roof_exhaust_fan_diameter_m: state.climateEquipment.sizing.roofExhaustFanDiameterM,
+        circulation_fan_count: state.climateEquipment.sizing.circulationFanCount,
+        circulation_fan_diameter_m: state.climateEquipment.sizing.circulationFanDiameterM,
         pad_wall_width_m: state.climateEquipment.sizing.padWallWidthM,
         pad_wall_height_m: state.climateEquipment.sizing.padWallHeightM,
         ac_unit_count: state.climateEquipment.sizing.acUnitCount,

@@ -55,12 +55,17 @@
   "equipment": {
     "title": "Climate Equipment",
     "sizingTitle": "Equipment Sizing (3D Twin)",
+    "circulationTitle": "Internal Air Circulation",
     "cooling": "Cooling System",
     "heating": "Heating System",
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Exhaust Fans",
       "exhaustFanDiameter": "Fan Diameter",
+      "roofExhaustFanCount": "Roof Exhaust Fans",
+      "roofExhaustFanDiameter": "Roof Fan Diameter",
+      "circulationFanCount": "Internal Circulation Fans",
+      "circulationFanDiameter": "Circulation Fan Diameter",
       "padWallWidth": "Pad Wall Width",
       "padWallHeight": "Pad Wall Height",
       "acUnitCount": "AC Units",

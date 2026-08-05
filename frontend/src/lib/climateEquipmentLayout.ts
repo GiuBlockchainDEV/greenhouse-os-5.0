@@ -18,6 +18,16 @@ export interface FanPlacement extends Vec3 {
   diameterM: number;
 }
 
+export interface CirculationFanPlacement extends FanPlacement {
+  /** Horizontal blow direction (yaw radians, 0 = +X). */
+  yaw: number;
+}
+
+export interface RoofExhaustFanPlacement extends FanPlacement {
+  /** Roof slope pitch in radians (tilt down toward interior). */
+  pitchX: number;
+}
+
 export interface PadWallPlacement {
   x: number;
   y: number;
@@ -52,6 +62,8 @@ export interface FogLinePlacement {
 
 export interface ClimateEquipmentLayout {
   exhaustFans: FanPlacement[];
+  roofExhaustFans: RoofExhaustFanPlacement[];
+  circulationFans: CirculationFanPlacement[];
   padWalls: PadWallPlacement[];
   acUnits: AcUnitPlacement[];
   vents: VentPlacement[];
@@ -62,6 +74,10 @@ export interface ClimateEquipmentLayout {
 export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
   exhaustFanCount: 4,
   exhaustFanDiameterM: 1.2,
+  roofExhaustFanCount: 2,
+  roofExhaustFanDiameterM: 1.0,
+  circulationFanCount: 6,
+  circulationFanDiameterM: 0.55,
   padWallWidthM: 8,
   padWallHeightM: 2,
   acUnitCount: 2,
@@ -116,6 +132,8 @@ export function computeClimateEquipmentLayout(params: {
   const halfLength = length / 2;
   const halfWidth = width / 2;
   const exhaustFans: FanPlacement[] = [];
+  const roofExhaustFans: RoofExhaustFanPlacement[] = [];
+  const circulationFans: CirculationFanPlacement[] = [];
   const padWalls: PadWallPlacement[] = [];
   const acUnits: AcUnitPlacement[] = [];
   const vents: VentPlacement[] = [];
@@ -132,6 +150,42 @@ export function computeClimateEquipmentLayout(params: {
         diameterM: sizing.exhaustFanDiameterM,
       });
     });
+
+    const roofFanZs =
+      sizing.roofExhaustFanCount > 0
+        ? spreadAlongAxis(sizing.roofExhaustFanCount, width, width * 0.15)
+        : [];
+    const roofPitch = Math.atan2(ridgeHeight - eaveHeight, Math.max(bayWidthM * 0.45, 1));
+    roofFanZs.forEach((offsetZ) => {
+      roofExhaustFans.push({
+        x: halfLength - 0.18,
+        y: eaveHeight + (ridgeHeight - eaveHeight) * 0.82,
+        z: offsetZ,
+        diameterM: sizing.roofExhaustFanDiameterM,
+        pitchX: roofPitch * 0.55,
+      });
+    });
+  }
+
+  if (sizing.circulationFanCount > 0) {
+    const hangY = Math.min(eaveHeight - 0.65, ridgeHeight - 1.1);
+    const rows = Math.max(1, Math.round(Math.sqrt(sizing.circulationFanCount * (length / Math.max(width, 1)))));
+    const cols = Math.max(1, Math.ceil(sizing.circulationFanCount / rows));
+    const fanXs = spreadAlongAxis(cols, length, length * 0.16);
+    const fanZs = spreadAlongAxis(rows, width, width * 0.14);
+    let placed = 0;
+    for (let row = 0; row < rows && placed < sizing.circulationFanCount; row++) {
+      for (let col = 0; col < cols && placed < sizing.circulationFanCount; col++) {
+        circulationFans.push({
+          x: fanXs[col] ?? 0,
+          y: Math.max(1.8, hangY),
+          z: fanZs[row] ?? 0,
+          diameterM: sizing.circulationFanDiameterM,
+          yaw: row % 2 === 0 ? Math.PI : 0,
+        });
+        placed++;
+      }
+    }
   }
 
   if (needsPadWall(equipment.cooling)) {
@@ -271,6 +325,8 @@ export function computeClimateEquipmentLayout(params: {
 
   return {
     exhaustFans,
+    roofExhaustFans,
+    circulationFans,
     padWalls,
     acUnits,
     vents,

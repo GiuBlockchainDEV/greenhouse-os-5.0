@@ -56,6 +56,10 @@ export interface WSCrop {
 export interface WSClimateEquipmentSizing {
   exhaust_fan_count: number;
   exhaust_fan_diameter_m: number;
+  roof_exhaust_fan_count: number;
+  roof_exhaust_fan_diameter_m: number;
+  circulation_fan_count: number;
+  circulation_fan_diameter_m: number;
   pad_wall_width_m: number;
   pad_wall_height_m: number;
   ac_unit_count: number;

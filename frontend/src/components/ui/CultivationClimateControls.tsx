@@ -328,6 +328,24 @@ export function CultivationClimateControls() {
                   step={0.1}
                   onChange={(value) => setClimateEquipmentSizing({ exhaustFanDiameterM: value })}
                 />
+                <SliderRow
+                  label={tSim("equipment.sizing.roofExhaustFanCount")}
+                  value={sizing.roofExhaustFanCount}
+                  unit=""
+                  min={0}
+                  max={8}
+                  step={1}
+                  onChange={(value) => setClimateEquipmentSizing({ roofExhaustFanCount: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.sizing.roofExhaustFanDiameter")}
+                  value={sizing.roofExhaustFanDiameterM}
+                  unit={tCommon("units.meters")}
+                  min={0.7}
+                  max={1.6}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ roofExhaustFanDiameterM: value })}
+                />
               </>
             )}
             {showPad && (
@@ -453,6 +471,30 @@ export function CultivationClimateControls() {
             )}
           </div>
         )}
+
+        <div className="mt-2 flex flex-col gap-2 rounded-lg border border-greenhouse-700/60 bg-greenhouse-950/40 p-3">
+          <h5 className="text-[11px] font-semibold uppercase tracking-wide text-greenhouse-500">
+            {tSim("equipment.circulationTitle")}
+          </h5>
+          <SliderRow
+            label={tSim("equipment.sizing.circulationFanCount")}
+            value={sizing.circulationFanCount}
+            unit=""
+            min={0}
+            max={24}
+            step={1}
+            onChange={(value) => setClimateEquipmentSizing({ circulationFanCount: value })}
+          />
+          <SliderRow
+            label={tSim("equipment.sizing.circulationFanDiameter")}
+            value={sizing.circulationFanDiameterM}
+            unit={tCommon("units.meters")}
+            min={0.4}
+            max={1.0}
+            step={0.05}
+            onChange={(value) => setClimateEquipmentSizing({ circulationFanDiameterM: value })}
+          />
+        </div>
       </section>
     </>
   );

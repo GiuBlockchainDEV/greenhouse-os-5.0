@@ -55,12 +55,17 @@
   "equipment": {
     "title": "Impianto Climatico",
     "sizingTitle": "Dimensioni Impianto (Digital Twin)",
+    "circulationTitle": "Circolazione Aria Interna",
     "cooling": "Raffrescamento",
     "heating": "Riscaldamento",
     "ventilation": "Ventilazione",
     "sizing": {
       "exhaustFanCount": "Ventole Estrazione",
       "exhaustFanDiameter": "Diametro Ventola",
+      "roofExhaustFanCount": "Ventole Tetto (sopra estrazione)",
+      "roofExhaustFanDiameter": "Diametro Ventola Tetto",
+      "circulationFanCount": "Ventole Circolazione Interne",
+      "circulationFanDiameter": "Diametro Circolazione",
       "padWallWidth": "Larghezza Pad Wall",
       "padWallHeight": "Altezza Pad Wall",
       "acUnitCount": "Unità Climatizzatore",

@@ -96,6 +96,14 @@ export interface ClimateEquipmentSizing {
   exhaustFanCount: number;
   /** Fan impeller diameter in meters. */
   exhaustFanDiameterM: number;
+  /** Gable-roof exhaust fans above wall fans at the fan end. */
+  roofExhaustFanCount: number;
+  /** Roof exhaust fan impeller diameter in meters. */
+  roofExhaustFanDiameterM: number;
+  /** Horizontal circulation (HAF) fans inside the greenhouse. */
+  circulationFanCount: number;
+  /** Circulation fan impeller diameter in meters. */
+  circulationFanDiameterM: number;
   /** Pad wall span along the gable width in meters. */
   padWallWidthM: number;
   /** Pad wall height in meters. */
