@@ -1,8 +1,15 @@
-/** Bed layout, pathways, and elevation by cultivation system. */
+/** Bed layout, pathways, and system-aware plant placement. */
 
+import {
+  DWC_HOLE_SPACING_M,
+  SUBSTRATE_SLAB_SPACING_M,
+  SYSTEM_DEFAULT_DENSITY,
+} from "@/lib/cultivationConstants";
 import { plantScaleForSystem } from "@/lib/plantGeometry";
 import { bayCenterZ } from "@/lib/structureUtils";
 import type { CultivationLayout, CultivationSystem, CropType } from "@/types/greenhouse";
+
+export { DWC_HOLE_SPACING_M, SUBSTRATE_SLAB_SPACING_M };
 
 export const SYSTEM_BED_ELEVATION_M: Record<CultivationSystem, number> = {
   soil: 0.0,
@@ -63,6 +70,7 @@ export interface PlantSlot {
   z: number;
   scale: number;
   rotation: number;
+  slotIndex: number;
 }
 
 export interface CultivationLayoutResult {
@@ -71,6 +79,7 @@ export interface CultivationLayoutResult {
   cultivationAreaM2: number;
   pathwayAreaM2: number;
   totalPlants: number;
+  plantsPerTier: number;
 }
 
 function computeBedZonesForBay(
@@ -126,6 +135,99 @@ function computeBedZonesForBay(
   ];
 }
 
+function plantY(bed: BedZone, system: CultivationSystem, tier: number, tierStep: number): number {
+  switch (system) {
+    case "nft":
+    case "aeroponic":
+      return bed.elevationM + 0.11 + tier * tierStep;
+    case "dwc":
+      return bed.elevationM + bed.depthM + 0.14 + tier * tierStep;
+    case "substrate":
+      return bed.elevationM + 0.22 + tier * tierStep;
+    default:
+      return bed.elevationM + bed.depthM + 0.02 + tier * tierStep;
+  }
+}
+
+function generateSlotsForBed(
+  bed: BedZone,
+  system: CultivationSystem,
+  spacing: number,
+  tier: number,
+  tierStep: number,
+  baseScale: number,
+  systemScale: number,
+  slotOffset: number,
+): PlantSlot[] {
+  const bedLength = bed.xMax - bed.xMin;
+  const bedWidth = bed.zMax - bed.zMin;
+  const centerZ = (bed.zMin + bed.zMax) / 2;
+  const y = plantY(bed, system, tier, tierStep);
+  const slots: PlantSlot[] = [];
+  let idx = slotOffset;
+
+  const push = (x: number, z: number, scaleMul = 1) => {
+    slots.push({
+      x,
+      y,
+      z,
+      scale: baseScale * systemScale * scaleMul,
+      rotation: ((idx * 17) % 360) * (Math.PI / 180),
+      slotIndex: idx++,
+    });
+  };
+
+  switch (system) {
+    case "nft":
+    case "aeroponic": {
+      const count = Math.max(1, Math.floor(bedLength / spacing));
+      for (let row = 0; row < count; row++) {
+        push(bed.xMin + spacing / 2 + row * spacing, centerZ);
+      }
+      break;
+    }
+    case "dwc": {
+      const startX = bed.xMin + DWC_HOLE_SPACING_M * 0.7;
+      const startZ = bed.zMin + DWC_HOLE_SPACING_M * 0.7;
+      for (let x = startX; x <= bed.xMax - 0.25; x += DWC_HOLE_SPACING_M) {
+        for (let z = startZ; z <= bed.zMax - 0.25; z += DWC_HOLE_SPACING_M) {
+          push(x, z);
+        }
+      }
+      break;
+    }
+    case "substrate": {
+      const slabCount = Math.max(1, Math.floor(bedLength / SUBSTRATE_SLAB_SPACING_M));
+      for (let i = 0; i < slabCount; i++) {
+        const x = bed.xMin + bedLength / (slabCount + 1) * (i + 1);
+        if (bedWidth > 1.2) {
+          push(x, centerZ - bedWidth * 0.2);
+          push(x, centerZ + bedWidth * 0.2, 0.95);
+        } else {
+          push(x, centerZ);
+        }
+      }
+      break;
+    }
+    default: {
+      const rows = Math.max(1, Math.floor(bedLength / spacing));
+      const cols = Math.max(1, Math.floor(bedWidth / spacing));
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const jitter = ((tier * rows * cols + row * cols + col) % 7) * 0.012 - 0.03;
+          push(
+            bed.xMin + spacing / 2 + row * spacing + jitter,
+            bed.zMin + spacing / 2 + col * spacing + jitter,
+            0.85 + ((row + col + tier) % 5) * 0.05,
+          );
+        }
+      }
+    }
+  }
+
+  return slots;
+}
+
 export function computeCultivationLayout(params: {
   length: number;
   totalWidth: number;
@@ -154,8 +256,9 @@ export function computeCultivationLayout(params: {
   const sideClearanceM = layout.sideClearanceM;
   const pathwayWidthM = layout.pathwayWidthM;
   const tierCount = Math.max(layout.tierCount, 1);
+  const density = layout.plantDensity * SYSTEM_DEFAULT_DENSITY[system];
   const spacing =
-    SYSTEM_PLANT_SPACING_M[system] * CROP_SPACING_FACTOR[cropType];
+    (SYSTEM_PLANT_SPACING_M[system] * CROP_SPACING_FACTOR[cropType]) / density;
   const tierStep = Math.min(1.0, Math.max((eaveHeight - 1.2) / tierCount, 0.35));
   const systemScale = plantScaleForSystem(system);
 
@@ -167,7 +270,7 @@ export function computeCultivationLayout(params: {
     generative: 1.0,
     harvest: 0.85,
   };
-  const baseScale = (0.25 + lai * 0.12) * (stageScale[growthStage] ?? 1.0);
+  const baseScale = (0.35 + lai * 0.1) * (stageScale[growthStage] ?? 1.0);
 
   const beds: BedZone[] = [];
   for (let bayIndex = 0; bayIndex < bayCount; bayIndex++) {
@@ -185,26 +288,21 @@ export function computeCultivationLayout(params: {
   }
 
   const plants: PlantSlot[] = [];
+  let slotOffset = 0;
   for (const bed of beds) {
     for (let tier = 0; tier < tierCount; tier++) {
-      const bedLength = bed.xMax - bed.xMin;
-      const bedWidth = bed.zMax - bed.zMin;
-      const rows = Math.max(1, Math.floor(bedLength / spacing));
-      const cols = Math.max(1, Math.floor(bedWidth / spacing));
-      const y = bed.elevationM + bed.depthM + 0.01 + tier * tierStep;
-
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const jitter = ((tier * rows * cols + row * cols + col) % 7) * 0.015 - 0.04;
-          plants.push({
-            x: bed.xMin + spacing / 2 + row * spacing + jitter,
-            y,
-            z: bed.zMin + spacing / 2 + col * spacing + jitter,
-            scale: baseScale * systemScale * (0.85 + ((row + col + tier) % 5) * 0.05),
-            rotation: ((row * 3 + col * 7 + tier * 11) % 360) * (Math.PI / 180),
-          });
-        }
-      }
+      const bedSlots = generateSlotsForBed(
+        bed,
+        system,
+        spacing,
+        tier,
+        tierStep,
+        baseScale,
+        systemScale,
+        slotOffset,
+      );
+      plants.push(...bedSlots);
+      slotOffset += bedSlots.length;
     }
   }
 
@@ -215,6 +313,7 @@ export function computeCultivationLayout(params: {
 
   const floorAreaM2 = length * totalWidth;
   const pathwayAreaM2 = Math.max(floorAreaM2 - cultivationAreaM2 / tierCount, 0);
+  const plantsPerTier = tierCount > 0 ? Math.round(plants.length / tierCount) : 0;
 
   return {
     beds,
@@ -222,6 +321,7 @@ export function computeCultivationLayout(params: {
     cultivationAreaM2,
     pathwayAreaM2,
     totalPlants: plants.length,
+    plantsPerTier,
   };
 }
 
@@ -234,7 +334,7 @@ export function estimatePlantsPerTier(
   system: CultivationSystem,
   layout: CultivationLayout,
 ): number {
-  const result = computeCultivationLayout({
+  return computeCultivationLayout({
     length,
     totalWidth,
     bayCount,
@@ -245,6 +345,5 @@ export function estimatePlantsPerTier(
     layout: { ...layout, tierCount: 1 },
     lai: 3,
     growthStage: "mid_season",
-  });
-  return Math.max(1, Math.round(result.totalPlants / Math.max(layout.tierCount, 1)));
+  }).plantsPerTier;
 }

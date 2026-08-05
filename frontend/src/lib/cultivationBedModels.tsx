@@ -1,5 +1,10 @@
 /** 3D bed / gutter / raft models per cultivation system. */
 
+import {
+  DWC_HOLE_SPACING_M,
+  NFT_CHANNEL_WIDTH_M,
+  SUBSTRATE_SLAB_SPACING_M,
+} from "@/lib/cultivationConstants";
 import type { BedZone } from "@/lib/cultivationLayout";
 import type { CultivationSystem } from "@/types/greenhouse";
 
@@ -44,7 +49,7 @@ function SubstrateBed({ bed }: { bed: BedZone }) {
   const d = bed.zMax - bed.zMin;
   const cx = (bed.xMin + bed.xMax) / 2;
   const cz = (bed.zMin + bed.zMax) / 2;
-  const slabCount = Math.max(2, Math.floor(w / 1.2));
+  const slabCount = Math.max(2, Math.floor(w / SUBSTRATE_SLAB_SPACING_M));
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
@@ -93,7 +98,7 @@ function NftGutter({ bed }: { bed: BedZone }) {
   const w = bed.xMax - bed.xMin;
   const cx = (bed.xMin + bed.xMax) / 2;
   const cz = (bed.zMin + bed.zMax) / 2;
-  const channelW = 0.32;
+  const channelW = NFT_CHANNEL_WIDTH_M;
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
@@ -129,11 +134,15 @@ function DwcRaft({ bed }: { bed: BedZone }) {
         <boxGeometry args={[w * 0.96, 0.1, d * 0.96]} />
         <meshStandardMaterial color={RAFT} roughness={0.85} />
       </mesh>
-      {Array.from({ length: Math.floor(w / 0.5) }, (_, i) =>
-        Array.from({ length: Math.floor(d / 0.5) }, (_, j) => (
+      {Array.from({ length: Math.floor((w - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, i) =>
+        Array.from({ length: Math.floor((d - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, j) => (
           <mesh
             key={`hole-${i}-${j}`}
-            position={[-w / 2 + 0.35 + i * 0.5, bed.depthM / 2 + 0.1, -d / 2 + 0.35 + j * 0.5]}
+            position={[
+              -w / 2 + DWC_HOLE_SPACING_M * 0.7 + i * DWC_HOLE_SPACING_M,
+              bed.depthM / 2 + 0.1,
+              -d / 2 + DWC_HOLE_SPACING_M * 0.7 + j * DWC_HOLE_SPACING_M,
+            ]}
           >
             <cylinderGeometry args={[0.06, 0.06, 0.12, 8]} />
             <meshStandardMaterial color="#111827" roughness={0.9} />

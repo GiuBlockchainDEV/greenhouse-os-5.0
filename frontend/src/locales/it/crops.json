@@ -35,6 +35,8 @@
     "tierLayout": "Layout Livelli",
     "tierCount": "Numero di Livelli",
     "plantsPerTier": "Piante per Livello",
+    "totalPlants": "Piante Totali",
+    "plantDensity": "Densità Impianto",
     "pathwayWidth": "Larghezza Corsello",
     "sideClearance": "Margine Laterale",
     "tiersShort": "livelli"

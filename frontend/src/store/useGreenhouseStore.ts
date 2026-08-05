@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 
 import { roofRiseM } from "@/lib/structureUtils";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
+import { defaultSystemForCrop } from "@/lib/cultivationConstants";
 import { DEFAULT_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
 import type {
   ClimateEquipment,
@@ -10,6 +11,7 @@ import type {
   CoveringMaterial,
   CropConfig,
   CultivationLayout,
+  CropType,
   DimensionUpdate,
   GeoLocation,
   GreenhouseDimensions,
@@ -49,14 +51,15 @@ const DEFAULT_COVERING: CoveringMaterial = {
 const DEFAULT_LAYOUT: CultivationLayout = {
   tierCount: 1,
   gutterLengthM: 30,
-  plantsPerTier: 120,
+  plantsPerTier: 0,
+  plantDensity: 1.0,
   pathwayWidthM: 1.2,
   sideClearanceM: 0.6,
 };
 
 const DEFAULT_CROP: CropConfig = {
   type: "tomato",
-  system: "nft",
+  system: "substrate",
   lai: 3.2,
   growthStage: "mid_season",
   layout: DEFAULT_LAYOUT,
@@ -129,6 +132,7 @@ function computeVolumeMetrics(
     cultivationAreaM2: Number(cultivation.cultivationAreaM2.toFixed(2)),
     pathwayAreaM2: Number(cultivation.pathwayAreaM2.toFixed(2)),
     totalPlants: cultivation.totalPlants,
+    plantsPerTier: cultivation.plantsPerTier,
     totalWidthM: Number(width.toFixed(2)),
     bayCount: structure.bayCount,
     bedCoveragePct: Number(
@@ -136,6 +140,64 @@ function computeVolumeMetrics(
     ),
   };
 }
+
+function syncCropFromLayout(
+  structure: GreenhouseStructure,
+  dimensions: GreenhouseDimensions,
+  crop: CropConfig,
+): CropConfig {
+  const width = structure.bayCount * structure.bayWidthM;
+  const cultivation = computeCultivationLayout({
+    length: dimensions.length,
+    totalWidth: width,
+    bayCount: structure.bayCount,
+    bayWidthM: structure.bayWidthM,
+    eaveHeight: dimensions.eaveHeight,
+    cropType: crop.type,
+    system: crop.system,
+    layout: crop.layout,
+    lai: crop.lai,
+    growthStage: crop.growthStage,
+  });
+
+  return {
+    ...crop,
+    layout: {
+      ...crop.layout,
+      plantsPerTier: cultivation.plantsPerTier,
+      gutterLengthM: Number(
+        Math.max(1, dimensions.length - 2 * crop.layout.sideClearanceM).toFixed(1),
+      ),
+    },
+  };
+}
+
+function buildCropUpdate(
+  structure: GreenhouseStructure,
+  dimensions: GreenhouseDimensions,
+  prev: CropConfig,
+  patch: Partial<CropConfig>,
+): { crop: CropConfig; metrics: VolumeMetrics } {
+  let next: CropConfig = {
+    ...prev,
+    ...patch,
+    layout: { ...prev.layout, ...(patch.layout ?? {}) },
+  };
+
+  if (patch.type && !patch.system) {
+    next.system = defaultSystemForCrop(patch.type as CropType);
+  }
+
+  const synced = syncCropFromLayout(structure, dimensions, next);
+  return {
+    crop: synced,
+    metrics: computeVolumeMetrics(structure, dimensions, synced),
+  };
+}
+
+const initialDimensions = syncDimensionsFromStructure(DEFAULT_STRUCTURE, DEFAULT_DIMENSIONS);
+const initialCrop = syncCropFromLayout(DEFAULT_STRUCTURE, initialDimensions, DEFAULT_CROP);
+const initialMetrics = computeVolumeMetrics(DEFAULT_STRUCTURE, initialDimensions, initialCrop);
 
 interface GreenhouseStore {
   locale: SupportedLocale;
@@ -177,11 +239,11 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       name: "Virtual Twin Alpha",
       location: DEFAULT_LOCATION,
       structure: DEFAULT_STRUCTURE,
-      dimensions: syncDimensionsFromStructure(DEFAULT_STRUCTURE, DEFAULT_DIMENSIONS),
+      dimensions: initialDimensions,
       covering: DEFAULT_COVERING,
-      crop: DEFAULT_CROP,
+      crop: initialCrop,
       climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
-      metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, DEFAULT_DIMENSIONS, DEFAULT_CROP),
+      metrics: initialMetrics,
       simulationStatus: "idle",
       simulationResults: null,
       gizmoMode: "off",
@@ -202,15 +264,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       setStructure: (update) => {
         const structure = { ...get().structure, ...update };
         const dimensions = syncDimensionsFromStructure(structure, get().dimensions);
-        set(
-          {
-            structure,
-            dimensions,
-            metrics: computeVolumeMetrics(structure, dimensions, get().crop),
-          },
-          false,
-          "setStructure",
-        );
+        const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {});
+        set({ structure, dimensions, crop, metrics }, false, "setStructure");
       },
 
       setDimensions: (update) => {
@@ -219,14 +274,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           ...get().dimensions,
           ...update,
         });
-        set(
-          {
-            dimensions,
-            metrics: computeVolumeMetrics(structure, dimensions, get().crop),
-          },
-          false,
-          "setDimensions",
-        );
+        const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {});
+        set({ dimensions, crop, metrics }, false, "setDimensions");
       },
 
       setCovering: (covering) =>
@@ -236,33 +285,20 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           "setCovering",
         ),
 
-      setCrop: (crop) => {
+      setCrop: (cropPatch) => {
         const structure = get().structure;
-        const nextCrop = { ...get().crop, ...crop };
-        set(
-          {
-            crop: nextCrop,
-            metrics: computeVolumeMetrics(structure, get().dimensions, nextCrop),
-          },
-          false,
-          "setCrop",
-        );
+        const dimensions = get().dimensions;
+        const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, cropPatch);
+        set({ crop, metrics }, false, "setCrop");
       },
 
-      setCropLayout: (layout) => {
+      setCropLayout: (layoutPatch) => {
         const structure = get().structure;
-        const nextCrop = {
-          ...get().crop,
-          layout: { ...get().crop.layout, ...layout },
-        };
-        set(
-          {
-            crop: nextCrop,
-            metrics: computeVolumeMetrics(structure, get().dimensions, nextCrop),
-          },
-          false,
-          "setCropLayout",
-        );
+        const dimensions = get().dimensions;
+        const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {
+          layout: layoutPatch,
+        });
+        set({ crop, metrics }, false, "setCropLayout");
       },
 
       setClimateEquipment: (equipment) => {
@@ -305,6 +341,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       resetToDefaults: () => {
         const dimensions = syncDimensionsFromStructure(DEFAULT_STRUCTURE, DEFAULT_DIMENSIONS);
+        const crop = syncCropFromLayout(DEFAULT_STRUCTURE, dimensions, DEFAULT_CROP);
         set(
           {
             name: "Virtual Twin Alpha",
@@ -312,9 +349,9 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             structure: DEFAULT_STRUCTURE,
             dimensions,
             covering: DEFAULT_COVERING,
-            crop: DEFAULT_CROP,
+            crop,
             climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
-            metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, dimensions, DEFAULT_CROP),
+            metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, dimensions, crop),
           },
           false,
           "resetToDefaults",

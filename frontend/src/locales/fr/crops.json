@@ -35,6 +35,8 @@
     "tierLayout": "Disposition des Niveaux",
     "tierCount": "Nombre de Niveaux",
     "plantsPerTier": "Plantes par Niveau",
+    "totalPlants": "Plantes Totales",
+    "plantDensity": "Densité de Plantation",
     "pathwayWidth": "Largeur de l'Allée",
     "sideClearance": "Marge Latérale",
     "tiersShort": "niveaux"

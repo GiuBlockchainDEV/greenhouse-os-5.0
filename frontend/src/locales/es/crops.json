@@ -35,6 +35,8 @@
     "tierLayout": "Disposición de Niveles",
     "tierCount": "Número de Niveles",
     "plantsPerTier": "Plantas por Nivel",
+    "totalPlants": "Plantas Totales",
+    "plantDensity": "Densidad de Plantación",
     "pathwayWidth": "Ancho del Pasillo",
     "sideClearance": "Margen Lateral",
     "tiersShort": "niveles"

@@ -57,8 +57,10 @@ export interface CultivationLayout {
   tierCount: number;
   /** Length of each gutter or bed run in meters. */
   gutterLengthM: number;
-  /** Plants per tier (approximate). */
+  /** Plants per tier — auto-synced from 3D layout (read-only in UI). */
   plantsPerTier: number;
+  /** Planting density multiplier (0.7 = sparse, 1.3 = dense). */
+  plantDensity: number;
   /** Central pathway width per bay (corsello) — not cultivable. */
   pathwayWidthM: number;
   /** Clearance from walls and bay edges. */
@@ -167,6 +169,7 @@ export interface VolumeMetrics {
   cultivationAreaM2: number;
   pathwayAreaM2: number;
   totalPlants: number;
+  plantsPerTier: number;
   totalWidthM: number;
   bayCount: number;
   bedCoveragePct: number;

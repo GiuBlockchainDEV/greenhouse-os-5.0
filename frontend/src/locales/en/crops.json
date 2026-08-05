@@ -35,6 +35,8 @@
     "tierLayout": "Growing Levels",
     "tierCount": "Vertical Levels",
     "plantsPerTier": "Plants per Level",
+    "totalPlants": "Total Plants",
+    "plantDensity": "Plant Density",
     "pathwayWidth": "Pathway Width",
     "sideClearance": "Side Clearance",
     "tiersShort": "levels"

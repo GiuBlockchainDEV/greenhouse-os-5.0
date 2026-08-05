@@ -112,12 +112,24 @@ function SelectRow({ label, value, options, onChange }: SelectRowProps) {
   );
 }
 
+function ReadOnlyMetricRow({ label, value, unit }: { label: string; value: number; unit: string }) {
+  return (
+    <div className="flex justify-between rounded-lg border border-greenhouse-700/80 bg-greenhouse-900/60 px-3 py-2 text-xs">
+      <span className="text-greenhouse-300">{label}</span>
+      <span className="font-mono text-white">
+        {value.toLocaleString()} {unit}
+      </span>
+    </div>
+  );
+}
+
 export function CultivationClimateControls() {
   const { t: tCommon } = useTranslation("common");
   const { t: tCrops } = useTranslation("crops");
   const { t: tSim } = useTranslation("simulation");
 
   const crop = useGreenhouseStore((state) => state.crop);
+  const metrics = useGreenhouseStore((state) => state.metrics);
   const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const setCrop = useGreenhouseStore((state) => state.setCrop);
   const setCropLayout = useGreenhouseStore((state) => state.setCropLayout);
@@ -196,13 +208,23 @@ export function CultivationClimateControls() {
           onChange={(value) => setCropLayout({ tierCount: value })}
         />
         <SliderRow
-          label={tCrops("labels.plantsPerTier")}
-          value={crop.layout.plantsPerTier}
+          label={tCrops("labels.plantDensity")}
+          value={crop.layout.plantDensity}
           unit=""
-          min={10}
-          max={500}
-          step={10}
-          onChange={(value) => setCropLayout({ plantsPerTier: value })}
+          min={0.7}
+          max={1.3}
+          step={0.05}
+          onChange={(value) => setCropLayout({ plantDensity: value })}
+        />
+        <ReadOnlyMetricRow
+          label={tCrops("labels.totalPlants")}
+          value={metrics.totalPlants}
+          unit=""
+        />
+        <ReadOnlyMetricRow
+          label={tCrops("labels.plantsPerTier")}
+          value={metrics.plantsPerTier}
+          unit=""
         />
         <SliderRow
           label={tCrops("labels.pathwayWidth")}

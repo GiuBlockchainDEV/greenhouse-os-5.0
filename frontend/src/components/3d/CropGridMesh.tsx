@@ -6,7 +6,7 @@ import {
   computeCultivationLayout,
   type PlantSlot,
 } from "@/lib/cultivationLayout";
-import { createPlantGeometry } from "@/lib/plantGeometry";
+import { createPlantLayers } from "@/lib/plantGeometry";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 function applyInstanceMatrices(mesh: THREE.InstancedMesh, plants: PlantSlot[]): void {
@@ -21,11 +21,48 @@ function applyInstanceMatrices(mesh: THREE.InstancedMesh, plants: PlantSlot[]): 
   mesh.instanceMatrix.needsUpdate = true;
 }
 
+function PlantInstances({
+  geometry,
+  count,
+  color,
+  plants,
+  instanceKey,
+}: {
+  geometry: THREE.BufferGeometry;
+  count: number;
+  color?: THREE.Color;
+  plants: PlantSlot[];
+  instanceKey: string;
+}) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    applyInstanceMatrices(mesh, plants);
+  }, [plants, instanceKey]);
+
+  return (
+    <instancedMesh
+      key={instanceKey}
+      ref={meshRef}
+      args={[geometry, undefined, count]}
+      castShadow
+      receiveShadow
+    >
+      {color ? (
+        <meshStandardMaterial color={color} roughness={0.78} metalness={0.04} side={THREE.DoubleSide} />
+      ) : (
+        <meshStandardMaterial vertexColors roughness={0.78} metalness={0.04} side={THREE.DoubleSide} />
+      )}
+    </instancedMesh>
+  );
+}
+
 export function CropGridMesh() {
   const dimensions = useGreenhouseStore((s) => s.dimensions);
   const structure = useGreenhouseStore((s) => s.structure);
   const crop = useGreenhouseStore((s) => s.crop);
-  const meshRef = useRef<THREE.InstancedMesh>(null);
 
   const layoutResult = useMemo(
     () =>
@@ -55,40 +92,46 @@ export function CropGridMesh() {
     ],
   );
 
-  const plantGeometry = useMemo(
-    () => createPlantGeometry(crop.type, crop.system, crop.growthStage),
+  const layers = useMemo(
+    () => createPlantLayers(crop.type, crop.system, crop.growthStage),
     [crop.type, crop.system, crop.growthStage],
   );
 
-  const instanceKey = `${crop.type}-${crop.system}-${crop.growthStage}-${layoutResult.plants.length}`;
-
-  useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-    applyInstanceMatrices(mesh, layoutResult.plants);
-  }, [layoutResult.plants, instanceKey]);
+  const instanceKey = `${crop.type}-${crop.system}-${crop.growthStage}-${layoutResult.plants.length}-${crop.layout.plantDensity}`;
 
   if (layoutResult.plants.length === 0) {
     return null;
   }
 
+  const count = layoutResult.plants.length;
+
   return (
     <group>
       <CultivationBedsGroup beds={layoutResult.beds} system={crop.system} />
-      <instancedMesh
-        key={instanceKey}
-        ref={meshRef}
-        args={[plantGeometry, undefined, layoutResult.plants.length]}
-        castShadow
-        receiveShadow
-      >
-        <meshStandardMaterial
-          vertexColors
-          side={THREE.DoubleSide}
-          roughness={0.82}
-          metalness={0.03}
+      {layers.mount && (
+        <PlantInstances
+          geometry={layers.mount}
+          count={count}
+          color={layers.mountColor}
+          plants={layoutResult.plants}
+          instanceKey={`${instanceKey}-mount`}
         />
-      </instancedMesh>
+      )}
+      <PlantInstances
+        geometry={layers.foliage}
+        count={count}
+        plants={layoutResult.plants}
+        instanceKey={`${instanceKey}-foliage`}
+      />
+      {layers.fruit && (
+        <PlantInstances
+          geometry={layers.fruit}
+          count={count}
+          color={layers.fruitColor ?? undefined}
+          plants={layoutResult.plants}
+          instanceKey={`${instanceKey}-fruit`}
+        />
+      )}
     </group>
   );
 }
