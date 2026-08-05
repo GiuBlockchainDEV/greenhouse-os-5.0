@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
+import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import {
   computeClimateEquipmentLayout,
   type AcUnitPlacement,
@@ -60,19 +61,12 @@ function ExhaustFan({ fan }: { fan: FanPlacement }) {
 function RoofExhaustFan({ fan }: { fan: RoofExhaustFanPlacement }) {
   const radius = fan.diameterM / 2;
   return (
-    <group
-      position={[fan.x, fan.y, fan.z]}
-      rotation={[-fan.pitchX, -Math.PI / 2, 0]}
-    >
-      <mesh position={[0, 0.12, 0]}>
-        <boxGeometry args={[fan.diameterM + 0.2, 0.1, fan.diameterM + 0.2]} />
-        <meshStandardMaterial color={METAL_COLOR} metalness={0.65} roughness={0.35} />
-      </mesh>
+    <group position={[fan.x, fan.y, fan.z]} rotation={[0, -Math.PI / 2, 0]}>
       <mesh>
-        <boxGeometry args={[fan.diameterM + 0.18, fan.diameterM + 0.18, 0.28]} />
+        <boxGeometry args={[fan.diameterM + 0.16, fan.diameterM + 0.16, 0.22]} />
         <meshStandardMaterial color="#475569" metalness={0.6} roughness={0.38} />
       </mesh>
-      <mesh position={[0, 0, 0.16]}>
+      <mesh position={[0, 0, 0.12]}>
         <cylinderGeometry args={[radius * 0.82, radius * 0.82, 0.05, 16]} />
         <meshStandardMaterial color="#334155" metalness={0.5} roughness={0.4} />
       </mesh>
@@ -305,16 +299,30 @@ export function ClimateEquipmentMesh() {
   const dimensions = useGreenhouseStore((s) => s.dimensions);
   const structure = useGreenhouseStore((s) => s.structure);
   const equipment = useGreenhouseStore((s) => s.climateEquipment);
+  const crop = useGreenhouseStore((s) => s.crop);
 
-  const layout = useMemo(
-    () =>
-      computeClimateEquipmentLayout({
-        dimensions,
-        structure,
-        equipment,
-      }),
-    [dimensions, structure, equipment],
-  );
+  const layout = useMemo(() => {
+    const cultivation = computeCultivationLayout({
+      length: dimensions.length,
+      totalWidth: dimensions.width,
+      bayCount: structure.bayCount,
+      bayWidthM: structure.bayWidthM,
+      eaveHeight: dimensions.eaveHeight,
+      cropType: crop.type,
+      system: crop.system,
+      layout: crop.layout,
+      lai: crop.lai,
+      growthStage: crop.growthStage,
+    });
+
+    return computeClimateEquipmentLayout({
+      dimensions,
+      structure,
+      equipment,
+      cultivationBeds: cultivation.beds,
+      bedLineCount: cultivation.bedLineCount,
+    });
+  }, [dimensions, structure, equipment, crop]);
 
   return (
     <group>

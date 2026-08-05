@@ -66,6 +66,8 @@
       "roofExhaustFanDiameter": "Diamètre Ventilateur Toit",
       "circulationFanCount": "Ventilateurs de Circulation Internes",
       "circulationFanDiameter": "Diamètre Circulation",
+      "circulationHint": "Ventilateurs par ligne de culture",
+      "circulationHintUnit": "par ligne",
       "padWallWidth": "Largeur Mur de Pad",
       "padWallHeight": "Hauteur Mur de Pad",
       "acUnitCount": "Unités de Climatisation",

@@ -1,7 +1,9 @@
 /** Positions and dimensions for 3D climate equipment placement. */
 
-import { bayCenterZ } from "@/lib/structureUtils";
+import type { BedZone } from "@/lib/cultivationLayout";
+import { bayCenterZ, roofRiseM } from "@/lib/structureUtils";
 import type {
+  ArchType,
   ClimateEquipment,
   ClimateEquipmentSizing,
   GreenhouseDimensions,
@@ -24,8 +26,8 @@ export interface CirculationFanPlacement extends FanPlacement {
 }
 
 export interface RoofExhaustFanPlacement extends FanPlacement {
-  /** Roof slope pitch in radians (tilt down toward interior). */
-  pitchX: number;
+  /** Fan mounted flush on the gable face (−X). */
+  gableMount: true;
 }
 
 export interface PadWallPlacement {
@@ -74,7 +76,7 @@ export interface ClimateEquipmentLayout {
 export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
   exhaustFanCount: 4,
   exhaustFanDiameterM: 1.2,
-  roofExhaustFanCount: 2,
+  roofExhaustFanCount: 1,
   roofExhaustFanDiameterM: 1.0,
   circulationFanCount: 6,
   circulationFanDiameterM: 0.55,
@@ -119,14 +121,82 @@ function needsExhaustFans(
   );
 }
 
+function gableFanCenterY(
+  archType: ArchType,
+  eaveHeight: number,
+  ridgeHeight: number,
+  bayWidthM: number,
+): number {
+  const rise = roofRiseM(eaveHeight, ridgeHeight);
+  if (archType === "semicircular") {
+    return eaveHeight + rise * 0.62;
+  }
+  return eaveHeight + rise * 0.58;
+}
+
+function distributeCirculationFansOnBeds(
+  totalCount: number,
+  beds: BedZone[],
+  bedLineCount: number,
+  eaveHeight: number,
+  ridgeHeight: number,
+  diameterM: number,
+): CirculationFanPlacement[] {
+  if (totalCount <= 0 || beds.length === 0) return [];
+
+  const lineCount = Math.max(1, bedLineCount);
+  const perLine = Math.floor(totalCount / lineCount);
+  let lineRemainder = totalCount % lineCount;
+  const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
+  const fans: CirculationFanPlacement[] = [];
+
+  for (let lineIdx = 0; lineIdx < lineCount; lineIdx++) {
+    const lineFanCount = perLine + (lineRemainder > 0 ? 1 : 0);
+    if (lineRemainder > 0) lineRemainder--;
+
+    if (lineFanCount <= 0) continue;
+
+    const lineBeds = beds.filter((bed) => bed.bedIndex === lineIdx);
+    if (lineBeds.length === 0) continue;
+
+    let bedRemainder = lineFanCount % lineBeds.length;
+    const perBed = Math.floor(lineFanCount / lineBeds.length);
+
+    for (const bed of lineBeds) {
+      const count = perBed + (bedRemainder > 0 ? 1 : 0);
+      if (bedRemainder > 0) bedRemainder--;
+      if (count <= 0) continue;
+
+      const runLen = bed.xMax - bed.xMin;
+      const centerX = (bed.xMin + bed.xMax) / 2;
+      const centerZ = (bed.zMin + bed.zMax) / 2;
+      const xOffsets = spreadAlongAxis(count, runLen, Math.max(runLen * 0.08, 0.5));
+
+      xOffsets.forEach((offset) => {
+        fans.push({
+          x: centerX + offset,
+          y: hangY,
+          z: centerZ,
+          diameterM,
+          yaw: lineIdx % 2 === 0 ? Math.PI : 0,
+        });
+      });
+    }
+  }
+
+  return fans;
+}
+
 export function computeClimateEquipmentLayout(params: {
   dimensions: GreenhouseDimensions;
   structure: GreenhouseStructure;
   equipment: ClimateEquipment;
+  cultivationBeds?: BedZone[];
+  bedLineCount?: number;
 }): ClimateEquipmentLayout {
-  const { dimensions, structure, equipment } = params;
+  const { dimensions, structure, equipment, cultivationBeds = [], bedLineCount = 0 } = params;
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
-  const { bayCount, bayWidthM } = structure;
+  const { bayCount, bayWidthM, archType } = structure;
   const sizing = equipment.sizing;
 
   const halfLength = length / 2;
@@ -151,41 +221,33 @@ export function computeClimateEquipmentLayout(params: {
       });
     });
 
-    const roofFanZs =
-      sizing.roofExhaustFanCount > 0
-        ? spreadAlongAxis(sizing.roofExhaustFanCount, width, width * 0.15)
-        : [];
-    const roofPitch = Math.atan2(ridgeHeight - eaveHeight, Math.max(bayWidthM * 0.45, 1));
-    roofFanZs.forEach((offsetZ) => {
+    const roofFanBayCount = Math.min(
+      Math.max(0, sizing.roofExhaustFanCount),
+      bayCount,
+    );
+    for (let bayIndex = 0; bayIndex < roofFanBayCount; bayIndex++) {
+      const zCenter = bayCenterZ(bayIndex, bayWidthM, width);
       roofExhaustFans.push({
-        x: halfLength - 0.18,
-        y: eaveHeight + (ridgeHeight - eaveHeight) * 0.82,
-        z: offsetZ,
-        diameterM: sizing.roofExhaustFanDiameterM,
-        pitchX: roofPitch * 0.55,
+        x: halfLength - 0.08,
+        y: gableFanCenterY(archType, eaveHeight, ridgeHeight, bayWidthM),
+        z: zCenter,
+        diameterM: Math.min(sizing.roofExhaustFanDiameterM, bayWidthM * 0.38),
+        gableMount: true,
       });
-    });
+    }
   }
 
-  if (sizing.circulationFanCount > 0) {
-    const hangY = Math.min(eaveHeight - 0.65, ridgeHeight - 1.1);
-    const rows = Math.max(1, Math.round(Math.sqrt(sizing.circulationFanCount * (length / Math.max(width, 1)))));
-    const cols = Math.max(1, Math.ceil(sizing.circulationFanCount / rows));
-    const fanXs = spreadAlongAxis(cols, length, length * 0.16);
-    const fanZs = spreadAlongAxis(rows, width, width * 0.14);
-    let placed = 0;
-    for (let row = 0; row < rows && placed < sizing.circulationFanCount; row++) {
-      for (let col = 0; col < cols && placed < sizing.circulationFanCount; col++) {
-        circulationFans.push({
-          x: fanXs[col] ?? 0,
-          y: Math.max(1.8, hangY),
-          z: fanZs[row] ?? 0,
-          diameterM: sizing.circulationFanDiameterM,
-          yaw: row % 2 === 0 ? Math.PI : 0,
-        });
-        placed++;
-      }
-    }
+  if (sizing.circulationFanCount > 0 && cultivationBeds.length > 0) {
+    circulationFans.push(
+      ...distributeCirculationFansOnBeds(
+        sizing.circulationFanCount,
+        cultivationBeds,
+        bedLineCount,
+        eaveHeight,
+        ridgeHeight,
+        sizing.circulationFanDiameterM,
+      ),
+    );
   }
 
   if (needsPadWall(equipment.cooling)) {

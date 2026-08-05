@@ -66,6 +66,8 @@
       "roofExhaustFanDiameter": "Diámetro Ventilador Techo",
       "circulationFanCount": "Ventiladores de Circulación Internos",
       "circulationFanDiameter": "Diámetro Circulación",
+      "circulationHint": "Ventiladores por línea de cultivo",
+      "circulationHintUnit": "por línea",
       "padWallWidth": "Ancho del Panel Húmedo",
       "padWallHeight": "Alto del Panel Húmedo",
       "acUnitCount": "Unidades de AC",

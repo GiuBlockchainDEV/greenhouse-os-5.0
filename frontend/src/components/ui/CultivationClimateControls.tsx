@@ -129,6 +129,7 @@ export function CultivationClimateControls() {
   const { t: tSim } = useTranslation("simulation");
 
   const crop = useGreenhouseStore((state) => state.crop);
+  const structure = useGreenhouseStore((state) => state.structure);
   const metrics = useGreenhouseStore((state) => state.metrics);
   const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const setCrop = useGreenhouseStore((state) => state.setCrop);
@@ -333,7 +334,7 @@ export function CultivationClimateControls() {
                   value={sizing.roofExhaustFanCount}
                   unit=""
                   min={0}
-                  max={8}
+                  max={structure.bayCount}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ roofExhaustFanCount: value })}
                 />
@@ -481,9 +482,18 @@ export function CultivationClimateControls() {
             value={sizing.circulationFanCount}
             unit=""
             min={0}
-            max={24}
+            max={Math.max(24, metrics.bedLineCount * structure.bayCount * 4)}
             step={1}
             onChange={(value) => setClimateEquipmentSizing({ circulationFanCount: value })}
+          />
+          <ReadOnlyMetricRow
+            label={tSim("equipment.sizing.circulationHint")}
+            value={
+              metrics.bedLineCount > 0
+                ? Math.floor(sizing.circulationFanCount / metrics.bedLineCount)
+                : 0
+            }
+            unit={tSim("equipment.sizing.circulationHintUnit")}
           />
           <SliderRow
             label={tSim("equipment.sizing.circulationFanDiameter")}

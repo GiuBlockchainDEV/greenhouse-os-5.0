@@ -66,6 +66,8 @@
       "roofExhaustFanDiameter": "Roof Fan Diameter",
       "circulationFanCount": "Internal Circulation Fans",
       "circulationFanDiameter": "Circulation Fan Diameter",
+      "circulationHint": "Fans per cultivation line",
+      "circulationHintUnit": "per line",
       "padWallWidth": "Pad Wall Width",
       "padWallHeight": "Pad Wall Height",
       "acUnitCount": "AC Units",
