@@ -1,25 +1,13 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
+import { CultivationBedsGroup } from "@/lib/cultivationBedModels";
 import {
   computeCultivationLayout,
-  type BedZone,
   type PlantSlot,
 } from "@/lib/cultivationLayout";
 import { createPlantGeometry } from "@/lib/plantGeometry";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
-import type { CultivationSystem } from "@/types/greenhouse";
-
-const BED_COLORS: Record<CultivationSystem, string> = {
-  soil: "#3d5c3a",
-  substrate: "#4a6741",
-  growbed: "#5c4a32",
-  nft: "#6b7280",
-  dwc: "#2563eb",
-  drip: "#3d5c3a",
-  aeroponic: "#7c3aed",
-  ebb_flow: "#5c4a32",
-};
 
 function applyInstanceMatrices(mesh: THREE.InstancedMesh, plants: PlantSlot[]): void {
   const dummy = new THREE.Object3D();
@@ -31,34 +19,6 @@ function applyInstanceMatrices(mesh: THREE.InstancedMesh, plants: PlantSlot[]): 
     mesh.setMatrixAt(index, dummy.matrix);
   });
   mesh.instanceMatrix.needsUpdate = true;
-}
-
-function CultivationBeds({ beds, system }: { beds: BedZone[]; system: CultivationSystem }) {
-  const color = BED_COLORS[system];
-
-  return (
-    <group>
-      {beds.map((bed) => {
-        const width = bed.xMax - bed.xMin;
-        const depth = bed.zMax - bed.zMin;
-        const centerX = (bed.xMin + bed.xMax) / 2;
-        const centerZ = (bed.zMin + bed.zMax) / 2;
-        const isGutter = system === "nft" || system === "aeroponic";
-
-        return (
-          <mesh
-            key={`bed-${bed.bayIndex}-${bed.bedIndex}`}
-            position={[centerX, bed.elevationM + bed.depthM / 2, centerZ]}
-            castShadow
-            receiveShadow
-          >
-            <boxGeometry args={[width, bed.depthM, isGutter ? 0.35 : depth]} />
-            <meshStandardMaterial color={color} roughness={0.85} metalness={0.15} />
-          </mesh>
-        );
-      })}
-    </group>
-  );
 }
 
 export function CropGridMesh() {
@@ -75,6 +35,7 @@ export function CropGridMesh() {
         bayCount: structure.bayCount,
         bayWidthM: structure.bayWidthM,
         eaveHeight: dimensions.eaveHeight,
+        cropType: crop.type,
         system: crop.system,
         layout: crop.layout,
         lai: crop.lai,
@@ -86,6 +47,7 @@ export function CropGridMesh() {
       dimensions.eaveHeight,
       structure.bayCount,
       structure.bayWidthM,
+      crop.type,
       crop.system,
       crop.layout,
       crop.lai,
@@ -94,15 +56,17 @@ export function CropGridMesh() {
   );
 
   const plantGeometry = useMemo(
-    () => createPlantGeometry(crop.type, crop.growthStage),
-    [crop.type, crop.growthStage],
+    () => createPlantGeometry(crop.type, crop.system, crop.growthStage),
+    [crop.type, crop.system, crop.growthStage],
   );
+
+  const instanceKey = `${crop.type}-${crop.system}-${crop.growthStage}-${layoutResult.plants.length}`;
 
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
     applyInstanceMatrices(mesh, layoutResult.plants);
-  }, [layoutResult.plants]);
+  }, [layoutResult.plants, instanceKey]);
 
   if (layoutResult.plants.length === 0) {
     return null;
@@ -110,9 +74,9 @@ export function CropGridMesh() {
 
   return (
     <group>
-      <CultivationBeds beds={layoutResult.beds} system={crop.system} />
+      <CultivationBedsGroup beds={layoutResult.beds} system={crop.system} />
       <instancedMesh
-        key={`${crop.type}-${crop.growthStage}-${layoutResult.plants.length}`}
+        key={instanceKey}
         ref={meshRef}
         args={[plantGeometry, undefined, layoutResult.plants.length]}
         castShadow

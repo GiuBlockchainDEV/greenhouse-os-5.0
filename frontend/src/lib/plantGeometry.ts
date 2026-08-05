@@ -1,11 +1,13 @@
-/** Procedural plant meshes — flat leaves and distinct silhouettes, no cone shapes. */
+/** Procedural plant meshes — crop type × cultivation system × growth stage. */
 
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
-import type { CropType, GrowthStage } from "@/types/greenhouse";
+import type { CropType, CultivationSystem, GrowthStage } from "@/types/greenhouse";
 
 const STEM = new THREE.Color("#5c4033");
+const NET_POT = new THREE.Color("#1f2937");
+const ROCKWOOL = new THREE.Color("#aed581");
 const FRUIT_TOMATO = new THREE.Color("#d64541");
 const FRUIT_PEPPER = new THREE.Color("#e67e22");
 const FRUIT_CUCUMBER = new THREE.Color("#2ecc71");
@@ -18,6 +20,18 @@ const LEAF: Record<CropType, THREE.Color> = {
   lettuce: new THREE.Color("#81c784"),
   strawberry: new THREE.Color("#4caf50"),
   cannabis: new THREE.Color("#689f38"),
+};
+
+/** Visual scale modifier per cultivation system. */
+export const SYSTEM_PLANT_SCALE: Record<CultivationSystem, number> = {
+  soil: 1.0,
+  substrate: 0.92,
+  growbed: 0.88,
+  nft: 0.7,
+  dwc: 0.75,
+  drip: 0.95,
+  aeroponic: 0.68,
+  ebb_flow: 0.82,
 };
 
 function paint(geometry: THREE.BufferGeometry, color: THREE.Color): THREE.BufferGeometry {
@@ -53,7 +67,6 @@ function place(
   return paint(geo, color);
 }
 
-/** Flat leaf blade — wide and thin, never conical. */
 function leafBlade(
   color: THREE.Color,
   length: number,
@@ -64,8 +77,7 @@ function leafBlade(
   tiltX: number,
   yaw: number,
 ): THREE.BufferGeometry {
-  const blade = new THREE.BoxGeometry(width, 0.014, length);
-  return place(blade, color, x, y, z, tiltX, yaw, 0);
+  return place(new THREE.BoxGeometry(width, 0.014, length), color, x, y, z, tiltX, yaw, 0);
 }
 
 function stem(height: number): THREE.BufferGeometry {
@@ -78,6 +90,25 @@ function fruitSphere(color: THREE.Color, x: number, y: number, z: number, r: num
   const geo = new THREE.SphereGeometry(r, 8, 8);
   geo.translate(x, y, z);
   return paint(geo, color);
+}
+
+function fruitCylinder(color: THREE.Color, x: number, y: number, z: number, len: number): THREE.BufferGeometry {
+  const geo = new THREE.CylinderGeometry(0.025, 0.028, len, 7);
+  geo.translate(x, y, z);
+  geo.rotateZ(Math.PI / 2);
+  return paint(geo, color);
+}
+
+function netPot(): THREE.BufferGeometry {
+  const outer = new THREE.CylinderGeometry(0.055, 0.045, 0.07, 10);
+  outer.translate(0, 0.035, 0);
+  return paint(outer, NET_POT);
+}
+
+function rockwoolCube(): THREE.BufferGeometry {
+  const cube = new THREE.BoxGeometry(0.1, 0.08, 0.1);
+  cube.translate(0, 0.04, 0);
+  return paint(cube, ROCKWOOL);
 }
 
 function horizontalCanopy(color: THREE.Color, y: number, armLength: number, arms = 4): THREE.BufferGeometry {
@@ -114,31 +145,54 @@ function buildVineCrop(
   fruitColor: THREE.Color,
   stage: GrowthStage,
   stemH: number,
+  fruitShape: "sphere" | "cylinder",
 ): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [stem(stemH)];
 
-  const whorlHeights = [stemH * 0.35, stemH * 0.55, stemH * 0.72];
-  whorlHeights.forEach((y, index) => {
-    parts.push(leafWhorl(leafColor, y, 0.14 + index * 0.02, 4, -0.35 - index * 0.08));
+  [0.35, 0.55, 0.72].forEach((ratio, index) => {
+    parts.push(leafWhorl(leafColor, stemH * ratio, 0.14 + index * 0.02, 4, -0.35 - index * 0.08));
   });
-
   parts.push(horizontalCanopy(leafColor, stemH + 0.04, 0.2, 4));
 
   if (hasFruit(stage)) {
     for (let i = 0; i < 4; i++) {
       const yaw = (i / 4) * Math.PI * 2;
+      const fx = Math.cos(yaw) * 0.09;
+      const fy = stemH * 0.38 + (i % 2) * 0.08;
+      const fz = Math.sin(yaw) * 0.09;
       parts.push(
-        fruitSphere(
-          fruitColor,
-          Math.cos(yaw) * 0.09,
-          stemH * 0.38 + (i % 2) * 0.08,
-          Math.sin(yaw) * 0.09,
-          0.038,
-        ),
+        fruitShape === "cylinder"
+          ? fruitCylinder(fruitColor, fx, fy, fz, 0.14)
+          : fruitSphere(fruitColor, fx, fy, fz, 0.038),
       );
     }
   }
 
+  return mergeGeometries(parts) ?? new THREE.BufferGeometry();
+}
+
+function buildBushCrop(
+  leafColor: THREE.Color,
+  fruitColor: THREE.Color,
+  stage: GrowthStage,
+): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [stem(0.28)];
+  parts.push(horizontalCanopy(leafColor, 0.22, 0.16, 5));
+  parts.push(horizontalCanopy(leafColor, 0.32, 0.14, 4));
+  if (hasFruit(stage)) {
+    for (let i = 0; i < 5; i++) {
+      const yaw = (i / 5) * Math.PI * 2;
+      parts.push(
+        fruitSphere(
+          fruitColor,
+          Math.cos(yaw) * 0.08,
+          0.2 + (i % 2) * 0.06,
+          Math.sin(yaw) * 0.08,
+          0.042,
+        ),
+      );
+    }
+  }
   return mergeGeometries(parts) ?? new THREE.BufferGeometry();
 }
 
@@ -179,9 +233,7 @@ function buildStrawberry(leafColor: THREE.Color, stage: GrowthStage): THREE.Buff
   if (hasFruit(stage)) {
     for (let i = 0; i < 4; i++) {
       const yaw = (i / 4) * Math.PI * 2;
-      parts.push(
-        fruitSphere(FRUIT_STRAWBERRY, Math.cos(yaw) * 0.05, 0.11, Math.sin(yaw) * 0.05, 0.032),
-      );
+      parts.push(fruitSphere(FRUIT_STRAWBERRY, Math.cos(yaw) * 0.05, 0.11, Math.sin(yaw) * 0.05, 0.032));
     }
   }
   return mergeGeometries(parts) ?? new THREE.BufferGeometry();
@@ -205,40 +257,60 @@ function buildCannabis(leafColor: THREE.Color, stage: GrowthStage): THREE.Buffer
   return mergeGeometries(parts) ?? new THREE.BufferGeometry();
 }
 
+function buildCropBody(cropType: CropType, leaf: THREE.Color, stage: GrowthStage): THREE.BufferGeometry {
+  switch (cropType) {
+    case "tomato":
+      return buildVineCrop(leaf, FRUIT_TOMATO, stage, 0.44, "sphere");
+    case "cucumber":
+      return buildVineCrop(leaf, FRUIT_CUCUMBER, stage, 0.38, "cylinder");
+    case "pepper":
+      return buildBushCrop(leaf, FRUIT_PEPPER, stage);
+    case "lettuce":
+      return buildLettuce(leaf);
+    case "strawberry":
+      return buildStrawberry(leaf, stage);
+    case "cannabis":
+      return buildCannabis(leaf, stage);
+    default:
+      return buildVineCrop(leaf, FRUIT_TOMATO, stage, 0.4, "sphere");
+  }
+}
+
+function buildPlantingBase(system: CultivationSystem): THREE.BufferGeometry | null {
+  switch (system) {
+    case "nft":
+    case "dwc":
+    case "aeroponic":
+      return netPot();
+    case "substrate":
+      return rockwoolCube();
+    default:
+      return null;
+  }
+}
+
 const cache = new Map<string, THREE.BufferGeometry>();
 
-export function createPlantGeometry(cropType: CropType, growthStage: GrowthStage): THREE.BufferGeometry {
-  const key = `${cropType}:${growthStage}`;
+export function createPlantGeometry(
+  cropType: CropType,
+  system: CultivationSystem,
+  growthStage: GrowthStage,
+): THREE.BufferGeometry {
+  const key = `${cropType}:${system}:${growthStage}`;
   const hit = cache.get(key);
   if (hit) return hit;
 
   const leaf = LEAF[cropType];
-  let geometry: THREE.BufferGeometry;
+  const parts: THREE.BufferGeometry[] = [buildCropBody(cropType, leaf, growthStage)];
+  const base = buildPlantingBase(system);
+  if (base) parts.unshift(base);
 
-  switch (cropType) {
-    case "tomato":
-      geometry = buildVineCrop(leaf, FRUIT_TOMATO, growthStage, 0.44);
-      break;
-    case "cucumber":
-      geometry = buildVineCrop(leaf, FRUIT_CUCUMBER, growthStage, 0.38);
-      break;
-    case "pepper":
-      geometry = buildVineCrop(leaf, FRUIT_PEPPER, growthStage, 0.34);
-      break;
-    case "lettuce":
-      geometry = buildLettuce(leaf);
-      break;
-    case "strawberry":
-      geometry = buildStrawberry(leaf, growthStage);
-      break;
-    case "cannabis":
-      geometry = buildCannabis(leaf, growthStage);
-      break;
-    default:
-      geometry = buildVineCrop(leaf, FRUIT_TOMATO, growthStage, 0.4);
-  }
-
+  const geometry = mergeGeometries(parts) ?? new THREE.BufferGeometry();
   geometry.computeVertexNormals();
   cache.set(key, geometry);
   return geometry;
+}
+
+export function plantScaleForSystem(system: CultivationSystem): number {
+  return SYSTEM_PLANT_SCALE[system];
 }

@@ -115,6 +115,7 @@ function computeVolumeMetrics(
     bayCount: structure.bayCount,
     bayWidthM: structure.bayWidthM,
     eaveHeight,
+    cropType: crop.type,
     system: crop.system,
     layout: crop.layout,
     lai: crop.lai,

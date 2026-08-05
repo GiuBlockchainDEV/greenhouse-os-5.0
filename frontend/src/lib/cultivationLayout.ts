@@ -1,7 +1,8 @@
 /** Bed layout, pathways, and elevation by cultivation system. */
 
+import { plantScaleForSystem } from "@/lib/plantGeometry";
 import { bayCenterZ } from "@/lib/structureUtils";
-import type { CultivationLayout, CultivationSystem } from "@/types/greenhouse";
+import type { CultivationLayout, CultivationSystem, CropType } from "@/types/greenhouse";
 
 export const SYSTEM_BED_ELEVATION_M: Record<CultivationSystem, number> = {
   soil: 0.0,
@@ -23,6 +24,15 @@ export const SYSTEM_BED_DEPTH_M: Record<CultivationSystem, number> = {
   drip: 0.05,
   aeroponic: 0.04,
   ebb_flow: 0.15,
+};
+
+export const CROP_SPACING_FACTOR: Record<CropType, number> = {
+  tomato: 1.0,
+  cucumber: 1.15,
+  pepper: 0.9,
+  lettuce: 0.55,
+  strawberry: 0.65,
+  cannabis: 1.1,
 };
 
 export const SYSTEM_PLANT_SPACING_M: Record<CultivationSystem, number> = {
@@ -122,6 +132,7 @@ export function computeCultivationLayout(params: {
   bayCount: number;
   bayWidthM: number;
   eaveHeight: number;
+  cropType: CropType;
   system: CultivationSystem;
   layout: CultivationLayout;
   lai: number;
@@ -133,6 +144,7 @@ export function computeCultivationLayout(params: {
     bayCount,
     bayWidthM,
     eaveHeight,
+    cropType,
     system,
     layout,
     lai,
@@ -142,8 +154,10 @@ export function computeCultivationLayout(params: {
   const sideClearanceM = layout.sideClearanceM;
   const pathwayWidthM = layout.pathwayWidthM;
   const tierCount = Math.max(layout.tierCount, 1);
-  const spacing = SYSTEM_PLANT_SPACING_M[system];
+  const spacing =
+    SYSTEM_PLANT_SPACING_M[system] * CROP_SPACING_FACTOR[cropType];
   const tierStep = Math.min(1.0, Math.max((eaveHeight - 1.2) / tierCount, 0.35));
+  const systemScale = plantScaleForSystem(system);
 
   const stageScale: Record<string, number> = {
     seedling: 0.4,
@@ -186,7 +200,7 @@ export function computeCultivationLayout(params: {
             x: bed.xMin + spacing / 2 + row * spacing + jitter,
             y,
             z: bed.zMin + spacing / 2 + col * spacing + jitter,
-            scale: baseScale * (0.85 + ((row + col + tier) % 5) * 0.05),
+            scale: baseScale * systemScale * (0.85 + ((row + col + tier) % 5) * 0.05),
             rotation: ((row * 3 + col * 7 + tier * 11) % 360) * (Math.PI / 180),
           });
         }
@@ -216,6 +230,7 @@ export function estimatePlantsPerTier(
   bayCount: number,
   bayWidthM: number,
   totalWidth: number,
+  cropType: CropType,
   system: CultivationSystem,
   layout: CultivationLayout,
 ): number {
@@ -225,6 +240,7 @@ export function estimatePlantsPerTier(
     bayCount,
     bayWidthM,
     eaveHeight: 4,
+    cropType,
     system,
     layout: { ...layout, tierCount: 1 },
     lai: 3,
