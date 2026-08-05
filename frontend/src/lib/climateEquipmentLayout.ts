@@ -106,6 +106,15 @@ function spreadAlongAxis(
   return Array.from({ length: count }, (_, index) => start + index * step);
 }
 
+/** Place items at equal intervals between edges (segment centers, not endpoints). */
+function evenlySpacedInRange(count: number, min: number, max: number): number[] {
+  if (count <= 0) return [];
+  if (count === 1) return [(min + max) / 2];
+  const span = max - min;
+  const step = span / (count + 1);
+  return Array.from({ length: count }, (_, index) => min + step * (index + 1));
+}
+
 function needsPadWall(cooling: ClimateEquipment["cooling"]): boolean {
   return cooling === "fan_and_pad" || cooling === "evaporative";
 }
@@ -158,29 +167,21 @@ function distributeCirculationFansOnBeds(
     const lineBeds = beds.filter((bed) => bed.bedIndex === lineIdx);
     if (lineBeds.length === 0) continue;
 
-    let bedRemainder = lineFanCount % lineBeds.length;
-    const perBed = Math.floor(lineFanCount / lineBeds.length);
+    const xMin = lineBeds[0].xMin;
+    const xMax = lineBeds[0].xMax;
+    const xPositions = evenlySpacedInRange(lineFanCount, xMin, xMax);
 
-    for (const bed of lineBeds) {
-      const count = perBed + (bedRemainder > 0 ? 1 : 0);
-      if (bedRemainder > 0) bedRemainder--;
-      if (count <= 0) continue;
-
-      const runLen = bed.xMax - bed.xMin;
-      const centerX = (bed.xMin + bed.xMax) / 2;
+    xPositions.forEach((x, fanIdx) => {
+      const bed = lineBeds[fanIdx % lineBeds.length];
       const centerZ = (bed.zMin + bed.zMax) / 2;
-      const xOffsets = spreadAlongAxis(count, runLen, Math.max(runLen * 0.08, 0.5));
-
-      xOffsets.forEach((offset) => {
-        fans.push({
-          x: centerX + offset,
-          y: hangY,
-          z: centerZ,
-          diameterM,
-          yaw: lineIdx % 2 === 0 ? Math.PI : 0,
-        });
+      fans.push({
+        x,
+        y: hangY,
+        z: centerZ,
+        diameterM,
+        yaw: lineIdx % 2 === 0 ? Math.PI : 0,
       });
-    }
+    });
   }
 
   return fans;
@@ -300,7 +301,7 @@ export function computeClimateEquipmentLayout(params: {
       ventXs.forEach((offsetX) => {
         vents.push({
           x: offsetX,
-          y: ridgeHeight - 0.08,
+          y: eaveHeight + (ridgeHeight - eaveHeight) * 0.78,
           z: zCenter,
           widthM: sizing.roofVentWidthM,
           heightM: 0.35,
