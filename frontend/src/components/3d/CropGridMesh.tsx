@@ -120,8 +120,9 @@ export function CropGridMesh() {
       >
         <meshStandardMaterial
           vertexColors
-          roughness={0.78}
-          metalness={0.04}
+          side={THREE.DoubleSide}
+          roughness={0.82}
+          metalness={0.03}
         />
       </instancedMesh>
     </group>
