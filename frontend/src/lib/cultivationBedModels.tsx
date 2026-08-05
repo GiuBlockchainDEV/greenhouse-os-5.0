@@ -1,4 +1,4 @@
-/** 3D bed / gutter / raft models — runs along Z, perpendicular to fan airflow (−X). */
+/** 3D bed / gutter / raft models — runs along X (pad↔fan), lines stacked along Z. */
 
 import {
   DWC_HOLE_SPACING_M,
@@ -24,24 +24,24 @@ interface BedMeshProps {
 }
 
 function bedDims(bed: BedZone) {
-  const lineW = bed.xMax - bed.xMin;
-  const runLen = bed.zMax - bed.zMin;
+  const runLen = bed.xMax - bed.xMin;
+  const lineW = bed.zMax - bed.zMin;
   const cx = (bed.xMin + bed.xMax) / 2;
   const cz = (bed.zMin + bed.zMax) / 2;
-  return { lineW, runLen, cx, cz };
+  return { runLen, lineW, cx, cz };
 }
 
 function SoilBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, bed.depthM / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, bed.depthM, runLen]} />
+        <boxGeometry args={[runLen, bed.depthM, lineW]} />
         <meshStandardMaterial color={MEDIA_SOIL} roughness={0.95} />
       </mesh>
       <mesh position={[0, bed.depthM + 0.015, 0]} receiveShadow>
-        <boxGeometry args={[lineW * 0.96, 0.03, runLen * 0.96]} />
+        <boxGeometry args={[runLen * 0.96, 0.03, lineW * 0.96]} />
         <meshStandardMaterial color="#4e342e" roughness={1} />
       </mesh>
     </group>
@@ -49,20 +49,20 @@ function SoilBed({ bed }: { bed: BedZone }) {
 }
 
 function SubstrateBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
   const slabCount = Math.max(2, Math.floor(runLen / SUBSTRATE_SLAB_SPACING_M));
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, 0.12, runLen]} />
+        <boxGeometry args={[runLen, 0.12, lineW]} />
         <meshStandardMaterial color={TRAY} metalness={0.35} roughness={0.55} />
       </mesh>
       {Array.from({ length: slabCount }, (_, i) => {
-        const z = -runLen / 2 + runLen / (slabCount + 1) * (i + 1);
+        const x = -runLen / 2 + runLen / (slabCount + 1) * (i + 1);
         return (
-          <mesh key={`slab-${i}`} position={[0, 0.16, z]} castShadow>
-            <boxGeometry args={[lineW * 0.88, 0.14, 0.95]} />
+          <mesh key={`slab-${i}`} position={[x, 0.16, 0]} castShadow>
+            <boxGeometry args={[0.95, 0.14, lineW * 0.88]} />
             <meshStandardMaterial color={SUBSTRATE} roughness={0.9} />
           </mesh>
         );
@@ -72,23 +72,23 @@ function SubstrateBed({ bed }: { bed: BedZone }) {
 }
 
 function GrowbedBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, bed.depthM / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, bed.depthM, runLen]} />
+        <boxGeometry args={[runLen, bed.depthM, lineW]} />
         <meshStandardMaterial color={TRAY} roughness={0.7} />
       </mesh>
       <mesh position={[0, bed.depthM + 0.02, 0]}>
-        <boxGeometry args={[lineW * 0.94, 0.12, runLen * 0.94]} />
+        <boxGeometry args={[runLen * 0.94, 0.12, lineW * 0.94]} />
         <meshStandardMaterial color={MEDIA_GRAVEL} roughness={0.95} />
       </mesh>
       <mesh position={[0, bed.depthM - 0.04, 0]}>
-        <boxGeometry args={[lineW * 0.92, 0.06, runLen * 0.92]} />
+        <boxGeometry args={[runLen * 0.92, 0.06, lineW * 0.92]} />
         <meshStandardMaterial color={WATER_DARK} roughness={0.2} metalness={0.15} transparent opacity={0.85} />
       </mesh>
-      <mesh position={[lineW / 2 - 0.08, bed.depthM + 0.06, -runLen / 2 + 0.2]}>
+      <mesh position={[runLen / 2 - 0.2, bed.depthM + 0.06, lineW / 2 - 0.08]}>
         <cylinderGeometry args={[0.025, 0.025, 0.08, 8]} />
         <meshStandardMaterial color="#1f2937" metalness={0.4} />
       </mesh>
@@ -97,29 +97,29 @@ function GrowbedBed({ bed }: { bed: BedZone }) {
 }
 
 function NftGutter({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
   const channelW = Math.min(lineW * 0.92, NFT_CHANNEL_WIDTH_M);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, 0.04, 0]} castShadow>
-        <boxGeometry args={[lineW, 0.08, runLen]} />
+        <boxGeometry args={[runLen, 0.08, lineW]} />
         <meshStandardMaterial color={GUTTER} metalness={0.55} roughness={0.35} />
       </mesh>
       <mesh position={[0, 0.02, 0]}>
-        <boxGeometry args={[channelW, 0.03, runLen * 0.98]} />
+        <boxGeometry args={[runLen * 0.98, 0.03, channelW]} />
         <meshStandardMaterial color={GUTTER_INNER} metalness={0.4} roughness={0.45} />
       </mesh>
       <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[runLen * 0.96, channelW * 0.75]} />
         <meshStandardMaterial color={WATER} roughness={0.15} metalness={0.25} transparent opacity={0.75} />
       </mesh>
-      <mesh position={[0, 0.07, -runLen / 2 + 0.04]}>
-        <boxGeometry args={[lineW * 0.5, 0.04, 0.06]} />
+      <mesh position={[-runLen / 2 + 0.04, 0.07, 0]}>
+        <boxGeometry args={[0.06, 0.04, lineW * 0.5]} />
         <meshStandardMaterial color="#6b7280" metalness={0.5} />
       </mesh>
-      <mesh position={[0, 0.07, runLen / 2 - 0.04]}>
-        <boxGeometry args={[lineW * 0.5, 0.04, 0.06]} />
+      <mesh position={[runLen / 2 - 0.04, 0.07, 0]}>
+        <boxGeometry args={[0.06, 0.04, lineW * 0.5]} />
         <meshStandardMaterial color="#6b7280" metalness={0.5} />
       </mesh>
     </group>
@@ -127,26 +127,26 @@ function NftGutter({ bed }: { bed: BedZone }) {
 }
 
 function DwcRaft({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, 0.08, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, 0.16, runLen]} />
+        <boxGeometry args={[runLen, 0.16, lineW]} />
         <meshStandardMaterial color={WATER_DARK} roughness={0.25} metalness={0.2} transparent opacity={0.9} />
       </mesh>
       <mesh position={[0, bed.depthM / 2 + 0.1, 0]} castShadow>
-        <boxGeometry args={[lineW * 0.96, 0.1, runLen * 0.96]} />
+        <boxGeometry args={[runLen * 0.96, 0.1, lineW * 0.96]} />
         <meshStandardMaterial color={RAFT} roughness={0.85} />
       </mesh>
-      {Array.from({ length: Math.floor((runLen - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, j) =>
-        Array.from({ length: Math.floor((lineW - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, i) => (
+      {Array.from({ length: Math.floor((runLen - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, i) =>
+        Array.from({ length: Math.floor((lineW - 0.7) / DWC_HOLE_SPACING_M) + 1 }, (_, j) => (
           <mesh
             key={`hole-${i}-${j}`}
             position={[
-              -lineW / 2 + DWC_HOLE_SPACING_M * 0.7 + i * DWC_HOLE_SPACING_M,
+              -runLen / 2 + DWC_HOLE_SPACING_M * 0.7 + i * DWC_HOLE_SPACING_M,
               bed.depthM / 2 + 0.1,
-              -runLen / 2 + DWC_HOLE_SPACING_M * 0.7 + j * DWC_HOLE_SPACING_M,
+              -lineW / 2 + DWC_HOLE_SPACING_M * 0.7 + j * DWC_HOLE_SPACING_M,
             ]}
           >
             <cylinderGeometry args={[0.06, 0.06, 0.12, 8]} />
@@ -159,24 +159,24 @@ function DwcRaft({ bed }: { bed: BedZone }) {
 }
 
 function DripBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, bed.depthM / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, bed.depthM, runLen]} />
+        <boxGeometry args={[runLen, bed.depthM, lineW]} />
         <meshStandardMaterial color={MEDIA_SOIL} roughness={0.95} />
       </mesh>
       <mesh position={[0, bed.depthM + 0.015, 0]}>
-        <boxGeometry args={[lineW * 0.96, 0.03, runLen * 0.96]} />
+        <boxGeometry args={[runLen * 0.96, 0.03, lineW * 0.96]} />
         <meshStandardMaterial color="#4e342e" roughness={1} />
       </mesh>
-      <mesh position={[0, 0.35, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+      <mesh position={[0, 0.35, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.012, 0.012, runLen * 0.9, 6]} />
         <meshStandardMaterial color="#374151" roughness={0.6} />
       </mesh>
       {Array.from({ length: Math.floor(runLen / 1.5) }, (_, i) => (
-        <mesh key={`dripper-${i}`} position={[0, 0.32, -runLen / 2 + 0.5 + i * 1.5]}>
+        <mesh key={`dripper-${i}`} position={[-runLen / 2 + 0.5 + i * 1.5, 0.32, 0]}>
           <sphereGeometry args={[0.025, 6, 6]} />
           <meshStandardMaterial color="#ef4444" roughness={0.5} />
         </mesh>
@@ -186,12 +186,12 @@ function DripBed({ bed }: { bed: BedZone }) {
 }
 
 function AeroponicBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, 0.05, 0]} castShadow>
-        <boxGeometry args={[lineW, 0.1, runLen]} />
+        <boxGeometry args={[runLen, 0.1, lineW]} />
         <meshStandardMaterial color="#374151" metalness={0.4} roughness={0.5} />
       </mesh>
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -199,7 +199,7 @@ function AeroponicBed({ bed }: { bed: BedZone }) {
         <meshStandardMaterial color={WATER} transparent opacity={0.6} roughness={0.1} />
       </mesh>
       {Array.from({ length: Math.floor(runLen / 2) }, (_, i) => (
-        <mesh key={`nozzle-${i}`} position={[0, 0.01, -runLen / 2 + 1 + i * 2]}>
+        <mesh key={`nozzle-${i}`} position={[-runLen / 2 + 1 + i * 2, 0.01, 0]}>
           <coneGeometry args={[0.02, 0.05, 5]} />
           <meshStandardMaterial color="#67e8f9" metalness={0.5} />
         </mesh>
@@ -209,19 +209,19 @@ function AeroponicBed({ bed }: { bed: BedZone }) {
 }
 
 function EbbFlowBed({ bed }: { bed: BedZone }) {
-  const { lineW, runLen, cx, cz } = bedDims(bed);
+  const { runLen, lineW, cx, cz } = bedDims(bed);
 
   return (
     <group position={[cx, bed.elevationM, cz]}>
       <mesh position={[0, bed.depthM / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[lineW, bed.depthM, runLen]} />
+        <boxGeometry args={[runLen, bed.depthM, lineW]} />
         <meshStandardMaterial color={TRAY} roughness={0.65} />
       </mesh>
       <mesh position={[0, 0.04, 0]}>
-        <boxGeometry args={[lineW * 0.94, 0.06, runLen * 0.94]} />
+        <boxGeometry args={[runLen * 0.94, 0.06, lineW * 0.94]} />
         <meshStandardMaterial color={WATER_DARK} transparent opacity={0.8} roughness={0.2} />
       </mesh>
-      <mesh position={[lineW / 2 - 0.12, 0.02, runLen / 2 - 0.15]}>
+      <mesh position={[runLen / 2 - 0.15, 0.02, lineW / 2 - 0.12]}>
         <cylinderGeometry args={[0.04, 0.04, 0.08, 8]} />
         <meshStandardMaterial color="#1f2937" metalness={0.5} />
       </mesh>

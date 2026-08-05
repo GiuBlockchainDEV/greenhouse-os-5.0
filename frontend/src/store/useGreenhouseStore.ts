@@ -50,7 +50,7 @@ const DEFAULT_COVERING: CoveringMaterial = {
 
 const DEFAULT_LAYOUT: CultivationLayout = {
   tierCount: 1,
-  gutterLengthM: 8.8,
+  gutterLengthM: 28.8,
   plantsPerTier: 0,
   plantDensity: 1.0,
   bedLineCount: 0,
@@ -169,7 +169,7 @@ function syncCropFromLayout(
       ...crop.layout,
       plantsPerTier: cultivation.plantsPerTier,
       gutterLengthM: Number(
-        Math.max(1, structure.bayWidthM - 2 * crop.layout.sideClearanceM).toFixed(1),
+        Math.max(1, dimensions.length - 2 * crop.layout.sideClearanceM).toFixed(1),
       ),
     },
   };

@@ -55,7 +55,7 @@ export type CultivationSystem =
 export interface CultivationLayout {
   /** Number of vertical growing levels (livelli), not structural bays. */
   tierCount: number;
-  /** Length of each gutter/bed run along Z (bay width minus clearance). Auto-synced. */
+  /** Length of each gutter/bed run along X (pad wall to fan wall). Auto-synced. */
   gutterLengthM: number;
   /** Plants per tier — auto-synced from layout (read-only in UI). */
   plantsPerTier: number;
@@ -63,7 +63,7 @@ export interface CultivationLayout {
   plantDensity: number;
   /** Parallel cultivation lines per bay (0 = auto from dimensions). */
   bedLineCount: number;
-  /** Pathway width between parallel lines along airflow (X) direction. */
+  /** Pathway width between parallel lines across bay width (Z). */
   pathwayWidthM: number;
   /** Clearance from gable walls (X) and bay side walls (Z). */
   sideClearanceM: number;
