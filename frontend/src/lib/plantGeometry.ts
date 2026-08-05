@@ -6,12 +6,10 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import type { CropType, GrowthStage } from "@/types/greenhouse";
 
 const STEM = new THREE.Color("#5c4033");
-const FRUIT: Record<string, THREE.Color> = {
-  tomato: new THREE.Color("#d64541"),
-  pepper: new THREE.Color("#e67e22"),
-  cucumber: new THREE.Color("#2ecc71"),
-  strawberry: new THREE.Color("#c0392b"),
-};
+const FRUIT_TOMATO = new THREE.Color("#d64541");
+const FRUIT_PEPPER = new THREE.Color("#e67e22");
+const FRUIT_CUCUMBER = new THREE.Color("#2ecc71");
+const FRUIT_STRAWBERRY = new THREE.Color("#c0392b");
 
 const LEAF: Record<CropType, THREE.Color> = {
   tomato: new THREE.Color("#2e7d32"),
@@ -24,7 +22,9 @@ const LEAF: Record<CropType, THREE.Color> = {
 
 function paint(geometry: THREE.BufferGeometry, color: THREE.Color): THREE.BufferGeometry {
   const geo = geometry.clone();
-  const count = geo.attributes.position.count;
+  const position = geo.attributes.position;
+  if (!position) return geo;
+  const count = position.count;
   const colors = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
     colors[i * 3] = color.r;
@@ -180,7 +180,7 @@ function buildStrawberry(leafColor: THREE.Color, stage: GrowthStage): THREE.Buff
     for (let i = 0; i < 4; i++) {
       const yaw = (i / 4) * Math.PI * 2;
       parts.push(
-        fruitSphere(FRUIT.strawberry, Math.cos(yaw) * 0.05, 0.11, Math.sin(yaw) * 0.05, 0.032),
+        fruitSphere(FRUIT_STRAWBERRY, Math.cos(yaw) * 0.05, 0.11, Math.sin(yaw) * 0.05, 0.032),
       );
     }
   }
@@ -217,13 +217,13 @@ export function createPlantGeometry(cropType: CropType, growthStage: GrowthStage
 
   switch (cropType) {
     case "tomato":
-      geometry = buildVineCrop(leaf, FRUIT.tomato, growthStage, 0.44);
+      geometry = buildVineCrop(leaf, FRUIT_TOMATO, growthStage, 0.44);
       break;
     case "cucumber":
-      geometry = buildVineCrop(leaf, FRUIT.cucumber, growthStage, 0.38);
+      geometry = buildVineCrop(leaf, FRUIT_CUCUMBER, growthStage, 0.38);
       break;
     case "pepper":
-      geometry = buildVineCrop(leaf, FRUIT.pepper, growthStage, 0.34);
+      geometry = buildVineCrop(leaf, FRUIT_PEPPER, growthStage, 0.34);
       break;
     case "lettuce":
       geometry = buildLettuce(leaf);
@@ -235,7 +235,7 @@ export function createPlantGeometry(cropType: CropType, growthStage: GrowthStage
       geometry = buildCannabis(leaf, growthStage);
       break;
     default:
-      geometry = buildVineCrop(leaf, FRUIT.tomato, growthStage, 0.4);
+      geometry = buildVineCrop(leaf, FRUIT_TOMATO, growthStage, 0.4);
   }
 
   geometry.computeVertexNormals();
