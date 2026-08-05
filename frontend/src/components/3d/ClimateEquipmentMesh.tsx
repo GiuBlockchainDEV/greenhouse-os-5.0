@@ -165,11 +165,11 @@ function ClimateVent({ vent }: { vent: VentPlacement }) {
     return (
       <group position={[vent.x, vent.y, vent.z]} rotation={[vent.rotationX ?? 0, 0, 0]}>
         <mesh>
-          <boxGeometry args={[vent.widthM, 0.06, 0.9]} />
+          <boxGeometry args={[vent.widthM, 0.08, 0.9]} />
           <meshStandardMaterial color={METAL_COLOR} metalness={0.55} roughness={0.35} />
         </mesh>
-        <mesh position={[0, 0.05, 0]} rotation={[0.45, 0, 0]}>
-          <boxGeometry args={[vent.widthM * 0.92, 0.03, 0.85]} />
+        <mesh position={[0, 0.12, 0]} rotation={[0.45, 0, 0]}>
+          <boxGeometry args={[vent.widthM * 0.92, 0.04, 0.85]} />
           <meshStandardMaterial
             color={FRAME_COLOR}
             transparent
