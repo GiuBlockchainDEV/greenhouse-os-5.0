@@ -130,6 +130,18 @@ function needsExhaustFans(
   );
 }
 
+function roofVentCenterY(
+  archType: ArchType,
+  eaveHeight: number,
+  ridgeHeight: number,
+): number {
+  const rise = roofRiseM(eaveHeight, ridgeHeight);
+  if (archType === "semicircular") {
+    return Math.max(eaveHeight + 0.25, ridgeHeight - 0.55);
+  }
+  return eaveHeight + rise * 0.48;
+}
+
 function gableFanCenterY(
   archType: ArchType,
   eaveHeight: number,
@@ -301,7 +313,7 @@ export function computeClimateEquipmentLayout(params: {
       ventXs.forEach((offsetX) => {
         vents.push({
           x: offsetX,
-          y: eaveHeight + (ridgeHeight - eaveHeight) * 0.78,
+          y: roofVentCenterY(archType, eaveHeight, ridgeHeight),
           z: zCenter,
           widthM: sizing.roofVentWidthM,
           heightM: 0.35,
