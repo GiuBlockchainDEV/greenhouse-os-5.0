@@ -64,7 +64,7 @@ const DEFAULT_CROP: CropConfig = {
 
 const DEFAULT_CLIMATE_EQUIPMENT: ClimateEquipment = {
   cooling: "fan_and_pad",
-  heating: "hot_water_pipes",
+  heating: "none",
   ventilation: "roof_vents",
   sizing: DEFAULT_CLIMATE_SIZING,
 };

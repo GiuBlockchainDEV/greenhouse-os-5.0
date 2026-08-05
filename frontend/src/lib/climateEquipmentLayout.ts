@@ -40,11 +40,6 @@ export interface VentPlacement extends Vec3 {
   rotationX?: number;
 }
 
-export interface PipeRowPlacement {
-  y: number;
-  z: number;
-}
-
 export interface HeaterPlacement extends Vec3 {
   kind: "unit" | "air" | "geothermal";
 }
@@ -60,7 +55,6 @@ export interface ClimateEquipmentLayout {
   padWalls: PadWallPlacement[];
   acUnits: AcUnitPlacement[];
   vents: VentPlacement[];
-  pipeRows: PipeRowPlacement[];
   heaters: HeaterPlacement[];
   fogLines: FogLinePlacement[];
 }
@@ -125,7 +119,6 @@ export function computeClimateEquipmentLayout(params: {
   const padWalls: PadWallPlacement[] = [];
   const acUnits: AcUnitPlacement[] = [];
   const vents: VentPlacement[] = [];
-  const pipeRows: PipeRowPlacement[] = [];
   const heaters: HeaterPlacement[] = [];
   const fogLines: FogLinePlacement[] = [];
 
@@ -240,13 +233,6 @@ export function computeClimateEquipmentLayout(params: {
     });
   }
 
-  if (equipment.heating === "hot_water_pipes") {
-    const pipeZs = spreadAlongAxis(sizing.pipeRowCount, width, width * 0.18);
-    pipeZs.forEach((offsetZ) => {
-      pipeRows.push({ y: 1.6, z: offsetZ });
-    });
-  }
-
   if (equipment.heating === "unit_heater") {
     const heaterZs = spreadAlongAxis(sizing.heaterUnitCount, width, width * 0.2);
     heaterZs.forEach((offsetZ) => {
@@ -288,7 +274,6 @@ export function computeClimateEquipmentLayout(params: {
     padWalls,
     acUnits,
     vents,
-    pipeRows,
     heaters,
     fogLines,
   };

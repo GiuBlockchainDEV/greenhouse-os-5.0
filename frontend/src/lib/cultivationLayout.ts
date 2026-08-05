@@ -177,7 +177,7 @@ export function computeCultivationLayout(params: {
       const bedWidth = bed.zMax - bed.zMin;
       const rows = Math.max(1, Math.floor(bedLength / spacing));
       const cols = Math.max(1, Math.floor(bedWidth / spacing));
-      const y = bed.elevationM + bed.depthM + 0.22 + tier * tierStep;
+      const y = bed.elevationM + bed.depthM + 0.01 + tier * tierStep;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {

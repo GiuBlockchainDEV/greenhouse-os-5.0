@@ -6,17 +6,9 @@ import {
   type BedZone,
   type PlantSlot,
 } from "@/lib/cultivationLayout";
+import { createPlantGeometry } from "@/lib/plantGeometry";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
-import type { CropType, CultivationSystem } from "@/types/greenhouse";
-
-const CROP_COLORS: Record<CropType, string> = {
-  tomato: "#2d8a4e",
-  cucumber: "#3cb371",
-  pepper: "#228b22",
-  lettuce: "#66cdaa",
-  strawberry: "#c0392b",
-  cannabis: "#6b8e23",
-};
+import type { CultivationSystem } from "@/types/greenhouse";
 
 const BED_COLORS: Record<CultivationSystem, string> = {
   soil: "#3d5c3a",
@@ -57,6 +49,8 @@ function CultivationBeds({ beds, system }: { beds: BedZone[]; system: Cultivatio
           <mesh
             key={`bed-${bed.bayIndex}-${bed.bedIndex}`}
             position={[centerX, bed.elevationM + bed.depthM / 2, centerZ]}
+            castShadow
+            receiveShadow
           >
             <boxGeometry args={[width, bed.depthM, isGutter ? 0.35 : depth]} />
             <meshStandardMaterial color={color} roughness={0.85} metalness={0.15} />
@@ -99,7 +93,10 @@ export function CropGridMesh() {
     ],
   );
 
-  const foliageGeometry = useMemo(() => new THREE.ConeGeometry(0.18, 0.55, 6), []);
+  const plantGeometry = useMemo(
+    () => createPlantGeometry(crop.type, crop.growthStage),
+    [crop.type, crop.growthStage],
+  );
 
   useEffect(() => {
     const mesh = meshRef.current;
@@ -115,15 +112,16 @@ export function CropGridMesh() {
     <group>
       <CultivationBeds beds={layoutResult.beds} system={crop.system} />
       <instancedMesh
+        key={`${crop.type}-${crop.growthStage}-${layoutResult.plants.length}`}
         ref={meshRef}
-        args={[foliageGeometry, undefined, layoutResult.plants.length]}
+        args={[plantGeometry, undefined, layoutResult.plants.length]}
         castShadow
         receiveShadow
       >
         <meshStandardMaterial
-          color={CROP_COLORS[crop.type]}
-          roughness={0.7}
-          metalness={0.05}
+          vertexColors
+          roughness={0.78}
+          metalness={0.04}
         />
       </instancedMesh>
     </group>

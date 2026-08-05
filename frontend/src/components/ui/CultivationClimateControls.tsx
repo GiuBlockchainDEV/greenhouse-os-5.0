@@ -142,7 +142,6 @@ export function CultivationClimateControls() {
   const showSideVents =
     climateEquipment.ventilation === "side_vents" ||
     climateEquipment.ventilation === "combined";
-  const showPipes = climateEquipment.heating === "hot_water_pipes";
   const showHeaters =
     climateEquipment.heating === "unit_heater" ||
     climateEquipment.heating === "air_heater";
@@ -263,7 +262,7 @@ export function CultivationClimateControls() {
           }
         />
 
-        {(showFans || showPad || showAc || showFog || showRoofVents || showSideVents || showPipes || showHeaters || showGeothermal) && (
+        {(showFans || showPad || showAc || showFog || showRoofVents || showSideVents || showHeaters || showGeothermal) && (
           <div className="mt-2 flex flex-col gap-2 rounded-lg border border-greenhouse-700/60 bg-greenhouse-950/40 p-3">
             <h5 className="text-[11px] font-semibold uppercase tracking-wide text-greenhouse-500">
               {tSim("equipment.sizingTitle")}
@@ -388,17 +387,6 @@ export function CultivationClimateControls() {
                   onChange={(value) => setClimateEquipmentSizing({ sideVentHeightM: value })}
                 />
               </>
-            )}
-            {showPipes && (
-              <SliderRow
-                label={tSim("equipment.sizing.pipeRowCount")}
-                value={sizing.pipeRowCount}
-                unit=""
-                min={0}
-                max={8}
-                step={1}
-                onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
-              />
             )}
             {showHeaters && (
               <SliderRow

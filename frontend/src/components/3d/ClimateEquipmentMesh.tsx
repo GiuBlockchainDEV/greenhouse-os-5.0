@@ -8,7 +8,6 @@ import {
   type FogLinePlacement,
   type HeaterPlacement,
   type PadWallPlacement,
-  type PipeRowPlacement,
   type VentPlacement,
 } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -18,7 +17,6 @@ const METAL_COLOR = "#64748b";
 const PAD_COLOR = "#0ea5e9";
 const AC_COLOR = "#94a3b8";
 const HEATER_COLOR = "#f97316";
-const PIPE_COLOR = "#e2e8f0";
 const FOG_COLOR = "#67e8f9";
 
 function ExhaustFan({ fan }: { fan: FanPlacement }) {
@@ -165,25 +163,6 @@ function ClimateVent({ vent }: { vent: VentPlacement }) {
   );
 }
 
-function HotWaterPipes({
-  rows,
-  length,
-}: {
-  rows: PipeRowPlacement[];
-  length: number;
-}) {
-  return (
-    <group>
-      {rows.map((row, index) => (
-        <mesh key={`pipe-${index}`} position={[0, row.y, row.z]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.035, 0.035, length * 0.88, 8]} />
-          <meshStandardMaterial color={PIPE_COLOR} metalness={0.75} roughness={0.25} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 function HeaterUnit({ heater }: { heater: HeaterPlacement }) {
   if (heater.kind === "geothermal") {
     return (
@@ -284,7 +263,6 @@ export function ClimateEquipmentMesh() {
       {layout.vents.map((vent, index) => (
         <ClimateVent key={`vent-${index}`} vent={vent} />
       ))}
-      <HotWaterPipes rows={layout.pipeRows} length={dimensions.length} />
       {layout.heaters.map((heater, index) => (
         <HeaterUnit key={`heater-${index}`} heater={heater} />
       ))}
