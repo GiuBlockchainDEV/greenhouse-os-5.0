@@ -175,11 +175,15 @@ function syncCropFromLayout(
   };
 }
 
+type CropConfigPatch = Partial<Omit<CropConfig, "layout">> & {
+  layout?: Partial<CultivationLayout>;
+};
+
 function buildCropUpdate(
   structure: GreenhouseStructure,
   dimensions: GreenhouseDimensions,
   prev: CropConfig,
-  patch: Partial<CropConfig>,
+  patch: CropConfigPatch,
 ): { crop: CropConfig; metrics: VolumeMetrics } {
   let next: CropConfig = {
     ...prev,

@@ -39,6 +39,8 @@ export interface WSCultivationLayout {
   tier_count: number;
   gutter_length_m: number;
   plants_per_tier: number;
+  plant_density: number;
+  bed_line_count: number;
   pathway_width_m: number;
   side_clearance_m: number;
 }
