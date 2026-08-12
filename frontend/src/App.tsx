@@ -15,13 +15,13 @@ export function AppShell() {
   const { reconnect } = useSimulationWS();
 
   return (
-    <div className="flex h-screen flex-col bg-greenhouse-900 text-white">
-      <header className="flex items-center justify-between border-b border-greenhouse-700 px-6 py-4">
+    <div className="flex h-screen flex-col bg-surface-page text-gray-900">
+      <header className="flex items-center justify-between border-b border-border bg-white px-6 py-4 shadow-sm">
         <div>
-          <h1 className="text-lg font-bold tracking-tight text-greenhouse-300">
+          <h1 className="text-lg font-bold tracking-tight text-gray-900">
             {t("app.title")}
           </h1>
-          <p className="text-xs text-white/50">{t("app.subtitle")}</p>
+          <p className="text-xs text-label">{t("app.subtitle")}</p>
         </div>
         <div className="flex items-center gap-4">
           <AuthPanel />

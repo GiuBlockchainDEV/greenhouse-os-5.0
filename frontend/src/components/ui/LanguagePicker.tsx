@@ -16,14 +16,14 @@ export function LanguagePicker() {
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor="locale-select" className="text-xs font-medium text-greenhouse-300">
+      <label htmlFor="locale-select" className="text-xs font-medium text-label">
         {t("labels.language")}
       </label>
       <select
         id="locale-select"
         value={locale}
         onChange={(event) => handleChange(event.target.value as SupportedLocale)}
-        className="rounded-lg border border-greenhouse-700 bg-greenhouse-800 px-3 py-2 text-sm text-white outline-none transition focus:border-greenhouse-400"
+        className="ui-select"
       >
         {SUPPORTED_LOCALES.map((code) => (
           <option key={code} value={code}>

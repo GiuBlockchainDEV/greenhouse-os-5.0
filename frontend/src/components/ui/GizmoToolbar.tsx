@@ -15,8 +15,8 @@ export function GizmoToolbar() {
 
   return (
     <div className="pointer-events-auto absolute right-4 top-4 z-20 flex flex-col gap-2">
-      <div className="rounded-xl border border-greenhouse-700/80 bg-greenhouse-900/90 p-2 backdrop-blur-sm">
-        <p className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-greenhouse-400">
+      <div className="ui-card p-2">
+        <p className="ui-section-title mb-1.5 px-1">
           {t("gizmo.title")}
         </p>
         <div className="flex gap-1">
@@ -31,8 +31,8 @@ export function GizmoToolbar() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-greenhouse-700/80 bg-greenhouse-900/90 p-2 backdrop-blur-sm">
-        <p className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-greenhouse-400">
+      <div className="ui-card p-2">
+        <p className="ui-section-title mb-1.5 px-1">
           {t("heatmap.title")}
         </p>
         <div className="flex gap-1">
@@ -61,10 +61,10 @@ function ToolbarButton({ label, active, onClick }: ToolbarButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-md px-2 py-1 text-xs font-medium transition ${
+      className={`rounded-lg px-2 py-1 text-xs font-medium transition ${
         active
-          ? "bg-greenhouse-500 text-white"
-          : "bg-greenhouse-800 text-greenhouse-300 hover:bg-greenhouse-700"
+          ? "bg-status-optimalDark text-white shadow-sm"
+          : "bg-surface-muted text-label hover:bg-gray-100"
       }`}
     >
       {label}

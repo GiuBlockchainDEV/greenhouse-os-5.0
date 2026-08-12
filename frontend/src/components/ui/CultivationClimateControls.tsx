@@ -67,9 +67,9 @@ interface SliderRowProps {
 function SliderRow({ label, value, unit, min, max, step, onChange }: SliderRowProps) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="flex justify-between text-xs text-greenhouse-300">
+      <span className="flex justify-between text-xs text-label">
         <span>{label}</span>
-        <span className="font-mono text-white">
+        <span className="font-mono font-semibold text-gray-800">
           {value.toFixed(step < 1 ? 1 : 0)} {unit}
         </span>
       </span>
@@ -80,7 +80,7 @@ function SliderRow({ label, value, unit, min, max, step, onChange }: SliderRowPr
         step={step}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-greenhouse-700 accent-greenhouse-400"
+        className="ui-range-track"
       />
     </label>
   );
@@ -96,11 +96,11 @@ interface SelectRowProps {
 function SelectRow({ label, value, options, onChange }: SelectRowProps) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs text-greenhouse-300">{label}</span>
+      <span className="text-xs text-label">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+        className="ui-select"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -114,9 +114,9 @@ function SelectRow({ label, value, options, onChange }: SelectRowProps) {
 
 function ReadOnlyMetricRow({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
-    <div className="flex justify-between rounded-lg border border-greenhouse-700/80 bg-greenhouse-900/60 px-3 py-2 text-xs">
-      <span className="text-greenhouse-300">{label}</span>
-      <span className="font-mono text-white">
+    <div className="ui-card-muted flex justify-between px-3 py-2 text-xs">
+      <span className="text-label">{label}</span>
+      <span className="font-mono font-semibold text-gray-800">
         {value.toLocaleString()} {unit}
       </span>
     </div>
@@ -162,8 +162,8 @@ export function CultivationClimateControls() {
 
   return (
     <>
-      <section className="flex flex-col gap-2 border-t border-greenhouse-700 pt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">
           {tCrops("labels.cultivationSystem")}
         </h4>
         <SelectRow
@@ -195,8 +195,8 @@ export function CultivationClimateControls() {
         />
       </section>
 
-      <section className="flex flex-col gap-2 border-t border-greenhouse-700 pt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">
           {tCrops("labels.tierLayout")}
         </h4>
         <SliderRow
@@ -266,8 +266,8 @@ export function CultivationClimateControls() {
         />
       </section>
 
-      <section className="flex flex-col gap-2 border-t border-greenhouse-700 pt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">
           {tSim("equipment.title")}
         </h4>
         <SelectRow
@@ -305,8 +305,8 @@ export function CultivationClimateControls() {
         />
 
         {(showFans || showPad || showAc || showFog || showRoofVents || showSideVents || showHeaters || showGeothermal) && (
-          <div className="mt-2 flex flex-col gap-2 rounded-lg border border-greenhouse-700/60 bg-greenhouse-950/40 p-3">
-            <h5 className="text-[11px] font-semibold uppercase tracking-wide text-greenhouse-500">
+          <div className="ui-card-muted mt-2 flex flex-col gap-2 p-3">
+            <h5 className="ui-section-title">
               {tSim("equipment.sizingTitle")}
             </h5>
             {showFans && (
@@ -473,8 +473,8 @@ export function CultivationClimateControls() {
           </div>
         )}
 
-        <div className="mt-2 flex flex-col gap-2 rounded-lg border border-greenhouse-700/60 bg-greenhouse-950/40 p-3">
-          <h5 className="text-[11px] font-semibold uppercase tracking-wide text-greenhouse-500">
+        <div className="ui-card-muted mt-2 flex flex-col gap-2 p-3">
+          <h5 className="ui-section-title">
             {tSim("equipment.circulationTitle")}
           </h5>
           <SliderRow

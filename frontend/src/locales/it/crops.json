@@ -42,6 +42,7 @@
     "totalBedLines": "Linee Totali",
     "pathwayWidth": "Larghezza Corsello tra Linee",
     "sideClearance": "Margine Laterale",
-    "tiersShort": "livelli"
+    "tiersShort": "livelli",
+    "plantsShort": "piante"
   }
 }

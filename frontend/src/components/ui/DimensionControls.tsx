@@ -58,9 +58,9 @@ function SliderRow({
 }: SliderRowProps) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="flex justify-between text-xs text-greenhouse-300">
+      <span className="flex justify-between text-xs text-label">
         <span>{label}</span>
-        <span className="font-mono text-white">
+        <span className="font-mono font-semibold text-gray-800">
           {value.toFixed(step < 1 ? 1 : 0)} {unit}
         </span>
       </span>
@@ -72,7 +72,7 @@ function SliderRow({
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-greenhouse-700 accent-greenhouse-400 disabled:opacity-40"
+        className="ui-range-track disabled:opacity-40"
       />
     </label>
   );
@@ -106,14 +106,14 @@ export function DimensionControls() {
   };
 
   return (
-    <aside className="flex h-full flex-col gap-5 overflow-y-auto rounded-xl border border-greenhouse-700 bg-greenhouse-800/60 p-5">
+    <aside className="ui-card flex h-full flex-col gap-5 overflow-y-auto p-5">
       <div>
-        <h3 className="text-sm font-semibold text-white">{tControls("viewport.title")}</h3>
-        <p className="mt-1 text-xs text-greenhouse-300/80">{tControls("viewport.hint")}</p>
+        <h3 className="text-sm font-bold text-gray-900">{tControls("viewport.title")}</h3>
+        <p className="mt-1 text-xs text-label">{tControls("viewport.hint")}</p>
       </div>
 
       <section className="flex flex-col gap-3">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+        <h4 className="ui-section-title">
           {tControls("structure.title")}
         </h4>
         <SliderRow
@@ -134,20 +134,20 @@ export function DimensionControls() {
           step={STRUCTURE_LIMITS.bayWidthM.step}
           onChange={(value) => setStructure({ bayWidthM: value })}
         />
-        <div className="rounded-lg border border-greenhouse-700/60 bg-greenhouse-900/50 px-3 py-2">
-          <p className="text-xs text-greenhouse-400">{tControls("structure.totalWidth")}</p>
-          <p className="font-mono text-sm text-white">
+        <div className="ui-card-muted px-3 py-2">
+          <p className="text-xs text-label">{tControls("structure.totalWidth")}</p>
+          <p className="font-mono text-sm font-semibold text-gray-800">
             {metrics.totalWidthM} {tCommon("units.meters")}
           </p>
         </div>
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-greenhouse-300">{tControls("structure.archType")}</span>
+          <span className="text-xs text-label">{tControls("structure.archType")}</span>
           <select
             value={structure.archType}
             onChange={(event) =>
               setStructure({ archType: event.target.value as ArchType })
             }
-            className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+            className="ui-select"
           >
             {ARCH_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -155,11 +155,11 @@ export function DimensionControls() {
               </option>
             ))}
           </select>
-          <p className="text-[10px] text-greenhouse-500">{tControls("structure.archAllBays")}</p>
+          <p className="text-[10px] text-gray-400">{tControls("structure.archAllBays")}</p>
         </label>
       </section>
 
-      <section className="flex flex-col gap-3 border-t border-greenhouse-700 pt-4">
+      <section className="ui-divider flex flex-col gap-3 pt-4">
         {(Object.keys(DIMENSION_LIMITS) as DimensionKey[]).map((key) => {
           const limits = DIMENSION_LIMITS[key];
           return (
@@ -177,8 +177,8 @@ export function DimensionControls() {
         })}
       </section>
 
-      <section className="flex flex-col gap-2 border-t border-greenhouse-700 pt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">
           {tControls("covering.title")}
         </h4>
         <select
@@ -186,7 +186,7 @@ export function DimensionControls() {
           onChange={(event) =>
             setCovering({ type: event.target.value as CoveringMaterial["type"] })
           }
-          className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+          className="ui-select"
         >
           {COVERING_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -205,14 +205,14 @@ export function DimensionControls() {
         />
       </section>
 
-      <section className="flex flex-col gap-2 border-t border-greenhouse-700 pt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-greenhouse-400">
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">
           {tCrops("labels.cropType")}
         </h4>
         <select
           value={crop.type}
           onChange={(event) => setCrop({ type: event.target.value as CropType })}
-          className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+          className="ui-select"
         >
           {CROP_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -227,7 +227,7 @@ export function DimensionControls() {
       <button
         type="button"
         onClick={resetToDefaults}
-        className="mt-auto rounded-lg border border-greenhouse-500/40 bg-greenhouse-700/50 px-4 py-2 text-sm font-medium text-greenhouse-300 transition hover:border-greenhouse-400 hover:bg-greenhouse-700 hover:text-white"
+        className="ui-btn-secondary mt-auto w-full py-2 text-sm"
       >
         {tCommon("actions.reset")}
       </button>

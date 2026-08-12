@@ -70,7 +70,7 @@ function CanvasLoader() {
 
 export function Viewport3D() {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl border border-greenhouse-700 bg-greenhouse-900">
+    <div className="relative h-full w-full overflow-hidden rounded-2xl border border-border bg-gray-100 shadow-card">
       <Canvas shadows gl={{ antialias: true, alpha: false }} dpr={[1, 2]}>
         <color attach="background" args={["#0a1f0f"]} />
         <fog attach="fog" args={["#0a1f0f", 40, 120]} />

@@ -17,14 +17,14 @@ export function ProviderSelector({ provider, providers, onChange }: ProviderSele
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor="ai-provider" className="text-[10px] font-semibold uppercase tracking-wide text-greenhouse-400">
+      <label htmlFor="ai-provider" className="ui-section-title">
         {t("providers.label")}
       </label>
       <select
         id="ai-provider"
         value={provider}
         onChange={(e) => onChange(e.target.value as AIProviderType)}
-        className="rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-3 py-2 text-sm text-white outline-none focus:border-greenhouse-400"
+        className="ui-select"
       >
         {PROVIDER_ORDER.map((id) => {
           const info = availabilityMap.get(id);

@@ -12,7 +12,11 @@
     "et0": "ET₀ di Riferimento",
     "internalTemp": "Temp. Interna",
     "externalTemp": "Temp. Esterna",
-    "internalRh": "UR Interna"
+    "internalRh": "UR Interna",
+    "overview": "Panoramica",
+    "live": "Live",
+    "optimalTempHint": "Ottimale per la fase colturale",
+    "et0Range": "Evapotraspirazione di riferimento"
   },
   "thermal": {
     "qSolar": "Guadagno Solare",
@@ -45,7 +49,12 @@
     "ready": "Simulazione live attiva",
     "running": "Connessione...",
     "disconnected": "Disconnesso",
-    "error": "Errore di connessione"
+    "error": "Errore di connessione",
+    "inRange": "In range"
+  },
+  "panel": {
+    "climateTitle": "Clima",
+    "syncFooter": "Simulazione live · sincronizzata"
   },
   "location": {
     "latitude": "Latitudine",

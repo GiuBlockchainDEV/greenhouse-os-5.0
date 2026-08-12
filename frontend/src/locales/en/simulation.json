@@ -12,7 +12,11 @@
     "et0": "Reference ET₀",
     "internalTemp": "Internal Temp",
     "externalTemp": "External Temp",
-    "internalRh": "Internal RH"
+    "internalRh": "Internal RH",
+    "overview": "Overview",
+    "live": "Live",
+    "optimalTempHint": "Optimal for crop stage",
+    "et0Range": "Reference evapotranspiration"
   },
   "thermal": {
     "qSolar": "Solar Gain",
@@ -45,7 +49,12 @@
     "ready": "Live simulation active",
     "running": "Connecting...",
     "disconnected": "Disconnected",
-    "error": "Connection error"
+    "error": "Connection error",
+    "inRange": "In range"
+  },
+  "panel": {
+    "climateTitle": "Climate",
+    "syncFooter": "Live simulation · synced"
   },
   "location": {
     "latitude": "Latitude",

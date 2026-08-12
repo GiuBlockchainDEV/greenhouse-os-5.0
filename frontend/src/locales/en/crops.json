@@ -42,6 +42,7 @@
     "totalBedLines": "Total Lines",
     "pathwayWidth": "Pathway Between Lines",
     "sideClearance": "Side Clearance",
-    "tiersShort": "levels"
+    "tiersShort": "levels",
+    "plantsShort": "plants"
   }
 }

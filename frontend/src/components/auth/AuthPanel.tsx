@@ -18,12 +18,8 @@ export function AuthPanel() {
   if (status === "authenticated" && user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="hidden text-xs text-white/50 sm:inline">{user.email}</span>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="rounded-lg border border-greenhouse-700 px-3 py-1.5 text-xs text-greenhouse-300 hover:bg-greenhouse-800"
-        >
+        <span className="hidden text-xs text-label sm:inline">{user.email}</span>
+        <button type="button" onClick={() => void signOut()} className="ui-btn-ghost">
           {t("auth.signOut")}
         </button>
       </div>
@@ -32,11 +28,7 @@ export function AuthPanel() {
 
   if (!expanded) {
     return (
-      <button
-        type="button"
-        onClick={() => setExpanded(true)}
-        className="rounded-lg border border-greenhouse-700 px-3 py-1.5 text-xs text-greenhouse-300 hover:bg-greenhouse-800"
-      >
+      <button type="button" onClick={() => setExpanded(true)} className="ui-btn-ghost">
         {t("auth.signIn")}
       </button>
     );
@@ -62,22 +54,22 @@ export function AuthPanel() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder={t("auth.email")}
-        className="w-32 rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-2 py-1.5 text-xs text-white outline-none sm:w-40"
+        className="ui-input w-32 py-1.5 text-xs sm:w-40"
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={t("auth.password")}
-        className="w-24 rounded-lg border border-greenhouse-700 bg-greenhouse-900 px-2 py-1.5 text-xs text-white outline-none sm:w-28"
+        className="ui-input w-24 py-1.5 text-xs sm:w-28"
       />
-      <button type="button" onClick={() => void handleSignIn()} className="rounded-lg bg-greenhouse-500 px-2 py-1.5 text-xs text-white">
+      <button type="button" onClick={() => void handleSignIn()} className="ui-btn-primary">
         {t("auth.signIn")}
       </button>
-      <button type="button" onClick={() => void handleSignUp()} className="rounded-lg border border-greenhouse-600 px-2 py-1.5 text-xs text-greenhouse-300">
+      <button type="button" onClick={() => void handleSignUp()} className="ui-btn-secondary">
         {t("auth.signUp")}
       </button>
-      {error && <span className="text-[10px] text-red-400">{error}</span>}
+      {error && <span className="text-[10px] text-red-500">{error}</span>}
     </div>
   );
 }
