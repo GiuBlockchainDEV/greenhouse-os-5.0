@@ -14,7 +14,7 @@ export function GizmoToolbar() {
   const setHeatmapMode = useGreenhouseStore((s) => s.setHeatmapMode);
 
   return (
-    <div className="pointer-events-auto absolute right-4 top-4 z-20 flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       <div className="ui-card p-2">
         <p className="ui-section-title mb-1.5 px-1">
           {t("gizmo.title")}

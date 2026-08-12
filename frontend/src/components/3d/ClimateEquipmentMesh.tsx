@@ -15,7 +15,7 @@ import {
 } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
-const FRAME_COLOR = "#4ade80";
+const FRAME_COLOR = "#059669";
 const METAL_COLOR = "#64748b";
 const PAD_COLOR = "#0ea5e9";
 const AC_COLOR = "#94a3b8";

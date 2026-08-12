@@ -11,9 +11,9 @@ import {
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType } from "@/types/greenhouse";
 
-const WALL_OPACITY = 0.18;
-const FRAME_COLOR = "#4ade80";
-const GLASS_COLOR = "#86efac";
+const WALL_OPACITY = 0.22;
+const FRAME_COLOR = "#059669";
+const GLASS_COLOR = "#ecfdf5";
 
 function createTriangularBayRoof(
   length: number,
@@ -157,7 +157,7 @@ export function GreenhouseMesh() {
     <group position={[0, 0, 0]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
         <planeGeometry args={[length + 4, width + 4]} />
-        <meshStandardMaterial color="#1a3822" roughness={0.9} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.85} />
       </mesh>
 
       <mesh position={[0, eaveHeight / 2, -width / 2]}>

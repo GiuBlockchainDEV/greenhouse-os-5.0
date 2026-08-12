@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { GizmoToolbar } from "@/components/ui/GizmoToolbar";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
@@ -17,8 +18,8 @@ export function HUDOverlay() {
   const location = useGreenhouseStore((state) => state.location);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between p-4">
-      <div className="ui-card px-4 py-3">
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4">
+      <div className="ui-card max-w-[min(100%,20rem)] px-4 py-3">
         <div className="flex items-start gap-2.5">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-status-optimalDark">
             <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="currentColor" aria-hidden>
@@ -46,24 +47,28 @@ export function HUDOverlay() {
         </div>
       </div>
 
-      <div className="ui-card px-4 py-3">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold text-gray-800">
-            {tSim("metrics.overview", { defaultValue: "Overview" })}
-          </span>
-          <StatusBadge
-            label={tSim("metrics.live", { defaultValue: "Live" })}
-            tone="sync"
-          />
+      <div className="pointer-events-auto flex w-[min(100%,22rem)] shrink-0 flex-col gap-2">
+        <div className="ui-card px-4 py-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-gray-800">
+              {tSim("metrics.overview", { defaultValue: "Overview" })}
+            </span>
+            <StatusBadge
+              label={tSim("metrics.live", { defaultValue: "Live" })}
+              tone="sync"
+            />
+          </div>
+          <dl className="grid grid-cols-2 gap-x-5 gap-y-2 text-xs sm:grid-cols-3">
+            <MetricItem label={tSim("metrics.floorArea")} value={`${metrics.floorAreaM2} ${tCommon("units.squareMeters")}`} />
+            <MetricItem label={tSim("metrics.cultivationArea")} value={`${metrics.cultivationAreaM2} ${tCommon("units.squareMeters")}`} />
+            <MetricItem label={tSim("metrics.totalPlants")} value={String(metrics.totalPlants)} highlight />
+            <MetricItem label={tSim("metrics.volume")} value={`${metrics.volumeM3} ${tCommon("units.cubicMeters")}`} />
+            <MetricItem label={tSim("metrics.bedCoverage")} value={`${metrics.bedCoveragePct}%`} />
+            <MetricItem label={tSim("metrics.pathwayArea")} value={`${metrics.pathwayAreaM2} ${tCommon("units.squareMeters")}`} />
+          </dl>
         </div>
-        <dl className="grid grid-cols-3 gap-x-6 gap-y-2 text-xs">
-          <MetricItem label={tSim("metrics.floorArea")} value={`${metrics.floorAreaM2} ${tCommon("units.squareMeters")}`} />
-          <MetricItem label={tSim("metrics.cultivationArea")} value={`${metrics.cultivationAreaM2} ${tCommon("units.squareMeters")}`} />
-          <MetricItem label={tSim("metrics.totalPlants")} value={String(metrics.totalPlants)} highlight />
-          <MetricItem label={tSim("metrics.volume")} value={`${metrics.volumeM3} ${tCommon("units.cubicMeters")}`} />
-          <MetricItem label={tSim("metrics.bedCoverage")} value={`${metrics.bedCoveragePct}%`} />
-          <MetricItem label={tSim("metrics.pathwayArea")} value={`${metrics.pathwayAreaM2} ${tCommon("units.squareMeters")}`} />
-        </dl>
+
+        <GizmoToolbar />
       </div>
     </div>
   );

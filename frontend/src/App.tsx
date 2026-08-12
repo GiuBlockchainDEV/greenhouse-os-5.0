@@ -5,7 +5,6 @@ import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { DimensionControls } from "@/components/ui/DimensionControls";
-import { GizmoToolbar } from "@/components/ui/GizmoToolbar";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { useSimulationWS } from "@/hooks/useSimulationWS";
@@ -33,7 +32,6 @@ export function AppShell() {
         <DimensionControls />
         <div className="relative min-h-0">
           <Viewport3D />
-          <GizmoToolbar />
           <HUDOverlay />
           <ClimateDashboard onReconnect={reconnect} />
         </div>

@@ -6,18 +6,20 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { GreenhouseScene } from "@/components/3d/GreenhouseScene";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
+const SCENE_BG = "#EEF2F6";
+
 function SceneLighting() {
   return (
     <>
-      <ambientLight intensity={0.35} />
+      <ambientLight intensity={0.72} />
       <directionalLight
         position={[20, 30, 15]}
-        intensity={1.2}
+        intensity={1.05}
         castShadow
         shadow-mapSize={[2048, 2048]}
       />
-      <directionalLight position={[-15, 10, -10]} intensity={0.3} color="#86efac" />
-      <hemisphereLight args={["#86efac", "#0a1f0f", 0.4]} />
+      <directionalLight position={[-15, 12, -10]} intensity={0.35} color="#ffffff" />
+      <hemisphereLight args={["#ffffff", "#d1d5db", 0.55]} />
     </>
   );
 }
@@ -45,10 +47,10 @@ function SceneContent() {
         args={[100, 100]}
         cellSize={1}
         cellThickness={0.5}
-        cellColor="#1a3822"
+        cellColor="#cbd5e1"
         sectionSize={5}
         sectionThickness={1}
-        sectionColor="#2d6a3e"
+        sectionColor="#94a3b8"
         fadeDistance={80}
         fadeStrength={1}
         followCamera={false}
@@ -63,7 +65,7 @@ function CanvasLoader() {
   return (
     <mesh>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#2d6a3e" wireframe />
+      <meshStandardMaterial color="#059669" wireframe />
     </mesh>
   );
 }
@@ -72,8 +74,8 @@ export function Viewport3D() {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-2xl border border-border bg-gray-100 shadow-card">
       <Canvas shadows gl={{ antialias: true, alpha: false }} dpr={[1, 2]}>
-        <color attach="background" args={["#0a1f0f"]} />
-        <fog attach="fog" args={["#0a1f0f", 40, 120]} />
+        <color attach="background" args={[SCENE_BG]} />
+        <fog attach="fog" args={[SCENE_BG, 80, 180]} />
         <Suspense fallback={<CanvasLoader />}>
           <SceneContent />
         </Suspense>
