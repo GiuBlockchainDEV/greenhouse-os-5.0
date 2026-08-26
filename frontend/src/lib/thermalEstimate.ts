@@ -7,7 +7,6 @@ import type {
   CoveringMaterial,
   CropConfig,
   GreenhouseDimensions,
-  GreenhouseStructure,
 } from "@/types/greenhouse";
 
 const COOLING_DELTA: Record<string, number> = {

@@ -130,11 +130,12 @@ export function buildHeatmapFieldContext(
     totalWidth: dimensions.width,
     bayCount: structure.bayCount,
     bayWidthM: structure.bayWidthM,
-    tierCount: crop.layout.tierCount,
-    bedLineCount: crop.layout.bedLineCount,
-    pathwayWidthM: crop.layout.pathwayWidthM,
-    sideClearanceM: crop.layout.sideClearanceM,
-    plantDensity: crop.layout.plantDensity,
+    eaveHeight: dimensions.eaveHeight,
+    cropType: crop.type,
+    system: crop.system,
+    layout: crop.layout,
+    lai: crop.lai,
+    growthStage: crop.growthStage,
   });
 
   const layout = computeClimateEquipmentLayout({
@@ -238,9 +239,9 @@ export function generateSurfaceHeatmap(
       }
 
       let temp = ctx.baseTemp + influenceAt(ctx, x, y, z);
-      if (surface === "wall_west" && ctx.layout.padWalls.length > 0) {
+      if (surface === "wall_west") {
         const pad = ctx.layout.padWalls[0];
-        if (y <= pad.heightM + 0.2) {
+        if (pad && y <= pad.heightM + 0.2) {
           temp -= 2 * gaussian1d(z - pad.zCenter, pad.widthM * 0.4);
         }
       }
