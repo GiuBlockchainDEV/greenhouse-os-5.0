@@ -37,8 +37,8 @@ function buildHeatmapTexture(
   }
 
   const values: number[] = [];
-  for (let col = 0; col < cols; col++) {
-    for (let row = 0; row < rows; row++) {
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
       values.push(matrixValueAt(surface, mode, preview.internalRh, row, col));
     }
   }

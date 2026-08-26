@@ -44,16 +44,10 @@ function matrixMean(matrix: number[][]): number {
   return count > 0 ? sum / count : 0;
 }
 
-function matrixMaxDeviation(matrix: number[][], mean: number): number {
-  let maxDev = 0;
-  for (const row of matrix) {
-    for (const value of row) {
-      maxDev = Math.max(maxDev, Math.abs(value - mean));
-    }
-  }
-  return maxDev;
-}
+const TEMP_UNIFORMITY_REF_C = 6;
+const RH_UNIFORMITY_REF_PCT = 18;
 
+/** 0-100 score: 100 = at greenhouse average, lower = more local deviation. */
 export function computeUniformityAt(
   temperature: number[][],
   humidity: number[][],
@@ -62,17 +56,13 @@ export function computeUniformityAt(
 ): number {
   const tempMean = matrixMean(temperature);
   const rhMean = matrixMean(humidity);
-  const tempDev = matrixMaxDeviation(temperature, tempMean);
-  const rhDev = matrixMaxDeviation(humidity, rhMean);
-
   const localTemp = temperature[row]?.[col] ?? tempMean;
   const localRh = humidity[row]?.[col] ?? rhMean;
 
-  const tempScore =
-    tempDev > 0.01 ? 100 * (1 - Math.abs(localTemp - tempMean) / tempDev) : 100;
-  const rhScore = rhDev > 0.01 ? 100 * (1 - Math.abs(localRh - rhMean) / rhDev) : 100;
+  const tempNorm = Math.min(Math.abs(localTemp - tempMean) / TEMP_UNIFORMITY_REF_C, 1);
+  const rhNorm = Math.min(Math.abs(localRh - rhMean) / RH_UNIFORMITY_REF_PCT, 1);
 
-  return Math.max(0, Math.min(100, (tempScore + rhScore) / 2));
+  return Math.max(0, Math.min(100, 100 * (1 - (tempNorm * 0.65 + rhNorm * 0.35))));
 }
 
 export function matrixValueAt(

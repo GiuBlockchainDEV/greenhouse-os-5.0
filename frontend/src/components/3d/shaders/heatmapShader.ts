@@ -65,8 +65,7 @@ export const heatmapFragmentShader = /* glsl */ `
   void main() {
     float raw = texture2D(heatmapTexture, vUv).r;
     float range = max(maxValue - minValue, 0.001);
-    float pad = range * 0.12;
-    float normalized = clamp((raw - minValue + pad) / (range + pad * 2.0), 0.0, 1.0);
+    float normalized = clamp((raw - minValue) / range, 0.0, 1.0);
 
     vec3 color;
     if (colorMode == 1) {
