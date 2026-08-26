@@ -1,3 +1,4 @@
+import type { ClimateScenario } from "@/types/greenhouse";
 import type { WSSimulationResults } from "@/types/simulation";
 
 export type SimulationData = WSSimulationResults["data"];
@@ -15,6 +16,13 @@ export function heatmapColorMode(mode: HeatmapValueMode): number {
     default:
       return 0;
   }
+}
+
+export interface HeatmapClimatePreview {
+  internalTemp: number;
+  externalTemp: number;
+  internalRh: number;
+  vpdKpa: number;
 }
 
 export interface HeatmapSurfaceValues {
@@ -135,5 +143,44 @@ export function computeHeatmapStats(
     max,
     unit:
       mode === "humidity" ? "%" : mode === "uniformity" ? "%" : mode === "vpd" ? "kPa" : "°C",
+  };
+}
+
+/** Color scale anchored to weather preview so slider changes shift the map colors. */
+export function computeHeatmapDisplayRange(
+  surface: HeatmapSurfaceValues,
+  mode: HeatmapValueMode,
+  preview: HeatmapClimatePreview,
+  scenario: ClimateScenario,
+): { min: number; max: number; unit: string } {
+  if (mode === "uniformity") {
+    return { min: 0, max: 100, unit: "%" };
+  }
+
+  const spatial = computeHeatmapStats(surface, mode, preview.internalRh);
+  const spatialSpread = spatial.max - spatial.min;
+
+  if (mode === "temperature") {
+    const upperPad = Math.max(spatialSpread, 3.5);
+    return {
+      min: preview.externalTemp - 1.5,
+      max: preview.internalTemp + upperPad,
+      unit: "°C",
+    };
+  }
+
+  if (mode === "humidity") {
+    return {
+      min: Math.max(25, scenario.externalRhPct - 10),
+      max: Math.min(98, preview.internalRh + Math.max(spatialSpread, 8)),
+      unit: "%",
+    };
+  }
+
+  const vpdPad = Math.max(spatialSpread, 0.35);
+  return {
+    min: Math.max(0, preview.vpdKpa - vpdPad * 0.5),
+    max: preview.vpdKpa + Math.max(vpdPad, 0.6),
+    unit: "kPa",
   };
 }

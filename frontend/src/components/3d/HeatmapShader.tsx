@@ -3,12 +3,14 @@ import * as THREE from "three";
 
 import { heatmapFragmentShader, heatmapVertexShader } from "@/components/3d/shaders/heatmapShader";
 import {
-  computeHeatmapStats,
+  computeHeatmapDisplayRange,
   heatmapColorMode,
   matrixValueAt,
+  type HeatmapClimatePreview,
   type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
+import type { ClimateScenario } from "@/types/greenhouse";
 import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
@@ -23,22 +25,23 @@ function heatmapValueMode(mode: HeatmapMode): HeatmapValueMode {
 function buildHeatmapTexture(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
-  internalRh: number,
+  preview: HeatmapClimatePreview,
+  scenario: ClimateScenario,
 ): { texture: THREE.DataTexture; min: number; max: number } {
   const rows = surface.temperature.length;
   const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
-  const stats = computeHeatmapStats(surface, mode, internalRh);
+  const displayRange = computeHeatmapDisplayRange(surface, mode, preview, scenario);
 
   if (rows === 0 || cols === 0) {
     const fallback = new THREE.DataTexture(new Float32Array([25]), 1, 1, THREE.RedFormat, THREE.FloatType);
     fallback.needsUpdate = true;
-    return { texture: fallback, min: stats.min, max: stats.max };
+    return { texture: fallback, min: displayRange.min, max: displayRange.max };
   }
 
   const values: number[] = [];
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
-      values.push(matrixValueAt(surface, mode, internalRh, row, col));
+      values.push(matrixValueAt(surface, mode, preview.internalRh, row, col));
     }
   }
 
@@ -49,14 +52,15 @@ function buildHeatmapTexture(
   texture.flipY = true;
   texture.needsUpdate = true;
 
-  return { texture, min: stats.min, max: stats.max };
+  return { texture, min: displayRange.min, max: displayRange.max };
 }
 
 interface HeatmapSurfaceProps {
   surfaceKey: string;
   surface: HeatmapSurfaceValues;
   mode: HeatmapValueMode;
-  internalRh: number;
+  preview: HeatmapClimatePreview;
+  scenario: ClimateScenario;
   colorMode: number;
   position: [number, number, number];
   rotation: [number, number, number];
@@ -67,15 +71,16 @@ function HeatmapSurface({
   surfaceKey,
   surface,
   mode,
-  internalRh,
+  preview,
+  scenario,
   colorMode,
   position,
   rotation,
   planeSize,
 }: HeatmapSurfaceProps) {
   const shaderData = useMemo(
-    () => buildHeatmapTexture(surface, mode, internalRh),
-    [surface, mode, internalRh, surfaceKey],
+    () => buildHeatmapTexture(surface, mode, preview, scenario),
+    [surface, mode, preview, scenario, surfaceKey],
   );
 
   useEffect(() => {
@@ -218,7 +223,8 @@ export function HeatmapPlane() {
             surfaceKey={`${surfaceKind}-${revision}-${valueMode}`}
             surface={field.surfaces[surfaceKind]}
             mode={valueMode}
-            internalRh={field.internalRh}
+            preview={field.preview}
+            scenario={climateScenario}
             colorMode={colorMode}
             position={layout.position}
             rotation={layout.rotation}

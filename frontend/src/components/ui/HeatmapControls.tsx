@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { computeHeatmapStats } from "@/lib/heatmapData";
+import { computeHeatmapDisplayRange } from "@/lib/heatmapData";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { HeatmapMode } from "@/types/viewport";
@@ -109,8 +109,13 @@ export function HeatmapControls() {
     () =>
       heatmapMode === "off"
         ? null
-        : computeHeatmapStats(heatmapSource.surfaces.floor, valueMode, heatmapSource.internalRh),
-    [heatmapMode, heatmapSource, valueMode],
+        : computeHeatmapDisplayRange(
+            heatmapSource.surfaces.floor,
+            valueMode,
+            heatmapSource.preview,
+            climateScenario,
+          ),
+    [heatmapMode, heatmapSource, valueMode, climateScenario],
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";

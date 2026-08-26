@@ -7,6 +7,7 @@ import {
 import type { HeatmapSurfaceValues } from "@/lib/heatmapData";
 import type {
   ClimateEquipment,
+  ClimateScenario,
   CropConfig,
   GreenhouseDimensions,
   GreenhouseStructure,
@@ -33,6 +34,7 @@ export interface HeatmapFieldContext {
   equipment: ClimateEquipment;
   layout: ClimateEquipmentLayout;
   mixingFactor: number;
+  scenario: ClimateScenario;
 }
 
 function gaussian1d(dist: number, sigma: number): number {
@@ -72,7 +74,7 @@ function exhaustScale(diameterM: number): number {
   return (diameterM / Math.max(DEFAULT_CLIMATE_SIZING.exhaustFanDiameterM, 0.1)) ** 2;
 }
 
-function computeMixingFactor(equipment: ClimateEquipment): number {
+function computeMixingFactor(equipment: ClimateEquipment, scenario: ClimateScenario): number {
   const s = equipment.sizing;
   const circulationFlow = fanFlowFactor(
     s.circulationFanDiameterM,
@@ -91,7 +93,8 @@ function computeMixingFactor(equipment: ClimateEquipment): number {
       DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM,
     );
 
-  return Math.min(0.92, circulationFlow * 0.055 + exhaustFlow * 0.04);
+  const windMix = scenario.windSpeedMS * 0.035;
+  return Math.min(0.95, circulationFlow * 0.055 + exhaustFlow * 0.04 + windMix);
 }
 
 function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number): number {
@@ -103,7 +106,10 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
   const edgeFactor = Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2);
 
   delta += ctx.qSolar * 0.014 * (1 - edgeFactor * 0.55);
-  delta -= edgeFactor * Math.max(ctx.baseTemp - ctx.externalTemp, 0) * 0.07;
+  delta -=
+    edgeFactor *
+    Math.max(ctx.baseTemp - ctx.externalTemp, 0) *
+    (0.07 + ctx.scenario.windSpeedMS * 0.006);
 
   for (const pad of ctx.layout.padWalls) {
     const padFactor = padAreaFactor(pad.widthM, pad.heightM);
@@ -196,6 +202,7 @@ function rhInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number
   const edgeFactor = Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2);
 
   deltaRh += edgeFactor * Math.max(ctx.externalTemp - ctx.baseTemp, 0) * 0.35;
+  deltaRh += edgeFactor * (ctx.scenario.externalRhPct - ctx.internalRh) * 0.14;
 
   for (const pad of ctx.layout.padWalls) {
     const padFactor = padAreaFactor(pad.widthM, pad.heightM);
@@ -276,6 +283,7 @@ export function buildHeatmapFieldContext(
   externalTemp: number,
   internalRh: number,
   qSolar: number,
+  scenario: ClimateScenario,
 ): HeatmapFieldContext {
   const cultivation = computeCultivationLayout({
     length: dimensions.length,
@@ -310,7 +318,8 @@ export function buildHeatmapFieldContext(
     qSolar,
     equipment,
     layout,
-    mixingFactor: computeMixingFactor(equipment),
+    mixingFactor: computeMixingFactor(equipment, scenario),
+    scenario,
   };
 }
 

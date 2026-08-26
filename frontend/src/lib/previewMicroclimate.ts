@@ -49,6 +49,7 @@ export function resolveHeatmapField(
     externalTemp,
     internalRh,
     qSolar,
+    scenario,
   );
 
   const surfaces = generateAllSurfaceHeatmaps(ctx);
