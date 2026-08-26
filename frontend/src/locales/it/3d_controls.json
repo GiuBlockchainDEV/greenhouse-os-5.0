@@ -60,10 +60,10 @@
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
     "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
     "legend": {
-      "temperature": "Range temperatura sul pavimento",
-      "humidity": "Range umidità relativa",
-      "vpd": "Range VPD sul pavimento",
-      "uniformity": "Indice uniformità interna (100 = più uniforme)"
+      "temperature": "Scala temperatura (blu 0°C → rosso 60°C)",
+      "humidity": "Scala umidità (0–100%)",
+      "vpd": "Scala VPD (0–10 kPa)",
+      "uniformity": "Indice uniformità interna (0–100%)"
     }
   }
 }

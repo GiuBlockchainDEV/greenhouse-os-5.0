@@ -106,16 +106,8 @@ export function HeatmapControls() {
   const valueMode =
     heatmapMode === "off" ? "temperature" : heatmapMode;
   const stats = useMemo(
-    () =>
-      heatmapMode === "off"
-        ? null
-        : computeHeatmapDisplayRange(
-            heatmapSource.surfaces.floor,
-            valueMode,
-            heatmapSource.preview,
-            climateScenario,
-          ),
-    [heatmapMode, heatmapSource, valueMode, climateScenario],
+    () => (heatmapMode === "off" ? null : computeHeatmapDisplayRange(valueMode)),
+    [heatmapMode, valueMode],
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";

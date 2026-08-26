@@ -10,7 +10,6 @@ import {
   type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
-import type { ClimateScenario } from "@/types/greenhouse";
 import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
@@ -26,11 +25,10 @@ function buildHeatmapTexture(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   preview: HeatmapClimatePreview,
-  scenario: ClimateScenario,
 ): { texture: THREE.DataTexture; min: number; max: number } {
   const rows = surface.temperature.length;
   const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
-  const displayRange = computeHeatmapDisplayRange(surface, mode, preview, scenario);
+  const displayRange = computeHeatmapDisplayRange(mode);
 
   if (rows === 0 || cols === 0) {
     const fallback = new THREE.DataTexture(new Float32Array([25]), 1, 1, THREE.RedFormat, THREE.FloatType);
@@ -60,7 +58,6 @@ interface HeatmapSurfaceProps {
   surface: HeatmapSurfaceValues;
   mode: HeatmapValueMode;
   preview: HeatmapClimatePreview;
-  scenario: ClimateScenario;
   colorMode: number;
   position: [number, number, number];
   rotation: [number, number, number];
@@ -72,15 +69,14 @@ function HeatmapSurface({
   surface,
   mode,
   preview,
-  scenario,
   colorMode,
   position,
   rotation,
   planeSize,
 }: HeatmapSurfaceProps) {
   const shaderData = useMemo(
-    () => buildHeatmapTexture(surface, mode, preview, scenario),
-    [surface, mode, preview, scenario, surfaceKey],
+    () => buildHeatmapTexture(surface, mode, preview),
+    [surface, mode, preview, surfaceKey],
   );
 
   useEffect(() => {
@@ -224,7 +220,6 @@ export function HeatmapPlane() {
             surface={field.surfaces[surfaceKind]}
             mode={valueMode}
             preview={field.preview}
-            scenario={climateScenario}
             colorMode={colorMode}
             position={layout.position}
             rotation={layout.rotation}
