@@ -65,7 +65,7 @@
     "previewHintDetailed": "Preview estimate: ~{{temp}}°C internal, ~{{rh}}% RH — based on weather inputs, covering, and equipment above.",
     "equipmentHint": "Impact scales with pad area, fan/AC diameter, and unit count from the left panel.",
     "legend": {
-      "temperature": "Temperature scale (blue 0°C → red 60°C)",
+      "temperature": "Temperature scale (blue 0°C → red 50°C)",
       "humidity": "Humidity scale (0–100%)",
       "vpd": "VPD scale (0–10 kPa)",
       "uniformity": "Internal uniformity index (0–100%)"

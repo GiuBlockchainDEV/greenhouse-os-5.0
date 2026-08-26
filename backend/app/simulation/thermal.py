@@ -246,7 +246,7 @@ def _generate_heatmap(
         pad_fraction = min(1.0, (sizing.pad_wall_width_m * sizing.pad_wall_height_m) / max(width * eave_height, 0.1))
         pad_cool = 2.5 * pad_fraction
 
-    fan_warm = min(sizing.exhaust_fan_count, 12) * 0.35
+    fan_cool = min(sizing.exhaust_fan_count, 12) * 0.25
     vent_cool = min(sizing.roof_vent_count, 12) * 0.2 + min(sizing.side_vent_count, 10) * 0.15
     mix = min(0.85, sizing.circulation_fan_count * 0.08)
 
@@ -261,7 +261,7 @@ def _generate_heatmap(
             temp = base_temp + solar_boost * (1.0 - edge_factor * 0.6)
             temp -= edge_factor * max(base_temp - t_external, 0) * 0.08
             temp -= pad_cool * (1.0 - x_norm)
-            temp += fan_warm * (x_norm**1.4) * 0.6
+            temp -= fan_cool * (x_norm**1.4) * 0.6
             temp -= vent_cool * edge_factor * 0.35
             temp = base_temp + (temp - base_temp) * (1.0 - mix * 0.45)
             row_data.append(round(temp, 2))

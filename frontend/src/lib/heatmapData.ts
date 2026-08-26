@@ -143,7 +143,7 @@ export interface HeatmapScale {
 
 /** Fixed absolute color scales for heatmap visualization. */
 export const HEATMAP_FIXED_SCALE: Record<HeatmapValueMode, HeatmapScale> = {
-  temperature: { min: 0, max: 60, unit: "°C" },
+  temperature: { min: 0, max: 50, unit: "°C" },
   humidity: { min: 0, max: 100, unit: "%" },
   vpd: { min: 0, max: 10, unit: "kPa" },
   uniformity: { min: 0, max: 100, unit: "%" },

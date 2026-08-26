@@ -6,6 +6,7 @@ import {
 } from "@/lib/climateEquipmentLayout";
 import { solarTempDeltaAt } from "@/lib/solarIrradiance";
 import type { HeatmapSurfaceValues } from "@/lib/heatmapData";
+import { HEATMAP_FIXED_SCALE } from "@/lib/heatmapData";
 import type {
   ClimateEquipment,
   ClimateScenario,
@@ -47,8 +48,35 @@ function gridSize(span: number, step = 1): number {
   return Math.max(Math.floor(span / step), 6);
 }
 
-function clampRh(value: number): number {
-  return Math.max(30, Math.min(98, value));
+const TEMP_DISPLAY_MIN = HEATMAP_FIXED_SCALE.temperature.min;
+const TEMP_DISPLAY_MAX = HEATMAP_FIXED_SCALE.temperature.max;
+const MAX_LOCAL_TEMP_DELTA_C = 7.5;
+const MAX_LOCAL_RH_DELTA_PCT = 20;
+
+function matrixMean2d(matrix: number[][]): number {
+  let sum = 0;
+  let count = 0;
+  for (const row of matrix) {
+    for (const value of row) {
+      sum += value;
+      count += 1;
+    }
+  }
+  return count > 0 ? sum / count : 0;
+}
+
+function anchorMatrixToTarget(
+  matrix: number[][],
+  target: number,
+  min: number,
+  max: number,
+): number[][] {
+  const shift = target - matrixMean2d(matrix);
+  return matrix.map((row) =>
+    row.map(
+      (value) => Math.round(Math.max(min, Math.min(max, value + shift)) * 100) / 100,
+    ),
+  );
 }
 
 function fanFlowFactor(diameterM: number, count: number, refDiameter: number): number {
@@ -99,8 +127,15 @@ function computeMixingFactor(equipment: ClimateEquipment, scenario: ClimateScena
 }
 
 function spatialRetention(mixingFactor: number): number {
-  // Keep strong local gradients visible on the fixed 0-60 / 0-100 color scales.
-  return 1 - mixingFactor * 0.04;
+  return 1 - mixingFactor * 0.55;
+}
+
+function clampLocalTempDelta(delta: number): number {
+  return Math.max(-MAX_LOCAL_TEMP_DELTA_C, Math.min(MAX_LOCAL_TEMP_DELTA_C, delta));
+}
+
+function clampLocalRhDelta(delta: number): number {
+  return Math.max(-MAX_LOCAL_RH_DELTA_PCT, Math.min(MAX_LOCAL_RH_DELTA_PCT, delta));
 }
 
 function exhaustFlowSum(ctx: HeatmapFieldContext): number {
@@ -121,33 +156,40 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
   let delta = 0;
 
   const xNorm = (x + halfL) / Math.max(ctx.length, 0.1);
-  const edgeFactor = Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2);
+  const edgeFactor = Math.min(
+    1,
+    Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2),
+  );
+  const warmExcess = Math.max(ctx.baseTemp - ctx.externalTemp, 0);
 
-  delta += solarTempDeltaAt(
-    ctx.scenario,
-    ctx.qSolar,
-    x,
-    y,
-    z,
-    ctx.length,
-    ctx.width,
-    ctx.eaveHeight,
-  ) * (1 - edgeFactor * 0.15);
-  delta -=
-    edgeFactor *
-    Math.max(ctx.baseTemp - ctx.externalTemp, 0) *
-    (0.16 + ctx.scenario.windSpeedMS * 0.012);
-  delta -= edgeFactor * 2.2;
-  delta += (1 - edgeFactor) * 0.8;
+  // Directional solar gradient only — mean solar gain is already in baseTemp.
+  delta +=
+    solarTempDeltaAt(
+      ctx.scenario,
+      ctx.qSolar,
+      x,
+      y,
+      z,
+      ctx.length,
+      ctx.width,
+      ctx.eaveHeight,
+    ) * 0.4;
 
+  // Perimeter exchange when the greenhouse is warmer than outside.
+  delta -= edgeFactor * warmExcess * (0.14 + ctx.scenario.windSpeedMS * 0.01);
+
+  let padStrength = 0;
   for (const pad of ctx.layout.padWalls) {
     const padFactor = padAreaFactor(pad.widthM, pad.heightM);
     const g =
       gaussian1d(z - pad.zCenter, pad.widthM * 0.35) *
-      gaussian1d(x - pad.x, ctx.length * 0.22);
-    delta -= 7 * g * padFactor * (0.7 + pad.widthM / Math.max(ctx.width, 1));
-    if (y <= pad.heightM + 0.3) {
-      delta -= 3 * g * padFactor;
+      gaussian1d(x - pad.x, ctx.length * 0.2);
+    padStrength = Math.max(padStrength, g * padFactor);
+  }
+  if (padStrength > 0) {
+    delta -= 3.2 * padStrength * (0.55 + (1 - xNorm) * 0.45);
+    if (y <= (ctx.layout.padWalls[0]?.heightM ?? ctx.eaveHeight) + 0.3) {
+      delta -= 1.2 * padStrength;
     }
   }
 
@@ -155,20 +197,20 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
     const scale = exhaustScale(fan.diameterM);
     const sigma = fan.diameterM * 1.4;
     delta -=
-      3.2 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+      1.6 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const fan of ctx.layout.roofExhaustFans) {
     const scale =
       (fan.diameterM / Math.max(DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
     const sigma = fan.diameterM * 1.6;
-    delta -= 2.5 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    delta -= 1.2 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const fan of ctx.layout.circulationFans) {
     const scale = circulationScale(fan.diameterM);
     const sigma = fan.diameterM * 2.2;
-    delta -= 0.9 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    delta -= 0.45 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const vent of ctx.layout.vents) {
@@ -176,22 +218,17 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
     const sigmaX = vent.kind === "roof" ? vent.widthM * 0.45 : 1.2 * ventWidthScale;
     const sigmaZ = vent.kind === "roof" ? ctx.structureBayWidth * 0.35 : 1.2 * ventWidthScale;
     const g = gaussian1d(x - vent.x, sigmaX) * gaussian1d(z - vent.z, sigmaZ);
-    if (vent.kind === "roof") {
-      delta -= 3.2 * g * ventWidthScale;
-      if (y >= ctx.ridgeHeight - 0.6) {
-        delta -= 1.6 * g * ventWidthScale;
-      }
-    } else if (vent.kind === "side") {
-      delta -= 2.2 * g * ventWidthScale;
-    } else {
-      delta -= 1.8 * g;
+    const strength = vent.kind === "roof" ? 1.4 : vent.kind === "side" ? 1.0 : 0.8;
+    delta -= strength * g * ventWidthScale;
+    if (vent.kind === "roof" && y >= ctx.ridgeHeight - 0.6) {
+      delta -= 0.7 * g * ventWidthScale;
     }
   }
 
   for (const ac of ctx.layout.acUnits) {
     const scale = acCapacityFactor(ac.widthM);
     const sigma = ac.widthM * 0.9;
-    delta -= 6.5 * scale * gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
+    delta -= 2.8 * scale * gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
   }
 
   for (const heater of ctx.layout.heaters) {
@@ -199,32 +236,25 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
       Math.min(ctx.equipment.sizing.heaterUnitCount, 6) /
       Math.max(ctx.layout.heaters.length, 1);
     delta +=
-      4 * heaterScale * gaussian1d(x - heater.x, 2.2) * gaussian1d(z - heater.z, 2.2);
+      2.2 * heaterScale * gaussian1d(x - heater.x, 2.2) * gaussian1d(z - heater.z, 2.2);
   }
 
   for (const fog of ctx.layout.fogLines) {
     const fogScale =
       ctx.equipment.sizing.fogLineCount / Math.max(DEFAULT_CLIMATE_SIZING.fogLineCount, 1);
-    delta -= 2 * fogScale * gaussian1d(z - fog.z, ctx.width * 0.18);
+    delta -= 1.1 * fogScale * gaussian1d(z - fog.z, ctx.width * 0.18);
   }
-
-  const exhaustFlow = exhaustFlowSum(ctx);
-  delta -= (1 - xNorm) * 5.5;
-  delta -= xNorm * 2.8 * Math.min(exhaustFlow, 4);
 
   if (ctx.equipment.cooling === "fan_and_pad") {
-    const pad = ctx.layout.padWalls[0];
-    const padFactor = pad
-      ? padAreaFactor(pad.widthM, pad.heightM)
-      : padAreaFactor(
-          ctx.equipment.sizing.padWallWidthM,
-          ctx.equipment.sizing.padWallHeightM,
-        );
-    delta -= (1 - xNorm) * 5 * padFactor;
-    delta -= xNorm * 2 * Math.min(exhaustFlow, 3) * padFactor;
+    const exhaustFlow = Math.min(exhaustFlowSum(ctx), 3);
+    delta -= (1 - xNorm) * 1.8;
+    delta -= xNorm ** 1.35 * 1.1 * exhaustFlow;
   }
 
-  return delta * spatialRetention(ctx.mixingFactor);
+  // Head space runs slightly warmer than the floor under load.
+  delta += (y / Math.max(ctx.eaveHeight, 1)) * 0.35;
+
+  return clampLocalTempDelta(delta * spatialRetention(ctx.mixingFactor));
 }
 
 function rhInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number): number {
@@ -233,10 +263,13 @@ function rhInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number
   let deltaRh = 0;
 
   const xNorm = (x + halfL) / Math.max(ctx.length, 0.1);
-  const edgeFactor = Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2);
+  const edgeFactor = Math.min(
+    1,
+    Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2),
+  );
+  const warmExcess = Math.max(ctx.baseTemp - ctx.externalTemp, 0);
 
-  deltaRh += edgeFactor * Math.max(ctx.externalTemp - ctx.baseTemp, 0) * 0.55;
-  deltaRh += edgeFactor * (ctx.scenario.externalRhPct - ctx.internalRh) * 0.28;
+  deltaRh += edgeFactor * (ctx.scenario.externalRhPct - ctx.internalRh) * 0.22;
   deltaRh -=
     solarTempDeltaAt(
       ctx.scenario,
@@ -247,68 +280,57 @@ function rhInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number
       ctx.length,
       ctx.width,
       ctx.eaveHeight,
-    ) * 0.45;
-  deltaRh -= edgeFactor * 4;
-  deltaRh += (1 - edgeFactor) * 2;
+    ) * 0.16;
+  deltaRh -= edgeFactor * warmExcess * 0.35;
 
   for (const pad of ctx.layout.padWalls) {
     const padFactor = padAreaFactor(pad.widthM, pad.heightM);
     const g =
       gaussian1d(z - pad.zCenter, pad.widthM * 0.35) *
-      gaussian1d(x - pad.x, ctx.length * 0.22);
-    deltaRh += 24 * g * padFactor;
+      gaussian1d(x - pad.x, ctx.length * 0.2);
+    deltaRh += 14 * g * padFactor * (0.55 + (1 - xNorm) * 0.45);
     if (y <= pad.heightM + 0.3) {
-      deltaRh += 12 * g * padFactor;
+      deltaRh += 6 * g * padFactor;
     }
   }
 
   for (const fan of ctx.layout.exhaustFans) {
     const scale = exhaustScale(fan.diameterM);
     const sigma = fan.diameterM * 1.4;
-    deltaRh -= 7 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    deltaRh -= 4 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const fan of ctx.layout.circulationFans) {
     const scale = circulationScale(fan.diameterM);
     const sigma = fan.diameterM * 2.2;
-    deltaRh -= 4 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    deltaRh -= 2.5 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const ac of ctx.layout.acUnits) {
     const scale = acCapacityFactor(ac.widthM);
     const sigma = ac.widthM * 0.9;
-    deltaRh -= 20 * scale * gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
+    deltaRh -= 12 * scale * gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
   }
 
   for (const fog of ctx.layout.fogLines) {
     const fogScale =
       ctx.equipment.sizing.fogLineCount / Math.max(DEFAULT_CLIMATE_SIZING.fogLineCount, 1);
-    deltaRh += 16 * fogScale * gaussian1d(z - fog.z, ctx.width * 0.18);
+    deltaRh += 10 * fogScale * gaussian1d(z - fog.z, ctx.width * 0.18);
   }
 
   for (const heater of ctx.layout.heaters) {
     const heaterScale =
       Math.min(ctx.equipment.sizing.heaterUnitCount, 6) /
       Math.max(ctx.layout.heaters.length, 1);
-    deltaRh -= 5 * heaterScale * gaussian1d(x - heater.x, 2.2) * gaussian1d(z - heater.z, 2.2);
+    deltaRh -= 3 * heaterScale * gaussian1d(x - heater.x, 2.2) * gaussian1d(z - heater.z, 2.2);
   }
-
-  deltaRh += (1 - xNorm) * 8;
-  deltaRh -= xNorm * 5 * Math.min(exhaustFlowSum(ctx), 4);
 
   if (ctx.equipment.cooling === "fan_and_pad") {
-    const pad = ctx.layout.padWalls[0];
-    const padFactor = pad
-      ? padAreaFactor(pad.widthM, pad.heightM)
-      : padAreaFactor(
-          ctx.equipment.sizing.padWallWidthM,
-          ctx.equipment.sizing.padWallHeightM,
-        );
-    deltaRh += (1 - xNorm) * 16 * padFactor;
-    deltaRh -= xNorm * 8 * padFactor;
+    deltaRh += (1 - xNorm) * 8;
+    deltaRh -= xNorm ** 1.35 * 4 * Math.min(exhaustFlowSum(ctx), 3);
   }
 
-  return deltaRh * spatialRetention(ctx.mixingFactor);
+  return clampLocalRhDelta(deltaRh * spatialRetention(ctx.mixingFactor));
 }
 
 function sampleAt(
@@ -318,10 +340,31 @@ function sampleAt(
   z: number,
 ): { temp: number; rh: number } {
   const temp = ctx.baseTemp + tempInfluenceAt(ctx, x, y, z);
-  const rh = clampRh(ctx.internalRh + rhInfluenceAt(ctx, x, y, z));
+  const rh = ctx.internalRh + rhInfluenceAt(ctx, x, y, z);
   return {
     temp: Math.round(temp * 100) / 100,
     rh: Math.round(rh * 100) / 100,
+  };
+}
+
+function finalizeSurfaceValues(
+  ctx: HeatmapFieldContext,
+  temperature: number[][],
+  humidity: number[][],
+): HeatmapSurfaceValues {
+  return {
+    temperature: anchorMatrixToTarget(
+      temperature,
+      ctx.baseTemp,
+      TEMP_DISPLAY_MIN,
+      TEMP_DISPLAY_MAX,
+    ),
+    humidity: anchorMatrixToTarget(
+      humidity,
+      ctx.internalRh,
+      HEATMAP_FIXED_SCALE.humidity.min,
+      HEATMAP_FIXED_SCALE.humidity.max,
+    ),
   };
 }
 
@@ -399,7 +442,7 @@ export function generateSurfaceHeatmap(
       temperature.push(tempRow);
       humidity.push(rhRow);
     }
-    return { temperature, humidity };
+    return finalizeSurfaceValues(ctx, temperature, humidity);
   }
 
   if (surface === "roof") {
@@ -413,26 +456,13 @@ export function generateSurfaceHeatmap(
       for (let col = 0; col < cols; col++) {
         const z = -halfW + (col / Math.max(cols - 1, 1)) * ctx.width;
         const sample = sampleAt(ctx, x, y, z);
-        tempRow.push(
-          Math.round(
-            (sample.temp + solarTempDeltaAt(
-              ctx.scenario,
-              ctx.qSolar,
-              x,
-              y,
-              z,
-              ctx.length,
-              ctx.width,
-              ctx.eaveHeight,
-            ) * 0.35) * 100,
-          ) / 100,
-        );
-        rhRow.push(Math.round(Math.max(25, sample.rh - 4) * 100) / 100);
+        tempRow.push(sample.temp);
+        rhRow.push(sample.rh);
       }
       temperature.push(tempRow);
       humidity.push(rhRow);
     }
-    return { temperature, humidity };
+    return finalizeSurfaceValues(ctx, temperature, humidity);
   }
 
   const wallRows = gridSize(
@@ -471,23 +501,23 @@ export function generateSurfaceHeatmap(
         if (pad && y <= pad.heightM + 0.2) {
           const padFactor = padAreaFactor(pad.widthM, pad.heightM);
           const g = gaussian1d(z - pad.zCenter, pad.widthM * 0.4);
-          temp -= 2 * g * padFactor;
-          rh += 6 * g * padFactor;
+          temp -= 1.2 * g * padFactor;
+          rh += 4 * g * padFactor;
         }
       }
       if (surface === "wall_east") {
-        temp -= 0.6 * (y / Math.max(ctx.eaveHeight, 1));
-        rh -= 1.5 * (y / Math.max(ctx.eaveHeight, 1));
+        temp -= 0.4 * (y / Math.max(ctx.eaveHeight, 1));
+        rh -= 1 * (y / Math.max(ctx.eaveHeight, 1));
       }
 
       tempRow.push(Math.round(temp * 100) / 100);
-      rhRow.push(Math.round(clampRh(rh) * 100) / 100);
+      rhRow.push(Math.round(rh * 100) / 100);
     }
     temperature.push(tempRow);
     humidity.push(rhRow);
   }
 
-  return { temperature, humidity };
+  return finalizeSurfaceValues(ctx, temperature, humidity);
 }
 
 export function generateAllSurfaceHeatmaps(
