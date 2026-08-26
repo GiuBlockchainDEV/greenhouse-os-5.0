@@ -23,6 +23,93 @@ export function solarElevationFactor(scenario: ClimateScenario): number {
   return Math.max(0, Math.sin(scenario.solarElevationDeg * DEG));
 }
 
+/** Precomputed solar field — build once per heatmap context, sample at many points. */
+export interface SolarFieldContext {
+  active: boolean;
+  amplitude: number;
+  dirX: number;
+  dirZ: number;
+  floorBeam: number;
+  halfL: number;
+  halfW: number;
+  length: number;
+  width: number;
+  eaveHeight: number;
+}
+
+export function buildSolarFieldContext(
+  scenario: ClimateScenario,
+  qSolar: number,
+  length: number,
+  width: number,
+  eaveHeight: number,
+): SolarFieldContext {
+  const intensity = solarIntensityFactor(scenario);
+  const elevationFactor = solarElevationFactor(scenario);
+  const halfL = length / 2;
+  const halfW = width / 2;
+
+  if (intensity <= 0 || elevationFactor <= 0 || qSolar <= 0) {
+    return {
+      active: false,
+      amplitude: 0,
+      dirX: 0,
+      dirZ: 0,
+      floorBeam: 0,
+      halfL,
+      halfW,
+      length,
+      width,
+      eaveHeight,
+    };
+  }
+
+  const { x: lx, z: lz, y: ly } = sunLightDirection(scenario);
+  const horiz = Math.hypot(lx, lz);
+  return {
+    active: true,
+    amplitude: elevationFactor * intensity * qSolar * 0.11,
+    dirX: horiz > 1e-6 ? lx / horiz : 0,
+    dirZ: horiz > 1e-6 ? lz / horiz : 0,
+    floorBeam: Math.max(0, ly),
+    halfL,
+    halfW,
+    length,
+    width,
+    eaveHeight,
+  };
+}
+
+export function solarTempDeltaFromContext(
+  solar: SolarFieldContext,
+  x: number,
+  y: number,
+  z: number,
+): number {
+  if (!solar.active) return 0;
+
+  const alongSun =
+    (x * solar.dirX + z * solar.dirZ) / Math.max(Math.max(solar.halfL, solar.halfW), 1);
+  const sunwardBias = 0.5 - alongSun * 0.5;
+
+  const fromWest = (x + solar.halfL) / Math.max(solar.length, 0.1);
+  const fromEast = (solar.halfL - x) / Math.max(solar.length, 0.1);
+  const fromSouth = (z + solar.halfW) / Math.max(solar.width, 0.1);
+  const fromNorth = (solar.halfW - z) / Math.max(solar.width, 0.1);
+
+  let sunFacing = 0;
+  if (solar.dirX > 0.12) sunFacing = Math.max(sunFacing, fromWest);
+  if (solar.dirX < -0.12) sunFacing = Math.max(sunFacing, fromEast);
+  if (solar.dirZ > 0.12) sunFacing = Math.max(sunFacing, fromSouth);
+  if (solar.dirZ < -0.12) sunFacing = Math.max(sunFacing, fromNorth);
+
+  const heightFactor = 0.65 + 0.35 * (1 - y / Math.max(solar.eaveHeight, 1));
+  const spatial =
+    solar.floorBeam * 0.45 + sunwardBias * 0.55 + sunFacing * 0.65;
+
+  return solar.amplitude * spatial * heightFactor;
+}
+
 /**
  * Spatial solar heating (°C-equivalent delta) from direction, elevation, and intensity.
  * Coordinates: +X east, +Z south, pad wall at −X, exhaust fans at +X.
@@ -37,44 +124,12 @@ export function solarTempDeltaAt(
   width: number,
   eaveHeight: number,
 ): number {
-  const intensity = solarIntensityFactor(scenario);
-  const elevationFactor = solarElevationFactor(scenario);
-  if (intensity <= 0 || elevationFactor <= 0 || qSolar <= 0) {
-    return 0;
-  }
-
-  const { x: lx, y: ly, z: lz } = sunLightDirection(scenario);
-  const halfL = length / 2;
-  const halfW = width / 2;
-
-  const horiz = Math.hypot(lx, lz);
-  const dirX = horiz > 1e-6 ? lx / horiz : 0;
-  const dirZ = horiz > 1e-6 ? lz / horiz : 0;
-
-  // −1 = sunward side, +1 = leeward side along horizontal sun bearing
-  const alongSun = (x * dirX + z * dirZ) / Math.max(Math.max(halfL, halfW), 1);
-  const sunwardBias = 0.5 - alongSun * 0.5;
-
-  const fromWest = (x + halfL) / Math.max(length, 0.1);
-  const fromEast = (halfL - x) / Math.max(length, 0.1);
-  const fromSouth = (z + halfW) / Math.max(width, 0.1);
-  const fromNorth = (halfW - z) / Math.max(width, 0.1);
-
-  let sunFacing = 0;
-  if (dirX > 0.12) sunFacing = Math.max(sunFacing, fromWest);
-  if (dirX < -0.12) sunFacing = Math.max(sunFacing, fromEast);
-  if (dirZ > 0.12) sunFacing = Math.max(sunFacing, fromSouth);
-  if (dirZ < -0.12) sunFacing = Math.max(sunFacing, fromNorth);
-
-  const floorBeam = Math.max(0, ly);
-  const heightFactor = 0.65 + 0.35 * (1 - y / Math.max(eaveHeight, 1));
-
-  const spatial =
-    elevationFactor *
-    (floorBeam * 0.45 + sunwardBias * 0.55 + sunFacing * 0.65) *
-    heightFactor;
-
-  return spatial * intensity * qSolar * 0.11;
+  return solarTempDeltaFromContext(
+    buildSolarFieldContext(scenario, qSolar, length, width, eaveHeight),
+    x,
+    y,
+    z,
+  );
 }
 
 export function solarAzimuthLabel(azimuthDeg: number): string {

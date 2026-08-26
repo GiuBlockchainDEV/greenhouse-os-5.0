@@ -1,11 +1,13 @@
 import type { ClimateEquipment, ClimateScenario, CoveringMaterial, CropConfig, GreenhouseDimensions, GreenhouseStructure } from "@/types/greenhouse";
 import {
   buildHeatmapFieldContext,
-  generateAllSurfaceHeatmaps,
-  type HeatmapSurfaceKind,
+  generateVisibleSurfaceHeatmaps,
+  VISIBLE_HEATMAP_SURFACE_KINDS,
 } from "@/lib/equipmentAwareHeatmap";
 import type { HeatmapSurfaceValues, SimulationData } from "@/lib/heatmapData";
 import { estimatePreviewMicroclimate } from "@/lib/thermalEstimate";
+
+type VisibleHeatmapSurface = (typeof VISIBLE_HEATMAP_SURFACE_KINDS)[number];
 
 export function resolveHeatmapField(
   dimensions: GreenhouseDimensions,
@@ -17,7 +19,7 @@ export function resolveHeatmapField(
   simulationResults: SimulationData | null,
 ): {
   ctx: ReturnType<typeof buildHeatmapFieldContext>;
-  surfaces: Record<HeatmapSurfaceKind, HeatmapSurfaceValues>;
+  surfaces: Record<VisibleHeatmapSurface, HeatmapSurfaceValues>;
   internalRh: number;
   isLive: boolean;
   preview: ReturnType<typeof estimatePreviewMicroclimate>;
@@ -52,7 +54,7 @@ export function resolveHeatmapField(
     scenario,
   );
 
-  const surfaces = generateAllSurfaceHeatmaps(ctx);
+  const surfaces = generateVisibleSurfaceHeatmaps(ctx);
 
   return { ctx, surfaces, internalRh, isLive, preview };
 }

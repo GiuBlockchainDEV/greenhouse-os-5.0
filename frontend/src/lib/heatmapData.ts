@@ -27,10 +27,17 @@ export interface HeatmapClimatePreview {
 export interface HeatmapSurfaceValues {
   temperature: number[][];
   humidity: number[][];
+  vpd: number[][];
+  uniformity: number[][];
 }
 
 const SATURATION_VPOR_PRESSURE = (tempC: number): number =>
   0.6108 * Math.exp((17.27 * tempC) / (tempC + 237.3));
+
+export function vpdKpaAt(tempC: number, rhPct: number): number {
+  const es = SATURATION_VPOR_PRESSURE(tempC);
+  return Math.max(0, es - es * (rhPct / 100));
+}
 
 function matrixMean(matrix: number[][]): number {
   let sum = 0;
@@ -47,15 +54,40 @@ function matrixMean(matrix: number[][]): number {
 const TEMP_UNIFORMITY_REF_C = 6;
 const RH_UNIFORMITY_REF_PCT = 18;
 
+export function buildVpdMatrix(temperature: number[][], humidity: number[][]): number[][] {
+  return temperature.map((row, rowIndex) =>
+    row.map((temp, colIndex) => {
+      const rh = humidity[rowIndex]?.[colIndex] ?? 50;
+      return Math.round(vpdKpaAt(temp, rh) * 1000) / 1000;
+    }),
+  );
+}
+
+export function buildUniformityMatrix(
+  temperature: number[][],
+  humidity: number[][],
+): number[][] {
+  const tempMean = matrixMean(temperature);
+  const rhMean = matrixMean(humidity);
+  return temperature.map((row, rowIndex) =>
+    row.map((localTemp, colIndex) => {
+      const localRh = humidity[rowIndex]?.[colIndex] ?? rhMean;
+      const tempNorm = Math.min(Math.abs(localTemp - tempMean) / TEMP_UNIFORMITY_REF_C, 1);
+      const rhNorm = Math.min(Math.abs(localRh - rhMean) / RH_UNIFORMITY_REF_PCT, 1);
+      return Math.round(Math.max(0, Math.min(100, 100 * (1 - (tempNorm * 0.65 + rhNorm * 0.35)))) * 100) / 100;
+    }),
+  );
+}
+
 /** 0-100 score: 100 = at greenhouse average, lower = more local deviation. */
 export function computeUniformityAt(
   temperature: number[][],
   humidity: number[][],
   row: number,
   col: number,
+  tempMean = matrixMean(temperature),
+  rhMean = matrixMean(humidity),
 ): number {
-  const tempMean = matrixMean(temperature);
-  const rhMean = matrixMean(humidity);
   const localTemp = temperature[row]?.[col] ?? tempMean;
   const localRh = humidity[row]?.[col] ?? rhMean;
 
@@ -72,24 +104,19 @@ export function matrixValueAt(
   row: number,
   col: number,
 ): number {
-  const temp = surface.temperature[row]?.[col] ?? 25;
-  const rh = surface.humidity[row]?.[col] ?? internalRh;
-
   if (mode === "humidity") {
-    return rh;
+    return surface.humidity[row]?.[col] ?? internalRh;
   }
 
   if (mode === "vpd") {
-    const es = SATURATION_VPOR_PRESSURE(temp);
-    const ea = es * (rh / 100);
-    return Math.max(0, es - ea);
+    return surface.vpd[row]?.[col] ?? 0;
   }
 
   if (mode === "uniformity") {
-    return computeUniformityAt(surface.temperature, surface.humidity, row, col);
+    return surface.uniformity[row]?.[col] ?? 100;
   }
 
-  return temp;
+  return surface.temperature[row]?.[col] ?? 25;
 }
 
 export function computeHeatmapStats(

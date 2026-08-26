@@ -10,7 +10,10 @@ import {
   type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
-import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
+import {
+  VISIBLE_HEATMAP_SURFACE_KINDS,
+  type HeatmapSurfaceKind,
+} from "@/lib/equipmentAwareHeatmap";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -116,13 +119,7 @@ function HeatmapSurface({
   );
 }
 
-const VISIBLE_HEATMAP_SURFACES: Exclude<HeatmapSurfaceKind, "roof">[] = [
-  "floor",
-  "wall_west",
-  "wall_east",
-  "wall_north",
-  "wall_south",
-];
+const VISIBLE_HEATMAP_SURFACES = VISIBLE_HEATMAP_SURFACE_KINDS;
 
 const SURFACE_LAYOUT: Record<
   (typeof VISIBLE_HEATMAP_SURFACES)[number],
