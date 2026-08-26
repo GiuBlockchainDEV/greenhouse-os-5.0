@@ -132,7 +132,7 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
     ctx.length,
     ctx.width,
     ctx.eaveHeight,
-  ) * (1 - edgeFactor * 0.2);
+  ) * (1 - edgeFactor * 0.15);
   delta -=
     edgeFactor *
     Math.max(ctx.baseTemp - ctx.externalTemp, 0) *

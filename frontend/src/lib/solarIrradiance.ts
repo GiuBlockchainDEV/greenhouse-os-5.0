@@ -18,6 +18,11 @@ export function solarIntensityFactor(scenario: ClimateScenario): number {
   return Math.max(0, Math.min(1, scenario.solarIntensityPct / 100));
 }
 
+/** Elevation factor for global solar gain (0 at horizon, 1 at zenith). */
+export function solarElevationFactor(scenario: ClimateScenario): number {
+  return Math.max(0, Math.sin(scenario.solarElevationDeg * DEG));
+}
+
 /**
  * Spatial solar heating (°C-equivalent delta) from direction, elevation, and intensity.
  * Coordinates: +X east, +Z south, pad wall at −X, exhaust fans at +X.
@@ -33,7 +38,8 @@ export function solarTempDeltaAt(
   eaveHeight: number,
 ): number {
   const intensity = solarIntensityFactor(scenario);
-  if (intensity <= 0 || scenario.solarElevationDeg <= 0 || qSolar <= 0) {
+  const elevationFactor = solarElevationFactor(scenario);
+  if (intensity <= 0 || elevationFactor <= 0 || qSolar <= 0) {
     return 0;
   }
 
@@ -41,23 +47,34 @@ export function solarTempDeltaAt(
   const halfL = length / 2;
   const halfW = width / 2;
 
+  const horiz = Math.hypot(lx, lz);
+  const dirX = horiz > 1e-6 ? lx / horiz : 0;
+  const dirZ = horiz > 1e-6 ? lz / horiz : 0;
+
+  // −1 = sunward side, +1 = leeward side along horizontal sun bearing
+  const alongSun = (x * dirX + z * dirZ) / Math.max(Math.max(halfL, halfW), 1);
+  const sunwardBias = 0.5 - alongSun * 0.5;
+
+  const fromWest = (x + halfL) / Math.max(length, 0.1);
+  const fromEast = (halfL - x) / Math.max(length, 0.1);
+  const fromSouth = (z + halfW) / Math.max(width, 0.1);
+  const fromNorth = (halfW - z) / Math.max(width, 0.1);
+
+  let sunFacing = 0;
+  if (dirX > 0.12) sunFacing = Math.max(sunFacing, fromWest);
+  if (dirX < -0.12) sunFacing = Math.max(sunFacing, fromEast);
+  if (dirZ > 0.12) sunFacing = Math.max(sunFacing, fromSouth);
+  if (dirZ < -0.12) sunFacing = Math.max(sunFacing, fromNorth);
+
   const floorBeam = Math.max(0, ly);
+  const heightFactor = 0.65 + 0.35 * (1 - y / Math.max(eaveHeight, 1));
 
-  const westDist = (x + halfL) / Math.max(length, 0.1);
-  const eastDist = (halfL - x) / Math.max(length, 0.1);
-  const southDist = (z + halfW) / Math.max(width, 0.1);
-  const northDist = (halfW - z) / Math.max(width, 0.1);
+  const spatial =
+    elevationFactor *
+    (floorBeam * 0.45 + sunwardBias * 0.55 + sunFacing * 0.65) *
+    heightFactor;
 
-  let wallLeak = 0;
-  wallLeak += Math.max(0, lx) * Math.exp(-westDist * 2.8) * 0.6;
-  wallLeak += Math.max(0, -lx) * Math.exp(-eastDist * 2.8) * 0.6;
-  wallLeak += Math.max(0, lz) * Math.exp(-southDist * 2.8) * 0.5;
-  wallLeak += Math.max(0, -lz) * Math.exp(-northDist * 2.8) * 0.5;
-
-  const heightFactor = 1 - (y / Math.max(eaveHeight, 1)) * 0.3;
-  const combined = (floorBeam * 0.7 + wallLeak * heightFactor) * intensity;
-
-  return combined * qSolar * 0.042;
+  return spatial * intensity * qSolar * 0.11;
 }
 
 export function solarAzimuthLabel(azimuthDeg: number): string {

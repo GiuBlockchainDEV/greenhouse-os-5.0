@@ -8,6 +8,7 @@ import type {
   CropConfig,
   GreenhouseDimensions,
 } from "@/types/greenhouse";
+import { solarElevationFactor, solarIntensityFactor } from "@/lib/solarIrradiance";
 
 const COOLING_DELTA: Record<string, number> = {
   none: 0,
@@ -97,7 +98,11 @@ export function estimatePreviewMicroclimate(
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
   const externalTemp = scenario.externalTempC - 3;
   const qSolar =
-    covering.transmittance * 260 * 0.72 * Math.max(0, scenario.solarIntensityPct / 100);
+    covering.transmittance *
+    260 *
+    0.72 *
+    solarIntensityFactor(scenario) *
+    solarElevationFactor(scenario);
 
   const ach = ventilationAchWithSizing(equipment, scenario, length, width);
   const volume = envelopeVolume(length, width, eaveHeight, ridgeHeight);
