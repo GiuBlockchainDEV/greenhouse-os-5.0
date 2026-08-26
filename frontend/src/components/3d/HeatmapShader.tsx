@@ -4,22 +4,30 @@ import * as THREE from "three";
 import { heatmapFragmentShader, heatmapVertexShader } from "@/components/3d/shaders/heatmapShader";
 import {
   computeHeatmapStats,
+  heatmapColorMode,
   matrixValueAt,
+  type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
 import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
+import type { HeatmapMode } from "@/types/viewport";
+
+function heatmapValueMode(mode: HeatmapMode): HeatmapValueMode {
+  if (mode === "off") return "temperature";
+  return mode;
+}
 
 function buildHeatmapTexture(
-  matrix: number[][],
+  surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   internalRh: number,
 ): { texture: THREE.DataTexture; min: number; max: number } {
-  const rows = matrix.length;
-  const cols = rows > 0 ? (matrix[0]?.length ?? 0) : 0;
-  const stats = computeHeatmapStats(matrix, mode, internalRh);
+  const rows = surface.temperature.length;
+  const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
+  const stats = computeHeatmapStats(surface, mode, internalRh);
 
   if (rows === 0 || cols === 0) {
     const fallback = new THREE.DataTexture(new Float32Array([25]), 1, 1, THREE.RedFormat, THREE.FloatType);
@@ -30,7 +38,7 @@ function buildHeatmapTexture(
   const values: number[] = [];
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
-      values.push(matrixValueAt(matrix, mode, internalRh, row, col));
+      values.push(matrixValueAt(surface, mode, internalRh, row, col));
     }
   }
 
@@ -46,7 +54,7 @@ function buildHeatmapTexture(
 
 interface HeatmapSurfaceProps {
   surfaceKey: string;
-  matrix: number[][];
+  surface: HeatmapSurfaceValues;
   mode: HeatmapValueMode;
   internalRh: number;
   colorMode: number;
@@ -57,7 +65,7 @@ interface HeatmapSurfaceProps {
 
 function HeatmapSurface({
   surfaceKey,
-  matrix,
+  surface,
   mode,
   internalRh,
   colorMode,
@@ -66,8 +74,8 @@ function HeatmapSurface({
   planeSize,
 }: HeatmapSurfaceProps) {
   const shaderData = useMemo(
-    () => buildHeatmapTexture(matrix, mode, internalRh),
-    [matrix, mode, internalRh, surfaceKey],
+    () => buildHeatmapTexture(surface, mode, internalRh),
+    [surface, mode, internalRh, surfaceKey],
   );
 
   useEffect(() => {
@@ -76,15 +84,15 @@ function HeatmapSurface({
     };
   }, [shaderData]);
 
-  const segmentsU = Math.max(matrix.length - 1, 1);
-  const segmentsV = Math.max((matrix[0]?.length ?? 1) - 1, 1);
+  const segmentsU = Math.max(surface.temperature.length - 1, 1);
+  const segmentsV = Math.max((surface.temperature[0]?.length ?? 1) - 1, 1);
 
   return (
     <mesh key={surfaceKey} position={position} rotation={rotation} renderOrder={25}>
       <planeGeometry args={[planeSize[0], planeSize[1], segmentsU, segmentsV]} />
       <shaderMaterial
         attach="material"
-        key={`${surfaceKey}-mat`}
+        key={`${surfaceKey}-mat-${mode}`}
         vertexShader={heatmapVertexShader}
         fragmentShader={heatmapFragmentShader}
         uniforms={{
@@ -186,8 +194,8 @@ export function HeatmapPlane() {
     [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults, revision],
   );
 
-  const valueMode: HeatmapValueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
-  const colorMode = heatmapMode === "vpd" ? 1 : 0;
+  const valueMode = heatmapValueMode(heatmapMode);
+  const colorMode = heatmapColorMode(valueMode);
 
   if (heatmapMode === "off") {
     return null;
@@ -206,9 +214,9 @@ export function HeatmapPlane() {
         const layout = SURFACE_LAYOUT[surfaceKind](geom);
         return (
           <HeatmapSurface
-            key={`${surfaceKind}-${revision}`}
-            surfaceKey={`${surfaceKind}-${revision}`}
-            matrix={field.surfaces[surfaceKind]}
+            key={`${surfaceKind}-${revision}-${valueMode}`}
+            surfaceKey={`${surfaceKind}-${revision}-${valueMode}`}
+            surface={field.surfaces[surfaceKind]}
             mode={valueMode}
             internalRh={field.internalRh}
             colorMode={colorMode}

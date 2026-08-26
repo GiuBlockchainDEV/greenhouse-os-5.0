@@ -47,7 +47,9 @@
     "title": "Overlay Heatmap",
     "off": "Off",
     "temperature": "Temperatura",
+    "humidity": "Umidità",
     "vpd": "VPD",
+    "uniformity": "Uniformità",
     "previewHint": "Mappa di anteprima — connetti la simulazione per dati live",
     "scenarioTitle": "Parametri meteo",
     "scenarioHint": "Questi valori alimentano la mappa di anteprima e vengono inviati al motore di simulazione quando connesso.",
@@ -56,10 +58,12 @@
     "windSpeed": "Velocità vento",
     "liveDataHint": "La mappa segue i parametri impostati; con simulazione connessa riceve gli stessi dati meteo.",
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
-    "equipmentHint": "La mappa include pad, ventole, serrande, AC, riscaldatori e circolazione configurati nel pannello sinistro.",
+    "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
     "legend": {
       "temperature": "Range temperatura sul pavimento",
-      "vpd": "Range VPD sul pavimento"
+      "humidity": "Range umidità relativa",
+      "vpd": "Range VPD sul pavimento",
+      "uniformity": "Indice uniformità interna (100 = più uniforme)"
     }
   }
 }

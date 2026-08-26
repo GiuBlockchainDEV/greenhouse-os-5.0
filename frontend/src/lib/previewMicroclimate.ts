@@ -4,7 +4,7 @@ import {
   generateAllSurfaceHeatmaps,
   type HeatmapSurfaceKind,
 } from "@/lib/equipmentAwareHeatmap";
-import type { SimulationData } from "@/lib/heatmapData";
+import type { HeatmapSurfaceValues, SimulationData } from "@/lib/heatmapData";
 import { estimatePreviewMicroclimate } from "@/lib/thermalEstimate";
 
 export function resolveHeatmapField(
@@ -17,7 +17,7 @@ export function resolveHeatmapField(
   simulationResults: SimulationData | null,
 ): {
   ctx: ReturnType<typeof buildHeatmapFieldContext>;
-  surfaces: Record<HeatmapSurfaceKind, number[][]>;
+  surfaces: Record<HeatmapSurfaceKind, HeatmapSurfaceValues>;
   internalRh: number;
   isLive: boolean;
   preview: ReturnType<typeof estimatePreviewMicroclimate>;

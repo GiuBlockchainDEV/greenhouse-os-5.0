@@ -6,7 +6,13 @@ import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { HeatmapMode } from "@/types/viewport";
 
-const HEATMAP_MODES: HeatmapMode[] = ["off", "temperature", "vpd"];
+const HEATMAP_MODES: HeatmapMode[] = [
+  "off",
+  "temperature",
+  "humidity",
+  "vpd",
+  "uniformity",
+];
 
 interface SliderRowProps {
   label: string;
@@ -62,6 +68,12 @@ function ToolbarButton({ label, active, onClick }: ToolbarButtonProps) {
   );
 }
 
+function formatStatValue(mode: HeatmapMode, value: number): string {
+  if (mode === "vpd") return value.toFixed(2);
+  if (mode === "uniformity" || mode === "humidity") return value.toFixed(0);
+  return value.toFixed(1);
+}
+
 export function HeatmapControls() {
   const { t } = useTranslation("3d_controls");
 
@@ -91,7 +103,8 @@ export function HeatmapControls() {
     [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults],
   );
 
-  const valueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
+  const valueMode =
+    heatmapMode === "off" ? "temperature" : heatmapMode;
   const stats = useMemo(
     () =>
       heatmapMode === "off"
@@ -162,9 +175,9 @@ export function HeatmapControls() {
                 {t(`heatmap.legend.${valueMode}`)}
               </p>
               <p className="mt-1 font-mono text-xs font-semibold text-gray-800">
-                {stats.min.toFixed(valueMode === "vpd" ? 2 : 1)}
+                {formatStatValue(heatmapMode, stats.min)}
                 {" – "}
-                {stats.max.toFixed(valueMode === "vpd" ? 2 : 1)} {stats.unit}
+                {formatStatValue(heatmapMode, stats.max)} {stats.unit}
               </p>
               <p className="mt-1 text-[10px] text-label">
                 {t("heatmap.equipmentHint")}
