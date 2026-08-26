@@ -10,8 +10,13 @@ export function GizmoToolbar() {
   const { t } = useTranslation("3d_controls");
   const gizmoMode = useGreenhouseStore((s) => s.gizmoMode);
   const heatmapMode = useGreenhouseStore((s) => s.heatmapMode);
+  const simulationResults = useGreenhouseStore((s) => s.simulationResults);
   const setGizmoMode = useGreenhouseStore((s) => s.setGizmoMode);
   const setHeatmapMode = useGreenhouseStore((s) => s.setHeatmapMode);
+
+  const usingPreviewHeatmap =
+    heatmapMode !== "off" &&
+    (!simulationResults?.heatmap_matrix || simulationResults.heatmap_matrix.length === 0);
 
   return (
     <div className="flex flex-col gap-2">
@@ -35,7 +40,7 @@ export function GizmoToolbar() {
         <p className="ui-section-title mb-1.5 px-1">
           {t("heatmap.title")}
         </p>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {HEATMAP_MODES.map((mode) => (
             <ToolbarButton
               key={mode}
@@ -45,6 +50,9 @@ export function GizmoToolbar() {
             />
           ))}
         </div>
+        {usingPreviewHeatmap && (
+          <p className="px-1 text-[10px] text-label">{t("heatmap.previewHint")}</p>
+        )}
       </div>
     </div>
   );

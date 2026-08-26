@@ -47,6 +47,7 @@
     "title": "Heatmap Overlay",
     "off": "Off",
     "temperature": "Temperature",
-    "vpd": "VPD"
+    "vpd": "VPD",
+    "previewHint": "Preview map — connect simulation for live data"
   }
 }

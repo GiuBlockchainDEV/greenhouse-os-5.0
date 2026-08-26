@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 import { heatmapFragmentShader, heatmapVertexShader } from "@/components/3d/shaders/heatmapShader";
+import { generateFallbackHeatmap } from "@/lib/heatmapFallback";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 const SATURATION_VPOR_PRESSURE = (tempC: number): number =>
@@ -43,6 +43,7 @@ function buildHeatmapTexture(
   const texture = new THREE.DataTexture(data, cols, rows, THREE.RedFormat, THREE.FloatType);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
+  texture.flipY = true;
   texture.needsUpdate = true;
 
   return { texture, min, max };
@@ -54,35 +55,29 @@ export function HeatmapPlane() {
   const simulationResults = useGreenhouseStore((s) => s.simulationResults);
 
   const { length, width } = dimensions;
-  const matrix = simulationResults?.heatmap_matrix;
-  const internalRh = simulationResults?.microclimate.internal_rh ?? 70;
+  const micro = simulationResults?.microclimate;
+  const thermal = simulationResults?.thermal_balance;
+
+  const internalTemp = micro?.internal_temp ?? 24;
+  const externalTemp = micro?.external_temp ?? 18;
+  const internalRh = micro?.internal_rh ?? 70;
+  const qSolar = thermal?.q_solar ?? 220;
+
+  const matrix = useMemo(() => {
+    const liveMatrix = simulationResults?.heatmap_matrix;
+    if (liveMatrix && liveMatrix.length > 0) {
+      return liveMatrix;
+    }
+    return generateFallbackHeatmap(length, width, internalTemp, externalTemp, qSolar);
+  }, [simulationResults?.heatmap_matrix, length, width, internalTemp, externalTemp, qSolar]);
 
   const shaderData = useMemo(() => {
-    if (heatmapMode === "off" || !matrix || matrix.length === 0) {
+    if (heatmapMode === "off") {
       return null;
     }
     const mode = heatmapMode === "vpd" ? "vpd" : "temperature";
     return buildHeatmapTexture(matrix, mode, internalRh);
   }, [heatmapMode, matrix, internalRh]);
-
-  const uniforms = useMemo(
-    () => ({
-      heatmapTexture: { value: new THREE.DataTexture() },
-      opacity: { value: 0.75 },
-      colorMode: { value: heatmapMode === "vpd" ? 1 : 0 },
-      minValue: { value: 20 },
-      maxValue: { value: 35 },
-    }),
-    [heatmapMode],
-  );
-
-  useFrame(() => {
-    if (!shaderData) return;
-    uniforms.heatmapTexture.value = shaderData.texture;
-    uniforms.minValue.value = shaderData.min;
-    uniforms.maxValue.value = shaderData.max;
-    uniforms.colorMode.value = heatmapMode === "vpd" ? 1 : 0;
-  });
 
   useEffect(() => {
     return () => {
@@ -90,12 +85,25 @@ export function HeatmapPlane() {
     };
   }, [shaderData]);
 
-  if (heatmapMode === "off" || !shaderData) {
+  const uniforms = useMemo(() => {
+    if (!shaderData) {
+      return null;
+    }
+    return {
+      heatmapTexture: { value: shaderData.texture },
+      opacity: { value: 0.88 },
+      colorMode: { value: heatmapMode === "vpd" ? 1 : 0 },
+      minValue: { value: shaderData.min },
+      maxValue: { value: shaderData.max },
+    };
+  }, [shaderData, heatmapMode]);
+
+  if (heatmapMode === "off" || !shaderData || !uniforms) {
     return null;
   }
 
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.12, 0]} renderOrder={5}>
       <planeGeometry args={[length, width, 1, 1]} />
       <shaderMaterial
         vertexShader={heatmapVertexShader}
@@ -103,6 +111,9 @@ export function HeatmapPlane() {
         uniforms={uniforms}
         transparent
         depthWrite={false}
+        polygonOffset
+        polygonOffsetFactor={-1}
+        polygonOffsetUnits={-1}
       />
     </mesh>
   );
