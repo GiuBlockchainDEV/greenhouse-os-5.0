@@ -88,6 +88,9 @@ class WSClimateOverride(BaseModel):
     external_temp_c: float | None = Field(default=None, ge=-20.0, le=55.0)
     external_rh_pct: float | None = Field(default=None, ge=0.0, le=100.0)
     wind_speed_m_s: float | None = Field(default=None, ge=0.0, le=30.0)
+    solar_azimuth_deg: float | None = Field(default=None, ge=0.0, lt=360.0)
+    solar_elevation_deg: float | None = Field(default=None, ge=0.0, le=90.0)
+    solar_intensity_pct: float | None = Field(default=None, ge=0.0, le=100.0)
 
 
 class WSUpdateData(BaseModel):

@@ -154,6 +154,12 @@ export interface ClimateScenario {
   externalTempC: number;
   externalRhPct: number;
   windSpeedMS: number;
+  /** Compass azimuth: 0° north, 90° east, 180° south, 270° west. */
+  solarAzimuthDeg: number;
+  /** Sun height above horizon in degrees. */
+  solarElevationDeg: number;
+  /** Relative solar intensity 0–100%. */
+  solarIntensityPct: number;
 }
 
 export interface GreenhouseState {

@@ -4,6 +4,7 @@ import {
   DEFAULT_CLIMATE_SIZING,
   type ClimateEquipmentLayout,
 } from "@/lib/climateEquipmentLayout";
+import { solarTempDeltaAt } from "@/lib/solarIrradiance";
 import type { HeatmapSurfaceValues } from "@/lib/heatmapData";
 import type {
   ClimateEquipment,
@@ -122,7 +123,16 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
   const xNorm = (x + halfL) / Math.max(ctx.length, 0.1);
   const edgeFactor = Math.sqrt(((x / halfL) ** 2 + (z / halfW) ** 2) / 2);
 
-  delta += ctx.qSolar * 0.028 * (1 - edgeFactor * 0.55);
+  delta += solarTempDeltaAt(
+    ctx.scenario,
+    ctx.qSolar,
+    x,
+    y,
+    z,
+    ctx.length,
+    ctx.width,
+    ctx.eaveHeight,
+  ) * (1 - edgeFactor * 0.2);
   delta -=
     edgeFactor *
     Math.max(ctx.baseTemp - ctx.externalTemp, 0) *
@@ -227,6 +237,17 @@ function rhInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: number
 
   deltaRh += edgeFactor * Math.max(ctx.externalTemp - ctx.baseTemp, 0) * 0.55;
   deltaRh += edgeFactor * (ctx.scenario.externalRhPct - ctx.internalRh) * 0.28;
+  deltaRh -=
+    solarTempDeltaAt(
+      ctx.scenario,
+      ctx.qSolar,
+      x,
+      y,
+      z,
+      ctx.length,
+      ctx.width,
+      ctx.eaveHeight,
+    ) * 0.45;
   deltaRh -= edgeFactor * 4;
   deltaRh += (1 - edgeFactor) * 2;
 
@@ -392,7 +413,20 @@ export function generateSurfaceHeatmap(
       for (let col = 0; col < cols; col++) {
         const z = -halfW + (col / Math.max(cols - 1, 1)) * ctx.width;
         const sample = sampleAt(ctx, x, y, z);
-        tempRow.push(Math.round((sample.temp + ctx.qSolar * 0.022) * 100) / 100);
+        tempRow.push(
+          Math.round(
+            (sample.temp + solarTempDeltaAt(
+              ctx.scenario,
+              ctx.qSolar,
+              x,
+              y,
+              z,
+              ctx.length,
+              ctx.width,
+              ctx.eaveHeight,
+            ) * 0.35) * 100,
+          ) / 100,
+        );
         rhRow.push(Math.round(Math.max(25, sample.rh - 4) * 100) / 100);
       }
       temperature.push(tempRow);

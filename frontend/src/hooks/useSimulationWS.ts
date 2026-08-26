@@ -89,6 +89,9 @@ function buildUpdatePayload(): WSUpdatePayload {
         external_temp_c: state.climateScenario.externalTempC,
         external_rh_pct: state.climateScenario.externalRhPct,
         wind_speed_m_s: state.climateScenario.windSpeedMS,
+        solar_azimuth_deg: state.climateScenario.solarAzimuthDeg,
+        solar_elevation_deg: state.climateScenario.solarElevationDeg,
+        solar_intensity_pct: state.climateScenario.solarIntensityPct,
       },
     },
   };

@@ -49,5 +49,8 @@ export function heatmapInputRevision(
     scenario.externalTempC,
     scenario.externalRhPct,
     scenario.windSpeedMS,
+    scenario.solarAzimuthDeg,
+    scenario.solarElevationDeg,
+    scenario.solarIntensityPct,
   ].join("|");
 }

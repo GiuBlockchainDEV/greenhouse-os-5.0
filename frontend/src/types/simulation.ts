@@ -84,6 +84,9 @@ export interface WSClimateOverride {
   external_temp_c?: number;
   external_rh_pct?: number;
   wind_speed_m_s?: number;
+  solar_azimuth_deg?: number;
+  solar_elevation_deg?: number;
+  solar_intensity_pct?: number;
 }
 
 export interface WSUpdatePayload {

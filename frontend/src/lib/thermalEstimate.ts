@@ -96,7 +96,8 @@ export function estimatePreviewMicroclimate(
 } {
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
   const externalTemp = scenario.externalTempC - 3;
-  const qSolar = covering.transmittance * 260 * 0.72;
+  const qSolar =
+    covering.transmittance * 260 * 0.72 * Math.max(0, scenario.solarIntensityPct / 100);
 
   const ach = ventilationAchWithSizing(equipment, scenario, length, width);
   const volume = envelopeVolume(length, width, eaveHeight, ridgeHeight);

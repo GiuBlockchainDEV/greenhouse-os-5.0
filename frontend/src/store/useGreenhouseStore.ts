@@ -84,6 +84,9 @@ const DEFAULT_CLIMATE_SCENARIO: ClimateScenario = {
   externalTempC: 28,
   externalRhPct: 65,
   windSpeedMS: 2,
+  solarAzimuthDeg: 180,
+  solarElevationDeg: 55,
+  solarIntensityPct: 85,
 };
 
 function syncDimensionsFromStructure(

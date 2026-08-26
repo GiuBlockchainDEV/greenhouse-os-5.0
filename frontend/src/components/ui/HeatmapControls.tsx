@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { computeHeatmapDisplayRange } from "@/lib/heatmapData";
+import { solarAzimuthLabel } from "@/lib/solarIrradiance";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { HeatmapMode } from "@/types/viewport";
@@ -162,6 +163,44 @@ export function HeatmapControls() {
                 max={12}
                 step={0.5}
                 onChange={(value) => setClimateScenario({ windSpeedMS: value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-[11px] font-semibold text-gray-800">
+              {t("heatmap.solarTitle")}
+            </p>
+            <p className="mb-2 text-[10px] leading-relaxed text-label">
+              {t("heatmap.solarHint")}
+            </p>
+            <div className="space-y-2">
+              <SliderRow
+                label={`${t("heatmap.solarAzimuth")} (${solarAzimuthLabel(climateScenario.solarAzimuthDeg)})`}
+                value={climateScenario.solarAzimuthDeg}
+                unit="°"
+                min={0}
+                max={359}
+                step={1}
+                onChange={(value) => setClimateScenario({ solarAzimuthDeg: value })}
+              />
+              <SliderRow
+                label={t("heatmap.solarElevation")}
+                value={climateScenario.solarElevationDeg}
+                unit="°"
+                min={5}
+                max={85}
+                step={1}
+                onChange={(value) => setClimateScenario({ solarElevationDeg: value })}
+              />
+              <SliderRow
+                label={t("heatmap.solarIntensity")}
+                value={climateScenario.solarIntensityPct}
+                unit="%"
+                min={0}
+                max={100}
+                step={1}
+                onChange={(value) => setClimateScenario({ solarIntensityPct: value })}
               />
             </div>
           </div>
