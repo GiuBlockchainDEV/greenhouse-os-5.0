@@ -36,14 +36,15 @@ function buildHeatmapTexture(
     return { texture: fallback, min: displayRange.min, max: displayRange.max };
   }
 
-  const values: number[] = [];
+  const values = new Float32Array(rows * cols);
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      values.push(matrixValueAt(surface, mode, preview.internalRh, row, col));
+      // DataTexture stores texels as y * width + x (x = row / length, y = col / width).
+      values[col * rows + row] = matrixValueAt(surface, mode, preview.internalRh, row, col);
     }
   }
 
-  const data = new Float32Array(values);
+  const data = values;
   const texture = new THREE.DataTexture(data, rows, cols, THREE.RedFormat, THREE.FloatType);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
