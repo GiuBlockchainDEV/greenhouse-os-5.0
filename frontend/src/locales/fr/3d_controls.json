@@ -48,6 +48,17 @@
     "off": "Off",
     "temperature": "Température",
     "vpd": "VPD",
-    "previewHint": "Carte d'aperçu — connectez la simulation pour des données live"
+    "previewHint": "Carte d'aperçu — connectez la simulation pour des données live",
+    "scenarioTitle": "Paramètres météo",
+    "scenarioHint": "Ces valeurs alimentent la carte d'aperçu et sont envoyées au moteur de simulation une fois connecté.",
+    "externalTemp": "Temp. extérieure (max)",
+    "externalRh": "HR extérieure",
+    "windSpeed": "Vitesse du vent",
+    "liveDataHint": "Carte live du moteur de simulation (géométrie, culture, équipements, météo).",
+    "previewHintDetailed": "Estimation d'aperçu : ~{{temp}}°C intérieur, ~{{rh}}% HR — selon météo, couverture et équipements.",
+    "legend": {
+      "temperature": "Plage de température au sol",
+      "vpd": "Plage de VPD au sol"
+    }
   }
 }

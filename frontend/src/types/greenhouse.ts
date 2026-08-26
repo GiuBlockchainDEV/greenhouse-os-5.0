@@ -149,6 +149,13 @@ export interface GeoLocation {
   elevationM: number;
 }
 
+/** External weather inputs used by the simulation and preview heatmap. */
+export interface ClimateScenario {
+  externalTempC: number;
+  externalRhPct: number;
+  windSpeedMS: number;
+}
+
 export interface GreenhouseState {
   name: string;
   location: GeoLocation;

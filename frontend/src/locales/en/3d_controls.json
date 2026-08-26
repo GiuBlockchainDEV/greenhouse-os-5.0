@@ -48,6 +48,17 @@
     "off": "Off",
     "temperature": "Temperature",
     "vpd": "VPD",
-    "previewHint": "Preview map — connect simulation for live data"
+    "previewHint": "Preview map — connect simulation for live data",
+    "scenarioTitle": "Weather inputs",
+    "scenarioHint": "These values drive the preview map and are sent to the simulation engine when connected.",
+    "externalTemp": "External temp (max)",
+    "externalRh": "External RH",
+    "windSpeed": "Wind speed",
+    "liveDataHint": "Live map from simulation engine (geometry, crop, equipment, weather).",
+    "previewHintDetailed": "Preview estimate: ~{{temp}}°C internal, ~{{rh}}% RH — based on weather inputs, covering, and equipment above.",
+    "legend": {
+      "temperature": "Floor temperature range",
+      "vpd": "Floor VPD range"
+    }
   }
 }

@@ -85,6 +85,11 @@ function buildUpdatePayload(): WSUpdatePayload {
           fog_line_count: state.climateEquipment.sizing.fogLineCount,
         },
       },
+      climate: {
+        external_temp_c: state.climateScenario.externalTempC,
+        external_rh_pct: state.climateScenario.externalRhPct,
+        wind_speed_m_s: state.climateScenario.windSpeedMS,
+      },
     },
   };
 }
@@ -216,6 +221,7 @@ export function useSimulationWS(): UseSimulationWSReturn {
         state.covering !== prev.covering ||
         state.crop !== prev.crop ||
         state.climateEquipment !== prev.climateEquipment ||
+        state.climateScenario !== prev.climateScenario ||
         state.location !== prev.location;
 
       if (!changed) return;

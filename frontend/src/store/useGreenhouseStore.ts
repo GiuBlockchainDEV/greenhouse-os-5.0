@@ -8,6 +8,7 @@ import { DEFAULT_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
 import type {
   ClimateEquipment,
   ClimateEquipmentSizing,
+  ClimateScenario,
   CoveringMaterial,
   CropConfig,
   CultivationLayout,
@@ -77,6 +78,12 @@ const DEFAULT_LOCATION: GeoLocation = {
   lat: 41.9028,
   lon: 12.4964,
   elevationM: 21,
+};
+
+const DEFAULT_CLIMATE_SCENARIO: ClimateScenario = {
+  externalTempC: 28,
+  externalRhPct: 65,
+  windSpeedMS: 2,
 };
 
 function syncDimensionsFromStructure(
@@ -215,6 +222,7 @@ interface GreenhouseStore {
   covering: CoveringMaterial;
   crop: CropConfig;
   climateEquipment: ClimateEquipment;
+  climateScenario: ClimateScenario;
   metrics: VolumeMetrics;
   simulationStatus: WSConnectionStatus;
   simulationResults: SimulationData | null;
@@ -231,6 +239,7 @@ interface GreenhouseStore {
   setCropLayout: (layout: Partial<CultivationLayout>) => void;
   setClimateEquipment: (equipment: Partial<ClimateEquipment>) => void;
   setClimateEquipmentSizing: (sizing: Partial<ClimateEquipmentSizing>) => void;
+  setClimateScenario: (scenario: Partial<ClimateScenario>) => void;
   setSimulationStatus: (status: WSConnectionStatus) => void;
   setSimulationResults: (results: SimulationData) => void;
   setGizmoMode: (mode: GizmoMode) => void;
@@ -250,6 +259,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       covering: DEFAULT_COVERING,
       crop: initialCrop,
       climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
+      climateScenario: DEFAULT_CLIMATE_SCENARIO,
       metrics: initialMetrics,
       simulationStatus: "idle",
       simulationResults: null,
@@ -334,6 +344,13 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           "setClimateEquipmentSizing",
         ),
 
+      setClimateScenario: (scenario) =>
+        set(
+          { climateScenario: { ...get().climateScenario, ...scenario } },
+          false,
+          "setClimateScenario",
+        ),
+
       setSimulationStatus: (simulationStatus) =>
         set({ simulationStatus }, false, "setSimulationStatus"),
 
@@ -358,6 +375,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             covering: DEFAULT_COVERING,
             crop,
             climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
+            climateScenario: DEFAULT_CLIMATE_SCENARIO,
             metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, dimensions, crop),
           },
           false,

@@ -48,6 +48,17 @@
     "off": "Off",
     "temperature": "Temperatura",
     "vpd": "VPD",
-    "previewHint": "Mapa de vista previa — conecta la simulación para datos en vivo"
+    "previewHint": "Mapa de vista previa — conecta la simulación para datos en vivo",
+    "scenarioTitle": "Parámetros meteorológicos",
+    "scenarioHint": "Estos valores alimentan el mapa de vista previa y se envían al motor de simulación cuando está conectado.",
+    "externalTemp": "Temp. exterior (máx)",
+    "externalRh": "HR exterior",
+    "windSpeed": "Velocidad del viento",
+    "liveDataHint": "Mapa en vivo del motor de simulación (geometría, cultivo, equipos, clima).",
+    "previewHintDetailed": "Estimación previa: ~{{temp}}°C interior, ~{{rh}}% HR — según clima, cubierta y equipos.",
+    "legend": {
+      "temperature": "Rango de temperatura en suelo",
+      "vpd": "Rango de VPD en suelo"
+    }
   }
 }

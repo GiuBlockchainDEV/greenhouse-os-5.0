@@ -48,6 +48,17 @@
     "off": "Off",
     "temperature": "Temperatura",
     "vpd": "VPD",
-    "previewHint": "Mappa di anteprima — connetti la simulazione per dati live"
+    "previewHint": "Mappa di anteprima — connetti la simulazione per dati live",
+    "scenarioTitle": "Parametri meteo",
+    "scenarioHint": "Questi valori alimentano la mappa di anteprima e vengono inviati al motore di simulazione quando connesso.",
+    "externalTemp": "Temp. esterna (max)",
+    "externalRh": "UR esterna",
+    "windSpeed": "Velocità vento",
+    "liveDataHint": "Mappa live dal motore di simulazione (geometria, coltura, impianti, meteo).",
+    "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
+    "legend": {
+      "temperature": "Range temperatura sul pavimento",
+      "vpd": "Range VPD sul pavimento"
+    }
   }
 }
