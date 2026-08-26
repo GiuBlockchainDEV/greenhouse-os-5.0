@@ -56,6 +56,7 @@
     "windSpeed": "Vitesse du vent",
     "liveDataHint": "Carte live du moteur de simulation (géométrie, culture, équipements, météo).",
     "previewHintDetailed": "Estimation d'aperçu : ~{{temp}}°C intérieur, ~{{rh}}% HR — selon météo, couverture et équipements.",
+    "equipmentHint": "La carte inclut pad, ventilateurs, ouvrants, AC, chauffage et circulation du panneau gauche.",
     "legend": {
       "temperature": "Plage de température au sol",
       "vpd": "Plage de VPD au sol"

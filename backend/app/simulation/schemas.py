@@ -127,6 +127,10 @@ class CultivationLayoutInput(BaseModel):
 class ClimateEquipmentSizingInput(BaseModel):
     exhaust_fan_count: int = Field(default=4, ge=0, le=12)
     exhaust_fan_diameter_m: float = Field(default=1.2, ge=0.8, le=1.8)
+    roof_exhaust_fan_count: int = Field(default=1, ge=0, le=20)
+    roof_exhaust_fan_diameter_m: float = Field(default=1.0, ge=0.7, le=1.6)
+    circulation_fan_count: int = Field(default=6, ge=0, le=24)
+    circulation_fan_diameter_m: float = Field(default=0.55, ge=0.4, le=1.0)
     pad_wall_width_m: float = Field(default=8.0, ge=2.0, le=20.0)
     pad_wall_height_m: float = Field(default=2.0, ge=1.2, le=3.5)
     ac_unit_count: int = Field(default=2, ge=0, le=8)

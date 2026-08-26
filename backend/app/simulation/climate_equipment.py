@@ -1,5 +1,9 @@
 """Climate equipment effects on greenhouse energy balance."""
 
+import math
+
+from app.simulation.schemas import ClimateEquipmentSizingInput
+
 COOLING_DELTA_C: dict[str, float] = {
     "none": 0.0,
     "fan_and_pad": -6.0,
@@ -42,6 +46,29 @@ def cooling_effect(cooling_system: str) -> tuple[float, float]:
     )
 
 
+def cooling_effect_with_sizing(
+    cooling_system: str,
+    sizing: ClimateEquipmentSizingInput,
+    length: float,
+    width: float,
+    eave_height: float,
+) -> tuple[float, float]:
+    """Scale cooling effect by installed pad/AC capacity."""
+    delta, rh = cooling_effect(cooling_system)
+    if cooling_system == "fan_and_pad":
+        pad_fraction = min(
+            1.0,
+            (sizing.pad_wall_width_m * sizing.pad_wall_height_m)
+            / max(width * max(eave_height, 0.1), 0.1),
+        )
+        delta *= 0.45 + pad_fraction * 0.9
+    elif cooling_system == "mechanical_ac":
+        delta *= 0.6 + min(sizing.ac_unit_count, 6) * 0.12
+    elif cooling_system == "high_pressure_fog":
+        delta *= 0.5 + min(sizing.fog_line_count, 8) * 0.08
+    return delta, rh
+
+
 def heating_flux_w_m2(heating_system: str, temp_deficit_c: float) -> float:
     """Heating power flux when internal temp is below setpoint."""
     if temp_deficit_c <= 0:
@@ -50,9 +77,44 @@ def heating_flux_w_m2(heating_system: str, temp_deficit_c: float) -> float:
     return base * min(temp_deficit_c / 5.0, 1.5)
 
 
+def heating_flux_with_sizing(
+    heating_system: str,
+    temp_deficit_c: float,
+    sizing: ClimateEquipmentSizingInput,
+) -> float:
+    """Scale heating flux by installed heater/pipe rows."""
+    base = heating_flux_w_m2(heating_system, temp_deficit_c)
+    if heating_system == "geothermal":
+        return base * min(max(sizing.pipe_row_count, 1), 8) / 3.0
+    if heating_system in {"unit_heater", "air_heater"}:
+        return base * min(max(sizing.heater_unit_count, 1), 6) / 2.0
+    return base
+
+
 def ventilation_ach(ventilation_system: str, wind_speed_m_s: float) -> float:
     """Effective air changes per hour from ventilation configuration."""
     base = VENTILATION_ACH_BASE.get(ventilation_system, 2.0)
     wind_bonus = 0.3 * wind_speed_m_s
     buoyancy = 0.5 if ventilation_system.startswith("natural") else 0.0
     return base + wind_bonus + buoyancy
+
+
+def ventilation_ach_with_sizing(
+    ventilation_system: str,
+    wind_speed_m_s: float,
+    sizing: ClimateEquipmentSizingInput,
+    length: float,
+    width: float,
+) -> float:
+    """Add ACH contribution from fan throat area and vent openings."""
+    base = ventilation_ach(ventilation_system, wind_speed_m_s)
+    floor_area = max(length * width, 1.0)
+
+    fan_area = sizing.exhaust_fan_count * math.pi * (sizing.exhaust_fan_diameter_m / 2) ** 2
+    fan_area += sizing.roof_exhaust_fan_count * math.pi * (sizing.roof_exhaust_fan_diameter_m / 2) ** 2
+    vent_area = sizing.roof_vent_count * sizing.roof_vent_width_m * 1.2
+    vent_area += sizing.side_vent_count * sizing.side_vent_height_m * 1.8
+
+    forced_boost = (fan_area / floor_area) * 8.0 + (vent_area / floor_area) * 2.5
+    circulation_boost = min(sizing.circulation_fan_count, 24) * 0.15
+    return base + forced_boost + circulation_boost

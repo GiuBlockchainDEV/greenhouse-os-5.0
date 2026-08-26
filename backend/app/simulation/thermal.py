@@ -3,9 +3,9 @@
 import math
 
 from app.simulation.climate_equipment import (
-    cooling_effect,
-    heating_flux_w_m2,
-    ventilation_ach,
+    cooling_effect_with_sizing,
+    heating_flux_with_sizing,
+    ventilation_ach_with_sizing,
 )
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
 from app.simulation.cultivation import (
@@ -139,7 +139,13 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     et_rate_mm_h = (params.et0_mm_day / 24.0) * kc * lai_factor * et_factor
     q_transpiration = -(et_rate_mm_h / 3600.0) * 1000.0 * LATENT_HEAT_J_KG / 1e6
 
-    ach = ventilation_ach(params.equipment.ventilation, params.wind_speed_m_s)
+    ach = ventilation_ach_with_sizing(
+        params.equipment.ventilation,
+        params.wind_speed_m_s,
+        params.equipment.sizing,
+        length,
+        width,
+    )
 
     t_internal = _solve_internal_temperature(
         t_external,
@@ -152,11 +158,21 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         q_transpiration,
     )
 
-    cool_delta, rh_cool_delta = cooling_effect(params.equipment.cooling)
+    cool_delta, rh_cool_delta = cooling_effect_with_sizing(
+        params.equipment.cooling,
+        params.equipment.sizing,
+        length,
+        width,
+        eave_height,
+    )
     t_internal += cool_delta
 
     temp_deficit = params.heating_setpoint_c - t_internal
-    q_heating = heating_flux_w_m2(params.equipment.heating, temp_deficit)
+    q_heating = heating_flux_with_sizing(
+        params.equipment.heating,
+        temp_deficit,
+        params.equipment.sizing,
+    )
     if q_heating > 0:
         t_internal += q_heating / max(params.materials.u_value * 2.5, 1.0)
 
@@ -181,6 +197,10 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         base_temp=t_internal,
         t_external=t_external,
         q_solar=q_solar,
+        length=length,
+        width=width,
+        eave_height=eave_height,
+        equipment=params.equipment,
     )
 
     return ThermalResult(
@@ -206,21 +226,44 @@ def _generate_heatmap(
     base_temp: float,
     t_external: float,
     q_solar: float,
+    length: float,
+    width: float,
+    eave_height: float,
+    equipment,
 ) -> list[list[float]]:
-    """Generate a spatial temperature grid with edge cooling and center heating."""
+    """Generate equipment-aware floor temperature grid."""
     matrix: list[list[float]] = []
     center_r = (rows - 1) / 2.0
     center_c = (cols - 1) / 2.0
     max_dist = math.sqrt(center_r**2 + center_c**2) or 1.0
     solar_boost = q_solar * 0.015
+    sizing = equipment.sizing
+    half_l = length / 2.0
+    half_w = width / 2.0
+
+    pad_cool = 0.0
+    if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
+        pad_fraction = min(1.0, (sizing.pad_wall_width_m * sizing.pad_wall_height_m) / max(width * eave_height, 0.1))
+        pad_cool = 2.5 * pad_fraction
+
+    fan_warm = min(sizing.exhaust_fan_count, 12) * 0.35
+    vent_cool = min(sizing.roof_vent_count, 12) * 0.2 + min(sizing.side_vent_count, 10) * 0.15
+    mix = min(0.85, sizing.circulation_fan_count * 0.08)
 
     for row in range(rows):
         row_data: list[float] = []
+        x = -half_l + (row / max(rows - 1, 1)) * length
+        x_norm = (x + half_l) / max(length, 0.1)
         for col in range(cols):
+            z = -half_w + (col / max(cols - 1, 1)) * width
             dist = math.sqrt((row - center_r) ** 2 + (col - center_c) ** 2)
             edge_factor = dist / max_dist
             temp = base_temp + solar_boost * (1.0 - edge_factor * 0.6)
             temp -= edge_factor * max(base_temp - t_external, 0) * 0.08
+            temp -= pad_cool * (1.0 - x_norm)
+            temp += fan_warm * (x_norm**1.4) * 0.6
+            temp -= vent_cool * edge_factor * 0.35
+            temp = base_temp + (temp - base_temp) * (1.0 - mix * 0.45)
             row_data.append(round(temp, 2))
         matrix.append(row_data)
 

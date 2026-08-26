@@ -56,6 +56,7 @@
     "windSpeed": "Velocidad del viento",
     "liveDataHint": "Mapa en vivo del motor de simulación (geometría, cultivo, equipos, clima).",
     "previewHintDetailed": "Estimación previa: ~{{temp}}°C interior, ~{{rh}}% HR — según clima, cubierta y equipos.",
+    "equipmentHint": "El mapa incluye pad, ventiladores, ventanas, AC, calefactores y circulación del panel izquierdo.",
     "legend": {
       "temperature": "Rango de temperatura en suelo",
       "vpd": "Rango de VPD en suelo"

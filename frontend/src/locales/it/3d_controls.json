@@ -56,6 +56,7 @@
     "windSpeed": "Velocità vento",
     "liveDataHint": "Mappa live dal motore di simulazione (geometria, coltura, impianti, meteo).",
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
+    "equipmentHint": "La mappa include pad, ventole, serrande, AC, riscaldatori e circolazione configurati nel pannello sinistro.",
     "legend": {
       "temperature": "Range temperatura sul pavimento",
       "vpd": "Range VPD sul pavimento"

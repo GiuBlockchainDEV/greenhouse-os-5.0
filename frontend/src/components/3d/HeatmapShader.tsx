@@ -7,10 +7,11 @@ import {
   matrixValueAt,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
-import { resolveHeatmapInputs } from "@/lib/previewMicroclimate";
+import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
+import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
-function buildHeatmapTexture(
+export function buildHeatmapTexture(
   matrix: number[][],
   mode: HeatmapValueMode,
   internalRh: number,
@@ -25,7 +26,6 @@ function buildHeatmapTexture(
     return { texture: fallback, min: stats.min, max: stats.max };
   }
 
-  // Texture U = length (rows), texture V = width (cols) to match plane UV mapping.
   const values: number[] = [];
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
@@ -43,77 +43,171 @@ function buildHeatmapTexture(
   return { texture, min: stats.min, max: stats.max };
 }
 
-export function HeatmapPlane() {
-  const heatmapMode = useGreenhouseStore((s) => s.heatmapMode);
-  const dimensions = useGreenhouseStore((s) => s.dimensions);
-  const simulationResults = useGreenhouseStore((s) => s.simulationResults);
-  const climateScenario = useGreenhouseStore((s) => s.climateScenario);
-  const covering = useGreenhouseStore((s) => s.covering);
-  const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
+interface HeatmapSurfaceProps {
+  matrix: number[][];
+  mode: HeatmapValueMode;
+  internalRh: number;
+  colorMode: number;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  planeSize: [number, number];
+}
 
-  const { length, width } = dimensions;
-
-  const heatmapSource = useMemo(
-    () =>
-      resolveHeatmapInputs(
-        length,
-        width,
-        simulationResults,
-        climateScenario,
-        covering,
-        climateEquipment,
-      ),
-    [length, width, simulationResults, climateScenario, covering, climateEquipment],
+function HeatmapSurface({
+  matrix,
+  mode,
+  internalRh,
+  colorMode,
+  position,
+  rotation,
+  planeSize,
+}: HeatmapSurfaceProps) {
+  const shaderData = useMemo(
+    () => buildHeatmapTexture(matrix, mode, internalRh),
+    [matrix, mode, internalRh],
   );
-
-  const valueMode: HeatmapValueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
-
-  const shaderData = useMemo(() => {
-    if (heatmapMode === "off") {
-      return null;
-    }
-    return buildHeatmapTexture(heatmapSource.matrix, valueMode, heatmapSource.internalRh);
-  }, [heatmapMode, heatmapSource, valueMode]);
 
   useEffect(() => {
     return () => {
-      shaderData?.texture.dispose();
+      shaderData.texture.dispose();
     };
   }, [shaderData]);
 
-  const uniforms = useMemo(() => {
-    if (!shaderData) {
-      return null;
-    }
-    return {
+  const uniforms = useMemo(
+    () => ({
       heatmapTexture: { value: shaderData.texture },
-      opacity: { value: 0.94 },
-      colorMode: { value: heatmapMode === "vpd" ? 1 : 0 },
+      opacity: { value: 0.92 },
+      colorMode: { value: colorMode },
       minValue: { value: shaderData.min },
       maxValue: { value: shaderData.max },
-    };
-  }, [shaderData, heatmapMode]);
+    }),
+    [shaderData, colorMode],
+  );
 
-  const segmentsX = Math.max(heatmapSource.matrix.length - 1, 1);
-  const segmentsZ = Math.max((heatmapSource.matrix[0]?.length ?? 1) - 1, 1);
-
-  if (heatmapMode === "off" || !shaderData || !uniforms) {
-    return null;
-  }
+  const segmentsU = Math.max(matrix.length - 1, 1);
+  const segmentsV = Math.max((matrix[0]?.length ?? 1) - 1, 1);
 
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.18, 0]} renderOrder={10}>
-      <planeGeometry args={[length, width, segmentsX, segmentsZ]} />
+    <mesh position={position} rotation={rotation} renderOrder={12}>
+      <planeGeometry args={[planeSize[0], planeSize[1], segmentsU, segmentsV]} />
       <shaderMaterial
         vertexShader={heatmapVertexShader}
         fragmentShader={heatmapFragmentShader}
         uniforms={uniforms}
         transparent
         depthWrite={false}
+        side={THREE.DoubleSide}
         polygonOffset
         polygonOffsetFactor={-2}
         polygonOffsetUnits={-2}
       />
     </mesh>
+  );
+}
+
+const SURFACE_LAYOUT: Record<
+  HeatmapSurfaceKind,
+  (d: { length: number; width: number; eaveHeight: number; ridgeHeight: number }) => {
+    position: [number, number, number];
+    rotation: [number, number, number];
+    planeSize: [number, number];
+  }
+> = {
+  floor: ({ length, width }) => ({
+    position: [0, 0.2, 0],
+    rotation: [-Math.PI / 2, 0, 0],
+    planeSize: [length, width],
+  }),
+  roof: ({ length, width, ridgeHeight }) => ({
+    position: [0, ridgeHeight - 0.12, 0],
+    rotation: [-Math.PI / 2, 0, 0],
+    planeSize: [length, width],
+  }),
+  wall_west: ({ length, width, eaveHeight }) => ({
+    position: [-length / 2 + 0.08, eaveHeight / 2, 0],
+    rotation: [0, Math.PI / 2, 0],
+    planeSize: [width, eaveHeight],
+  }),
+  wall_east: ({ length, width, eaveHeight }) => ({
+    position: [length / 2 - 0.08, eaveHeight / 2, 0],
+    rotation: [0, -Math.PI / 2, 0],
+    planeSize: [width, eaveHeight],
+  }),
+  wall_north: ({ length, width, eaveHeight }) => ({
+    position: [0, eaveHeight / 2, -width / 2 + 0.08],
+    rotation: [0, 0, 0],
+    planeSize: [length, eaveHeight],
+  }),
+  wall_south: ({ length, width, eaveHeight }) => ({
+    position: [0, eaveHeight / 2, width / 2 - 0.08],
+    rotation: [0, Math.PI, 0],
+    planeSize: [length, eaveHeight],
+  }),
+};
+
+export function HeatmapPlane() {
+  const heatmapMode = useGreenhouseStore((s) => s.heatmapMode);
+  const dimensions = useGreenhouseStore((s) => s.dimensions);
+  const structure = useGreenhouseStore((s) => s.structure);
+  const simulationResults = useGreenhouseStore((s) => s.simulationResults);
+  const climateScenario = useGreenhouseStore((s) => s.climateScenario);
+  const covering = useGreenhouseStore((s) => s.covering);
+  const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
+  const crop = useGreenhouseStore((s) => s.crop);
+
+  const field = useMemo(
+    () =>
+      resolveHeatmapField(
+        dimensions,
+        structure,
+        climateEquipment,
+        crop,
+        covering,
+        climateScenario,
+        simulationResults,
+      ),
+    [
+      dimensions,
+      structure,
+      climateEquipment,
+      crop,
+      covering,
+      climateScenario,
+      simulationResults,
+    ],
+  );
+
+  const valueMode: HeatmapValueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
+  const colorMode = heatmapMode === "vpd" ? 1 : 0;
+
+  if (heatmapMode === "off") {
+    return null;
+  }
+
+  const geom = {
+    length: dimensions.length,
+    width: dimensions.width,
+    eaveHeight: dimensions.eaveHeight,
+    ridgeHeight: dimensions.ridgeHeight,
+  };
+
+  return (
+    <group>
+      {(Object.keys(SURFACE_LAYOUT) as HeatmapSurfaceKind[]).map((surfaceKind) => {
+        const layout = SURFACE_LAYOUT[surfaceKind](geom);
+        return (
+          <HeatmapSurface
+            key={surfaceKind}
+            matrix={field.surfaces[surfaceKind]}
+            mode={valueMode}
+            internalRh={field.internalRh}
+            colorMode={colorMode}
+            position={layout.position}
+            rotation={layout.rotation}
+            planeSize={layout.planeSize}
+          />
+        );
+      })}
+    </group>
   );
 }

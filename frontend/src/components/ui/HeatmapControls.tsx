@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { computeHeatmapStats } from "@/lib/heatmapData";
-import { resolveHeatmapInputs } from "@/lib/previewMicroclimate";
+import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { HeatmapMode } from "@/types/viewport";
 
@@ -72,20 +72,23 @@ export function HeatmapControls() {
   const simulationResults = useGreenhouseStore((s) => s.simulationResults);
   const simulationStatus = useGreenhouseStore((s) => s.simulationStatus);
   const dimensions = useGreenhouseStore((s) => s.dimensions);
+  const structure = useGreenhouseStore((s) => s.structure);
+  const crop = useGreenhouseStore((s) => s.crop);
   const covering = useGreenhouseStore((s) => s.covering);
   const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
 
   const heatmapSource = useMemo(
     () =>
-      resolveHeatmapInputs(
-        dimensions.length,
-        dimensions.width,
-        simulationResults,
-        climateScenario,
-        covering,
+      resolveHeatmapField(
+        dimensions,
+        structure,
         climateEquipment,
+        crop,
+        covering,
+        climateScenario,
+        simulationResults,
       ),
-    [dimensions.length, dimensions.width, simulationResults, climateScenario, covering, climateEquipment],
+    [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults],
   );
 
   const valueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
@@ -93,7 +96,7 @@ export function HeatmapControls() {
     () =>
       heatmapMode === "off"
         ? null
-        : computeHeatmapStats(heatmapSource.matrix, valueMode, heatmapSource.internalRh),
+        : computeHeatmapStats(heatmapSource.surfaces.floor, valueMode, heatmapSource.internalRh),
     [heatmapMode, heatmapSource, valueMode],
   );
 
@@ -162,6 +165,9 @@ export function HeatmapControls() {
                 {stats.min.toFixed(valueMode === "vpd" ? 2 : 1)}
                 {" – "}
                 {stats.max.toFixed(valueMode === "vpd" ? 2 : 1)} {stats.unit}
+              </p>
+              <p className="mt-1 text-[10px] text-label">
+                {t("heatmap.equipmentHint")}
               </p>
               <p className="mt-1 text-[10px] text-label">
                 {isLive

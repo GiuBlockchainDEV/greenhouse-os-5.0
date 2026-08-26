@@ -1,80 +1,74 @@
-import type { ClimateEquipment, ClimateScenario, CoveringMaterial } from "@/types/greenhouse";
-import { generateFallbackHeatmap } from "@/lib/heatmapFallback";
+import type { ClimateEquipment, ClimateScenario, CoveringMaterial, CropConfig, GreenhouseDimensions, GreenhouseStructure } from "@/types/greenhouse";
+import {
+  buildHeatmapFieldContext,
+  generateAllSurfaceHeatmaps,
+  generateSurfaceHeatmap,
+  type HeatmapSurfaceKind,
+} from "@/lib/equipmentAwareHeatmap";
 import type { SimulationData } from "@/lib/heatmapData";
+import { estimatePreviewMicroclimate } from "@/lib/thermalEstimate";
 
-export function estimatePreviewMicroclimate(
-  scenario: ClimateScenario,
-  covering: CoveringMaterial,
+export function resolveHeatmapField(
+  dimensions: GreenhouseDimensions,
+  structure: GreenhouseStructure,
   equipment: ClimateEquipment,
-): {
-  internalTemp: number;
-  externalTemp: number;
-  internalRh: number;
-  qSolar: number;
-} {
-  const externalTemp = scenario.externalTempC - 3;
-  const qSolar = covering.transmittance * 260;
-
-  let internalTemp = externalTemp + qSolar * 0.04 + 2.5;
-  if (equipment.cooling === "fan_and_pad" || equipment.cooling === "evaporative") {
-    internalTemp -= 3.5;
-  }
-  if (equipment.cooling === "mechanical_ac") {
-    internalTemp -= 5;
-  }
-  if (equipment.heating !== "none") {
-    internalTemp += 2;
-  }
-
-  const internalRh = Math.min(
-    95,
-    Math.max(35, scenario.externalRhPct + 8 - (internalTemp - externalTemp) * 1.2),
-  );
-
-  return {
-    internalTemp: Math.round(internalTemp * 10) / 10,
-    externalTemp: Math.round(externalTemp * 10) / 10,
-    internalRh: Math.round(internalRh * 10) / 10,
-    qSolar: Math.round(qSolar * 10) / 10,
-  };
-}
-
-export function resolveHeatmapInputs(
-  length: number,
-  width: number,
+  crop: CropConfig,
+  covering: CoveringMaterial,
+  scenario: ClimateScenario,
   simulationResults: SimulationData | null,
-  scenario: ClimateScenario,
-  covering: CoveringMaterial,
-  equipment: ClimateEquipment,
 ): {
-  matrix: number[][];
+  ctx: ReturnType<typeof buildHeatmapFieldContext>;
+  surfaces: Record<HeatmapSurfaceKind, number[][]>;
   internalRh: number;
   isLive: boolean;
   preview: ReturnType<typeof estimatePreviewMicroclimate>;
 } {
-  const liveMatrix = simulationResults?.heatmap_matrix;
-  const isLive = Boolean(liveMatrix && liveMatrix.length > 0);
+  const preview = estimatePreviewMicroclimate(
+    scenario,
+    covering,
+    equipment,
+    dimensions,
+    crop,
+  );
 
-  if (isLive && liveMatrix) {
-    return {
-      matrix: liveMatrix,
-      internalRh: simulationResults!.microclimate.internal_rh,
-      isLive,
-      preview: estimatePreviewMicroclimate(scenario, covering, equipment),
-    };
+  const isLive = Boolean(
+    simulationResults?.heatmap_matrix && simulationResults.heatmap_matrix.length > 0,
+  );
+
+  const baseTemp = isLive
+    ? simulationResults!.microclimate.internal_temp
+    : preview.internalTemp;
+  const externalTemp = isLive
+    ? simulationResults!.microclimate.external_temp
+    : preview.externalTemp;
+  const internalRh = isLive
+    ? simulationResults!.microclimate.internal_rh
+    : preview.internalRh;
+  const qSolar = isLive
+    ? simulationResults!.thermal_balance.q_solar
+    : preview.qSolar;
+
+  const ctx = buildHeatmapFieldContext(
+    dimensions,
+    structure,
+    equipment,
+    crop,
+    baseTemp,
+    externalTemp,
+    internalRh,
+    qSolar,
+  );
+
+  const surfaces = generateAllSurfaceHeatmaps(ctx);
+
+  if (isLive && simulationResults?.heatmap_matrix) {
+    surfaces.floor = simulationResults.heatmap_matrix;
+  } else {
+    surfaces.floor = generateSurfaceHeatmap(ctx, "floor");
   }
 
-  const preview = estimatePreviewMicroclimate(scenario, covering, equipment);
-  return {
-    matrix: generateFallbackHeatmap(
-      length,
-      width,
-      preview.internalTemp,
-      preview.externalTemp,
-      preview.qSolar,
-    ),
-    internalRh: preview.internalRh,
-    isLive: false,
-    preview,
-  };
+  return { ctx, surfaces, internalRh, isLive, preview };
 }
+
+// Re-export for HeatmapControls
+export { estimatePreviewMicroclimate } from "@/lib/thermalEstimate";
