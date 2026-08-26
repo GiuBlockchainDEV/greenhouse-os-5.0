@@ -106,8 +106,16 @@ function HeatmapSurface({
   );
 }
 
+const VISIBLE_HEATMAP_SURFACES: Exclude<HeatmapSurfaceKind, "roof">[] = [
+  "floor",
+  "wall_west",
+  "wall_east",
+  "wall_north",
+  "wall_south",
+];
+
 const SURFACE_LAYOUT: Record<
-  HeatmapSurfaceKind,
+  (typeof VISIBLE_HEATMAP_SURFACES)[number],
   (d: { length: number; width: number; eaveHeight: number; ridgeHeight: number }) => {
     position: [number, number, number];
     rotation: [number, number, number];
@@ -116,11 +124,6 @@ const SURFACE_LAYOUT: Record<
 > = {
   floor: ({ length, width }) => ({
     position: [0, 0.22, 0],
-    rotation: [-Math.PI / 2, 0, 0],
-    planeSize: [length * 0.98, width * 0.98],
-  }),
-  roof: ({ length, width, ridgeHeight }) => ({
-    position: [0, ridgeHeight - 0.2, 0],
     rotation: [-Math.PI / 2, 0, 0],
     planeSize: [length * 0.98, width * 0.98],
   }),
@@ -199,7 +202,7 @@ export function HeatmapPlane() {
 
   return (
     <group renderOrder={25}>
-      {(Object.keys(SURFACE_LAYOUT) as HeatmapSurfaceKind[]).map((surfaceKind) => {
+      {VISIBLE_HEATMAP_SURFACES.map((surfaceKind) => {
         const layout = SURFACE_LAYOUT[surfaceKind](geom);
         return (
           <HeatmapSurface

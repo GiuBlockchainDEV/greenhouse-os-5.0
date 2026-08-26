@@ -107,7 +107,6 @@ interface BayRoofProps {
   zCenter: number;
   archType: ArchType;
   glassOpacity: number;
-  heatmapActive: boolean;
 }
 
 function BayRoof({
@@ -118,7 +117,6 @@ function BayRoof({
   zCenter,
   archType,
   glassOpacity,
-  heatmapActive,
 }: BayRoofProps) {
   const geometry = useMemo(() => {
     if (archType === "semicircular") {
@@ -128,11 +126,11 @@ function BayRoof({
   }, [archType, bayWidth, eaveHeight, length, ridgeHeight, zCenter]);
 
   const apex = bayApexHeight(archType, eaveHeight, ridgeHeight, bayWidth);
-  const glass = glassMaterialProps(heatmapActive, glassOpacity);
+  const glass = glassMaterialProps(false, glassOpacity);
 
   return (
     <group>
-      <mesh geometry={geometry} renderOrder={heatmapActive ? 0 : 1}>
+      <mesh geometry={geometry} renderOrder={1}>
         <meshPhysicalMaterial
           color={GLASS_COLOR}
           transparent
@@ -250,7 +248,6 @@ export function GreenhouseMesh() {
           zCenter={bay.zCenter}
           archType={bay.archType}
           glassOpacity={glassOpacity}
-          heatmapActive={heatmapActive}
         />
       ))}
 
