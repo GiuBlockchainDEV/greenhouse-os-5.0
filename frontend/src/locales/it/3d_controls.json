@@ -54,7 +54,7 @@
     "externalTemp": "Temp. esterna (max)",
     "externalRh": "UR esterna",
     "windSpeed": "Velocità vento",
-    "liveDataHint": "Mappa live dal motore di simulazione (geometria, coltura, impianti, meteo).",
+    "liveDataHint": "La mappa segue i parametri impostati; con simulazione connessa riceve gli stessi dati meteo.",
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
     "equipmentHint": "La mappa include pad, ventole, serrande, AC, riscaldatori e circolazione configurati nel pannello sinistro.",
     "legend": {

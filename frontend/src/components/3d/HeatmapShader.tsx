@@ -8,10 +8,11 @@ import {
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
 import type { HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
+import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
-export function buildHeatmapTexture(
+function buildHeatmapTexture(
   matrix: number[][],
   mode: HeatmapValueMode,
   internalRh: number,
@@ -44,6 +45,7 @@ export function buildHeatmapTexture(
 }
 
 interface HeatmapSurfaceProps {
+  surfaceKey: string;
   matrix: number[][];
   mode: HeatmapValueMode;
   internalRh: number;
@@ -54,6 +56,7 @@ interface HeatmapSurfaceProps {
 }
 
 function HeatmapSurface({
+  surfaceKey,
   matrix,
   mode,
   internalRh,
@@ -64,7 +67,7 @@ function HeatmapSurface({
 }: HeatmapSurfaceProps) {
   const shaderData = useMemo(
     () => buildHeatmapTexture(matrix, mode, internalRh),
-    [matrix, mode, internalRh],
+    [matrix, mode, internalRh, surfaceKey],
   );
 
   useEffect(() => {
@@ -73,33 +76,31 @@ function HeatmapSurface({
     };
   }, [shaderData]);
 
-  const uniforms = useMemo(
-    () => ({
-      heatmapTexture: { value: shaderData.texture },
-      opacity: { value: 0.92 },
-      colorMode: { value: colorMode },
-      minValue: { value: shaderData.min },
-      maxValue: { value: shaderData.max },
-    }),
-    [shaderData, colorMode],
-  );
-
   const segmentsU = Math.max(matrix.length - 1, 1);
   const segmentsV = Math.max((matrix[0]?.length ?? 1) - 1, 1);
 
   return (
-    <mesh position={position} rotation={rotation} renderOrder={12}>
+    <mesh key={surfaceKey} position={position} rotation={rotation} renderOrder={25}>
       <planeGeometry args={[planeSize[0], planeSize[1], segmentsU, segmentsV]} />
       <shaderMaterial
+        attach="material"
+        key={`${surfaceKey}-mat`}
         vertexShader={heatmapVertexShader}
         fragmentShader={heatmapFragmentShader}
-        uniforms={uniforms}
+        uniforms={{
+          heatmapTexture: { value: shaderData.texture },
+          opacity: { value: 0.96 },
+          colorMode: { value: colorMode },
+          minValue: { value: shaderData.min },
+          maxValue: { value: shaderData.max },
+        }}
         transparent
         depthWrite={false}
+        depthTest={true}
         side={THREE.DoubleSide}
         polygonOffset
-        polygonOffsetFactor={-2}
-        polygonOffsetUnits={-2}
+        polygonOffsetFactor={-4}
+        polygonOffsetUnits={-4}
       />
     </mesh>
   );
@@ -114,34 +115,34 @@ const SURFACE_LAYOUT: Record<
   }
 > = {
   floor: ({ length, width }) => ({
-    position: [0, 0.2, 0],
+    position: [0, 0.22, 0],
     rotation: [-Math.PI / 2, 0, 0],
-    planeSize: [length, width],
+    planeSize: [length * 0.98, width * 0.98],
   }),
   roof: ({ length, width, ridgeHeight }) => ({
-    position: [0, ridgeHeight - 0.12, 0],
+    position: [0, ridgeHeight - 0.2, 0],
     rotation: [-Math.PI / 2, 0, 0],
-    planeSize: [length, width],
+    planeSize: [length * 0.98, width * 0.98],
   }),
   wall_west: ({ length, width, eaveHeight }) => ({
-    position: [-length / 2 + 0.08, eaveHeight / 2, 0],
+    position: [-length / 2 + 0.045, eaveHeight / 2, 0],
     rotation: [0, Math.PI / 2, 0],
-    planeSize: [width, eaveHeight],
+    planeSize: [width * 0.98, eaveHeight * 0.98],
   }),
   wall_east: ({ length, width, eaveHeight }) => ({
-    position: [length / 2 - 0.08, eaveHeight / 2, 0],
+    position: [length / 2 - 0.045, eaveHeight / 2, 0],
     rotation: [0, -Math.PI / 2, 0],
-    planeSize: [width, eaveHeight],
+    planeSize: [width * 0.98, eaveHeight * 0.98],
   }),
   wall_north: ({ length, width, eaveHeight }) => ({
-    position: [0, eaveHeight / 2, -width / 2 + 0.08],
+    position: [0, eaveHeight / 2, -width / 2 + 0.045],
     rotation: [0, 0, 0],
-    planeSize: [length, eaveHeight],
+    planeSize: [length * 0.98, eaveHeight * 0.98],
   }),
   wall_south: ({ length, width, eaveHeight }) => ({
-    position: [0, eaveHeight / 2, width / 2 - 0.08],
+    position: [0, eaveHeight / 2, width / 2 - 0.045],
     rotation: [0, Math.PI, 0],
-    planeSize: [length, eaveHeight],
+    planeSize: [length * 0.98, eaveHeight * 0.98],
   }),
 };
 
@@ -149,11 +150,24 @@ export function HeatmapPlane() {
   const heatmapMode = useGreenhouseStore((s) => s.heatmapMode);
   const dimensions = useGreenhouseStore((s) => s.dimensions);
   const structure = useGreenhouseStore((s) => s.structure);
-  const simulationResults = useGreenhouseStore((s) => s.simulationResults);
   const climateScenario = useGreenhouseStore((s) => s.climateScenario);
   const covering = useGreenhouseStore((s) => s.covering);
   const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
   const crop = useGreenhouseStore((s) => s.crop);
+  const simulationResults = useGreenhouseStore((s) => s.simulationResults);
+
+  const revision = useMemo(
+    () =>
+      heatmapInputRevision(
+        dimensions,
+        structure,
+        climateEquipment,
+        crop,
+        covering,
+        climateScenario,
+      ),
+    [dimensions, structure, climateEquipment, crop, covering, climateScenario],
+  );
 
   const field = useMemo(
     () =>
@@ -166,15 +180,7 @@ export function HeatmapPlane() {
         climateScenario,
         simulationResults,
       ),
-    [
-      dimensions,
-      structure,
-      climateEquipment,
-      crop,
-      covering,
-      climateScenario,
-      simulationResults,
-    ],
+    [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults, revision],
   );
 
   const valueMode: HeatmapValueMode = heatmapMode === "vpd" ? "vpd" : "temperature";
@@ -192,12 +198,13 @@ export function HeatmapPlane() {
   };
 
   return (
-    <group>
+    <group renderOrder={25}>
       {(Object.keys(SURFACE_LAYOUT) as HeatmapSurfaceKind[]).map((surfaceKind) => {
         const layout = SURFACE_LAYOUT[surfaceKind](geom);
         return (
           <HeatmapSurface
-            key={surfaceKind}
+            key={`${surfaceKind}-${revision}`}
+            surfaceKey={`${surfaceKind}-${revision}`}
             matrix={field.surfaces[surfaceKind]}
             mode={valueMode}
             internalRh={field.internalRh}

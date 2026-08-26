@@ -1,0 +1,51 @@
+import type {
+  ClimateEquipment,
+  ClimateScenario,
+  CoveringMaterial,
+  CropConfig,
+  GreenhouseDimensions,
+  GreenhouseStructure,
+} from "@/types/greenhouse";
+
+/** Stable revision token so heatmap meshes re-render when inputs change. */
+export function heatmapInputRevision(
+  dimensions: GreenhouseDimensions,
+  structure: GreenhouseStructure,
+  equipment: ClimateEquipment,
+  crop: CropConfig,
+  covering: CoveringMaterial,
+  scenario: ClimateScenario,
+): string {
+  const s = equipment.sizing;
+  return [
+    dimensions.length,
+    dimensions.width,
+    dimensions.eaveHeight,
+    dimensions.ridgeHeight,
+    structure.bayCount,
+    structure.bayWidthM,
+    equipment.cooling,
+    equipment.heating,
+    equipment.ventilation,
+    s.exhaustFanCount,
+    s.exhaustFanDiameterM,
+    s.roofExhaustFanCount,
+    s.roofExhaustFanDiameterM,
+    s.circulationFanCount,
+    s.padWallWidthM,
+    s.padWallHeightM,
+    s.acUnitCount,
+    s.roofVentCount,
+    s.roofVentWidthM,
+    s.sideVentCount,
+    s.sideVentHeightM,
+    s.heaterUnitCount,
+    s.fogLineCount,
+    crop.lai,
+    crop.type,
+    covering.transmittance,
+    scenario.externalTempC,
+    scenario.externalRhPct,
+    scenario.windSpeedMS,
+  ].join("|");
+}

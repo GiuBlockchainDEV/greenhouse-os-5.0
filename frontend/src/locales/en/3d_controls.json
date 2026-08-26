@@ -54,7 +54,7 @@
     "externalTemp": "External temp (max)",
     "externalRh": "External RH",
     "windSpeed": "Wind speed",
-    "liveDataHint": "Live map from simulation engine (geometry, crop, equipment, weather).",
+    "liveDataHint": "Map follows your current inputs; simulation engine also receives the same weather data when connected.",
     "previewHintDetailed": "Preview estimate: ~{{temp}}°C internal, ~{{rh}}% RH — based on weather inputs, covering, and equipment above.",
     "equipmentHint": "Map includes pad wall, fans, vents, AC, heaters, and circulation sizing from the left panel.",
     "legend": {

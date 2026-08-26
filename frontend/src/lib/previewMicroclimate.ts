@@ -2,7 +2,6 @@ import type { ClimateEquipment, ClimateScenario, CoveringMaterial, CropConfig, G
 import {
   buildHeatmapFieldContext,
   generateAllSurfaceHeatmaps,
-  generateSurfaceHeatmap,
   type HeatmapSurfaceKind,
 } from "@/lib/equipmentAwareHeatmap";
 import type { SimulationData } from "@/lib/heatmapData";
@@ -35,18 +34,11 @@ export function resolveHeatmapField(
     simulationResults?.heatmap_matrix && simulationResults.heatmap_matrix.length > 0,
   );
 
-  const baseTemp = isLive
-    ? simulationResults!.microclimate.internal_temp
-    : preview.internalTemp;
-  const externalTemp = isLive
-    ? simulationResults!.microclimate.external_temp
-    : preview.externalTemp;
-  const internalRh = isLive
-    ? simulationResults!.microclimate.internal_rh
-    : preview.internalRh;
-  const qSolar = isLive
-    ? simulationResults!.thermal_balance.q_solar
-    : preview.qSolar;
+  // Heatmap visualization always follows current UI inputs (immediate slider feedback).
+  const baseTemp = preview.internalTemp;
+  const externalTemp = preview.externalTemp;
+  const internalRh = preview.internalRh;
+  const qSolar = preview.qSolar;
 
   const ctx = buildHeatmapFieldContext(
     dimensions,
@@ -60,12 +52,6 @@ export function resolveHeatmapField(
   );
 
   const surfaces = generateAllSurfaceHeatmaps(ctx);
-
-  if (isLive && simulationResults?.heatmap_matrix) {
-    surfaces.floor = simulationResults.heatmap_matrix;
-  } else {
-    surfaces.floor = generateSurfaceHeatmap(ctx, "floor");
-  }
 
   return { ctx, surfaces, internalRh, isLive, preview };
 }
