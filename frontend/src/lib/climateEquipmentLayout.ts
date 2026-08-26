@@ -188,6 +188,34 @@ function distributeCirculationFansOnBeds(
   return fans;
 }
 
+function distributeCirculationFansInHouse(
+  totalCount: number,
+  length: number,
+  width: number,
+  eaveHeight: number,
+  ridgeHeight: number,
+  diameterM: number,
+): CirculationFanPlacement[] {
+  if (totalCount <= 0) return [];
+
+  const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
+  const halfLength = length / 2;
+  const xPositions = evenlySpacedInRange(
+    totalCount,
+    -halfLength * 0.72,
+    halfLength * 0.72,
+  );
+  const zOffsets = spreadAlongAxis(totalCount, width, width * 0.18);
+
+  return xPositions.map((x, index) => ({
+    x,
+    y: hangY,
+    z: zOffsets[index] ?? 0,
+    diameterM,
+    yaw: index % 2 === 0 ? Math.PI : 0,
+  }));
+}
+
 export function computeClimateEquipmentLayout(params: {
   dimensions: GreenhouseDimensions;
   structure: GreenhouseStructure;
@@ -238,17 +266,30 @@ export function computeClimateEquipmentLayout(params: {
     }
   }
 
-  if (sizing.circulationFanCount > 0 && cultivationBeds.length > 0) {
-    circulationFans.push(
-      ...distributeCirculationFansOnBeds(
-        sizing.circulationFanCount,
-        cultivationBeds,
-        bedLineCount,
-        eaveHeight,
-        ridgeHeight,
-        sizing.circulationFanDiameterM,
-      ),
-    );
+  if (sizing.circulationFanCount > 0) {
+    if (cultivationBeds.length > 0) {
+      circulationFans.push(
+        ...distributeCirculationFansOnBeds(
+          sizing.circulationFanCount,
+          cultivationBeds,
+          bedLineCount,
+          eaveHeight,
+          ridgeHeight,
+          sizing.circulationFanDiameterM,
+        ),
+      );
+    } else {
+      circulationFans.push(
+        ...distributeCirculationFansInHouse(
+          sizing.circulationFanCount,
+          length,
+          width,
+          eaveHeight,
+          ridgeHeight,
+          sizing.circulationFanDiameterM,
+        ),
+      );
+    }
   }
 
   if (needsPadWall(equipment.cooling)) {

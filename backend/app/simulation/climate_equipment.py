@@ -38,6 +38,67 @@ VENTILATION_ACH_BASE: dict[str, float] = {
 }
 
 
+DEFAULT_EXHAUST_DIAM_M = 1.2
+DEFAULT_EXHAUST_COUNT = 4
+DEFAULT_ROOF_EXHAUST_DIAM_M = 1.0
+DEFAULT_ROOF_EXHAUST_COUNT = 1
+DEFAULT_PAD_WIDTH_M = 8.0
+DEFAULT_PAD_HEIGHT_M = 2.0
+DEFAULT_AC_COUNT = 2
+DEFAULT_AC_WIDTH_M = 1.8
+DEFAULT_FOG_LINES = 4
+DEFAULT_HEATER_COUNT = 2
+
+
+def _fan_flow_units(diameter_m: float, count: int, ref_diameter_m: float) -> float:
+    if count <= 0 or diameter_m <= 0:
+        return 0.0
+    ratio = diameter_m / ref_diameter_m
+    return count * ratio * ratio
+
+
+def exhaust_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
+    actual = _fan_flow_units(
+        sizing.exhaust_fan_diameter_m,
+        sizing.exhaust_fan_count,
+        DEFAULT_EXHAUST_DIAM_M,
+    ) + _fan_flow_units(
+        sizing.roof_exhaust_fan_diameter_m,
+        sizing.roof_exhaust_fan_count,
+        DEFAULT_ROOF_EXHAUST_DIAM_M,
+    )
+    baseline = _fan_flow_units(
+        DEFAULT_EXHAUST_DIAM_M,
+        DEFAULT_EXHAUST_COUNT,
+        DEFAULT_EXHAUST_DIAM_M,
+    ) + _fan_flow_units(
+        DEFAULT_ROOF_EXHAUST_DIAM_M,
+        DEFAULT_ROOF_EXHAUST_COUNT,
+        DEFAULT_ROOF_EXHAUST_DIAM_M,
+    )
+    return actual / max(baseline, 0.1)
+
+
+def pad_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
+    actual = sizing.pad_wall_width_m * sizing.pad_wall_height_m
+    baseline = DEFAULT_PAD_WIDTH_M * DEFAULT_PAD_HEIGHT_M
+    return actual / max(baseline, 0.1)
+
+
+def ac_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
+    actual = sizing.ac_unit_count * sizing.ac_unit_width_m
+    baseline = DEFAULT_AC_COUNT * DEFAULT_AC_WIDTH_M
+    return actual / max(baseline, 0.1)
+
+
+def fog_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
+    return sizing.fog_line_count / max(DEFAULT_FOG_LINES, 1)
+
+
+def heater_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
+    return sizing.heater_unit_count / max(DEFAULT_HEATER_COUNT, 1)
+
+
 def cooling_effect(cooling_system: str) -> tuple[float, float]:
     """Return (temp_delta_c, rh_delta_pct) from active cooling."""
     return (
@@ -56,16 +117,19 @@ def cooling_effect_with_sizing(
     """Scale cooling effect by installed pad/AC capacity."""
     delta, rh = cooling_effect(cooling_system)
     if cooling_system == "fan_and_pad":
-        pad_fraction = min(
-            1.0,
-            (sizing.pad_wall_width_m * sizing.pad_wall_height_m)
-            / max(width * max(eave_height, 0.1), 0.1),
-        )
-        delta *= 0.45 + pad_fraction * 0.9
+        pad_capacity = pad_capacity_factor(sizing)
+        exhaust_capacity = exhaust_capacity_factor(sizing)
+        delta *= (0.35 + pad_capacity * 0.65) * (0.55 + exhaust_capacity * 0.65)
+        rh += (pad_capacity - 1.0) * 6.0
+        rh -= (exhaust_capacity - 1.0) * 5.0
+    elif cooling_system == "evaporative":
+        delta *= 0.45 + pad_capacity_factor(sizing) * 0.75
     elif cooling_system == "mechanical_ac":
-        delta *= 0.6 + min(sizing.ac_unit_count, 6) * 0.12
+        delta *= 0.45 + ac_capacity_factor(sizing) * 0.85
+        rh -= (ac_capacity_factor(sizing) - 1.0) * 4.0
     elif cooling_system == "high_pressure_fog":
-        delta *= 0.5 + min(sizing.fog_line_count, 8) * 0.08
+        delta *= 0.45 + fog_capacity_factor(sizing) * 0.85
+        rh += (fog_capacity_factor(sizing) - 1.0) * 8.0
     return delta, rh
 
 
@@ -87,7 +151,7 @@ def heating_flux_with_sizing(
     if heating_system == "geothermal":
         return base * min(max(sizing.pipe_row_count, 1), 8) / 3.0
     if heating_system in {"unit_heater", "air_heater"}:
-        return base * min(max(sizing.heater_unit_count, 1), 6) / 2.0
+        return base * heater_capacity_factor(sizing)
     return base
 
 

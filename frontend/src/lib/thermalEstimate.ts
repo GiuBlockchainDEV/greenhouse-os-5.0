@@ -9,6 +9,14 @@ import type {
   GreenhouseDimensions,
 } from "@/types/greenhouse";
 import { solarElevationFactor, solarIntensityFactor } from "@/lib/solarIrradiance";
+import {
+  acCapacityFactor,
+  exhaustCapacityFactor,
+  fogCapacityFactor,
+  heaterCapacityFactor,
+  padCapacityFactor,
+  ventCapacityFactor,
+} from "@/lib/climateEquipmentCapacity";
 
 const COOLING_DELTA: Record<string, number> = {
   none: 0,
@@ -76,8 +84,8 @@ export function ventilationAchWithSizing(
     sizing.roofVentCount * sizing.roofVentWidthM * 1.2 +
     sizing.sideVentCount * sizing.sideVentHeightM * 1.8;
 
-  const forcedBoost = (fanArea / area) * 8 + (ventArea / area) * 2.5;
-  const circulationBoost = sizing.circulationFanCount * 0.15;
+  const forcedBoost = (fanArea / area) * 14 + (ventArea / area) * 4 * ventCapacityFactor(sizing);
+  const circulationBoost = sizing.circulationFanCount * 0.22;
 
   return base + windBonus + buoyancy + forcedBoost + circulationBoost;
 }
@@ -118,25 +126,39 @@ export function estimatePreviewMicroclimate(
     externalTemp + (qSolar + qTranspiration) / Math.max(totalCoeff, 0.5);
 
   const sizing = equipment.sizing;
+  const exhaustCapacity = exhaustCapacityFactor(sizing);
   let coolDelta = COOLING_DELTA[equipment.cooling] ?? 0;
   if (equipment.cooling === "fan_and_pad") {
-    const padFraction = Math.min(
-      1,
-      (sizing.padWallWidthM * sizing.padWallHeightM) / Math.max(width * eaveHeight, 1),
-    );
-    coolDelta *= 0.45 + padFraction * 0.9;
+    const padCapacity = padCapacityFactor(sizing);
+    coolDelta *= (0.35 + padCapacity * 0.65) * (0.55 + exhaustCapacity * 0.65);
+  }
+  if (equipment.cooling === "evaporative") {
+    coolDelta *= 0.45 + padCapacityFactor(sizing) * 0.75;
   }
   if (equipment.cooling === "mechanical_ac") {
-    coolDelta *= 0.6 + Math.min(sizing.acUnitCount, 6) * 0.12;
+    coolDelta *= 0.45 + acCapacityFactor(sizing) * 0.85;
+  }
+  if (equipment.cooling === "high_pressure_fog") {
+    coolDelta *= 0.45 + fogCapacityFactor(sizing) * 0.85;
   }
   internalTemp += coolDelta;
 
   const heatingBase = HEATING_W_M2[equipment.heating] ?? 0;
   if (heatingBase > 0) {
-    internalTemp += (heatingBase * Math.min(sizing.heaterUnitCount, 6) * 0.5) / Math.max(covering.uValue * 2.5, 1);
+    internalTemp +=
+      (heatingBase * heaterCapacityFactor(sizing) * 0.55) /
+      Math.max(covering.uValue * 2.5, 1);
   }
 
-  const rhCool = COOLING_RH[equipment.cooling] ?? 0;
+  let rhCool = COOLING_RH[equipment.cooling] ?? 0;
+  if (equipment.cooling === "fan_and_pad") {
+    rhCool += (padCapacityFactor(sizing) - 1) * 6;
+    rhCool -= (exhaustCapacity - 1) * 5;
+  } else if (equipment.cooling === "mechanical_ac") {
+    rhCool -= (acCapacityFactor(sizing) - 1) * 4;
+  } else if (equipment.cooling === "high_pressure_fog") {
+    rhCool += (fogCapacityFactor(sizing) - 1) * 8;
+  }
   const internalRh = Math.min(
     95,
     Math.max(30, scenario.externalRhPct + rhCool + (externalTemp - internalTemp) * 1.8),

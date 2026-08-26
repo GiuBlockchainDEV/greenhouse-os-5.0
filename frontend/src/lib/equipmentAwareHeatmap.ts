@@ -6,6 +6,15 @@ import {
   type PadWallPlacement,
 } from "@/lib/climateEquipmentLayout";
 import {
+  acCapacityFactor as acCapacityFromSizing,
+  circulationCapacityFactor,
+  exhaustCapacityFactor,
+  fogCapacityFactor,
+  heaterCapacityFactor,
+  padCapacityFactor as padCapacityFromSizing,
+  ventCapacityFactor,
+} from "@/lib/climateEquipmentCapacity";
+import {
   buildSolarFieldContext,
   solarTempDeltaFromContext,
   type SolarFieldContext,
@@ -69,6 +78,10 @@ interface HeatmapCoeffs {
   rhEdgeExchange: number;
   rhWarmDryCoeff: number;
   exhaustFlow: number;
+  exhaustCapacity: number;
+  circulationCapacity: number;
+  ventCapacity: number;
+  acCapacity: number;
   padFactor: number;
   fanAndPad: boolean;
   fanAndPadTempWest: number;
@@ -96,12 +109,6 @@ function gridSize(span: number): number {
   return Math.min(GRID_MAX, Math.max(GRID_MIN, Math.round(span / GRID_STEP_M)));
 }
 
-function fanFlowFactor(diameterM: number, count: number, refDiameter: number): number {
-  if (count <= 0 || diameterM <= 0) return 0;
-  const ratio = diameterM / refDiameter;
-  return count * ratio * ratio;
-}
-
 function padAreaFactor(widthM: number, heightM: number): number {
   const refArea =
     DEFAULT_CLIMATE_SIZING.padWallWidthM * DEFAULT_CLIMATE_SIZING.padWallHeightM;
@@ -121,26 +128,10 @@ function exhaustScale(diameterM: number): number {
 }
 
 function computeMixingFactor(equipment: ClimateEquipment, scenario: ClimateScenario): number {
-  const s = equipment.sizing;
-  const circulationFlow = fanFlowFactor(
-    s.circulationFanDiameterM,
-    s.circulationFanCount,
-    DEFAULT_CLIMATE_SIZING.circulationFanDiameterM,
-  );
-  const exhaustFlow =
-    fanFlowFactor(
-      s.exhaustFanDiameterM,
-      s.exhaustFanCount,
-      DEFAULT_CLIMATE_SIZING.exhaustFanDiameterM,
-    ) +
-    fanFlowFactor(
-      s.roofExhaustFanDiameterM,
-      s.roofExhaustFanCount,
-      DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM,
-    );
-
+  const exhaust = exhaustCapacityFactor(equipment.sizing);
+  const circulation = circulationCapacityFactor(equipment.sizing);
   const windMix = scenario.windSpeedMS * 0.02;
-  return Math.min(0.62, circulationFlow * 0.035 + exhaustFlow * 0.028 + windMix);
+  return Math.min(0.78, circulation * 0.09 + exhaust * 0.07 + windMix);
 }
 
 function exhaustFlowSum(layout: ClimateEquipmentLayout): number {
@@ -160,10 +151,7 @@ function resolvePadFactor(ctx: Pick<HeatmapFieldContext, "layout" | "equipment">
   if (pad) {
     return padAreaFactor(pad.widthM, pad.heightM);
   }
-  return padAreaFactor(
-    ctx.equipment.sizing.padWallWidthM,
-    ctx.equipment.sizing.padWallHeightM,
-  );
+  return padCapacityFromSizing(ctx.equipment.sizing);
 }
 
 function buildHeatmapCoeffs(
@@ -175,8 +163,14 @@ function buildHeatmapCoeffs(
   const mixingFactor = computeMixingFactor(ctx.equipment, ctx.scenario);
   const spatialRetention = 1 - mixingFactor * 0.05;
   const padFactor = resolvePadFactor(ctx);
-  const exhaustFlow = Math.min(exhaustFlowSum(ctx.layout), 4);
+  const sizing = ctx.equipment.sizing;
+  const exhaustCapacity = exhaustCapacityFactor(sizing);
+  const circulationCapacity = circulationCapacityFactor(sizing);
+  const ventCapacity = ventCapacityFactor(sizing);
+  const acCapacity = acCapacityFromSizing(sizing);
+  const exhaustFlow = exhaustFlowSum(ctx.layout);
   const fanAndPad = ctx.equipment.cooling === "fan_and_pad";
+  const padSystem = fanAndPad ? padFactor * (0.55 + exhaustCapacity * 0.65) : padFactor;
 
   return {
     halfL,
@@ -186,23 +180,25 @@ function buildHeatmapCoeffs(
     invHalfW: 1 / Math.max(halfW, 0.1),
     spatialRetention,
     warmExcess,
-    ventTempCoeff: 0.16 + ctx.scenario.windSpeedMS * 0.012,
+    ventTempCoeff: (0.16 + ctx.scenario.windSpeedMS * 0.012) * (0.7 + ventCapacity * 0.45),
     rhEdgeExchange: 0.22,
     rhWarmDryCoeff: 0.35,
     exhaustFlow,
+    exhaustCapacity,
+    circulationCapacity,
+    ventCapacity,
+    acCapacity,
     padFactor,
     fanAndPad,
-    fanAndPadTempWest: fanAndPad ? 7 * padFactor : 0,
-    fanAndPadTempEastWarm: fanAndPad ? 5.5 * padFactor : 0,
-    fanAndPadRhWest: fanAndPad ? 18 * padFactor : 0,
-    fanAndPadRhEastDry: fanAndPad ? 14 * Math.min(exhaustFlow, 3) * padFactor : 0,
+    fanAndPadTempWest: fanAndPad ? 7 * padSystem : 0,
+    fanAndPadTempEastWarm: fanAndPad ? 5.5 * padSystem * (0.75 + exhaustCapacity * 0.35) : 0,
+    fanAndPadRhWest: fanAndPad ? 18 * padSystem : 0,
+    fanAndPadRhEastDry: fanAndPad ? 14 * exhaustCapacity * padFactor : 0,
     heaterShare:
       ctx.layout.heaters.length > 0
-        ? Math.min(ctx.equipment.sizing.heaterUnitCount, 6) / ctx.layout.heaters.length
+        ? heaterCapacityFactor(sizing) / ctx.layout.heaters.length
         : 0,
-    fogScale:
-      ctx.equipment.sizing.fogLineCount /
-      Math.max(DEFAULT_CLIMATE_SIZING.fogLineCount, 1),
+    fogScale: fogCapacityFactor(sizing),
   };
 }
 
@@ -269,7 +265,7 @@ function influenceAt(
   }
 
   for (const fan of ctx.layout.exhaustFans) {
-    const scale = exhaustScale(fan.diameterM);
+    const scale = exhaustScale(fan.diameterM) * coeffs.exhaustCapacity;
     const sigma = fan.diameterM * 1.2;
     const g = gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
     tempDelta -= 3.5 * scale * g;
@@ -284,7 +280,7 @@ function influenceAt(
   }
 
   for (const fan of ctx.layout.circulationFans) {
-    const scale = circulationScale(fan.diameterM);
+    const scale = circulationScale(fan.diameterM) * coeffs.circulationCapacity;
     const sigma = fan.diameterM * 1.8;
     const g = gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
     tempDelta -= 1.2 * scale * g;
@@ -296,15 +292,15 @@ function influenceAt(
     const sigmaX = vent.kind === "roof" ? vent.widthM * 0.45 : 1.2 * ventWidthScale;
     const sigmaZ = vent.kind === "roof" ? ctx.structureBayWidth * 0.35 : 1.2 * ventWidthScale;
     const g = gaussian1d(x - vent.x, sigmaX) * gaussian1d(z - vent.z, sigmaZ);
-    const strength = vent.kind === "roof" ? 1.4 : vent.kind === "side" ? 1.0 : 0.8;
+    const strength = (vent.kind === "roof" ? 1.4 : vent.kind === "side" ? 1.0 : 0.8) * coeffs.ventCapacity;
     tempDelta -= strength * g * ventWidthScale;
     if (vent.kind === "roof" && y >= ctx.ridgeHeight - 0.6) {
-      tempDelta -= 0.7 * g * ventWidthScale;
+      tempDelta -= 0.7 * g * ventWidthScale * coeffs.ventCapacity;
     }
   }
 
   for (const ac of ctx.layout.acUnits) {
-    const scale = acCapacityFactor(ac.widthM);
+    const scale = acCapacityFactor(ac.widthM) * coeffs.acCapacity;
     const sigma = ac.widthM * 0.9;
     const g = gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
     tempDelta -= 2.8 * scale * g;

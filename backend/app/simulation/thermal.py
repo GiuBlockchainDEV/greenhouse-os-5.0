@@ -4,7 +4,9 @@ import math
 
 from app.simulation.climate_equipment import (
     cooling_effect_with_sizing,
+    exhaust_capacity_factor,
     heating_flux_with_sizing,
+    pad_capacity_factor,
     ventilation_ach_with_sizing,
 )
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
@@ -243,11 +245,15 @@ def _generate_heatmap(
 
     pad_cool = 0.0
     if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
-        pad_fraction = min(1.0, (sizing.pad_wall_width_m * sizing.pad_wall_height_m) / max(width * eave_height, 0.1))
-        pad_cool = 2.5 * pad_fraction
+        pad_capacity = pad_capacity_factor(sizing)
+        exhaust_capacity = exhaust_capacity_factor(sizing)
+        pad_cool = 2.5 * pad_capacity * (0.55 + exhaust_capacity * 0.65)
 
-    fan_cool = min(sizing.exhaust_fan_count, 12) * 0.25
-    vent_cool = min(sizing.roof_vent_count, 12) * 0.2 + min(sizing.side_vent_count, 10) * 0.15
+    fan_cool = exhaust_capacity_factor(sizing) * 1.0
+    vent_cool = (
+        sizing.roof_vent_count * sizing.roof_vent_width_m * 0.08
+        + sizing.side_vent_count * sizing.side_vent_height_m * 0.1
+    )
     mix = min(0.85, sizing.circulation_fan_count * 0.08)
 
     for row in range(rows):
