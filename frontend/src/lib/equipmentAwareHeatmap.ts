@@ -154,21 +154,21 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
   for (const fan of ctx.layout.exhaustFans) {
     const scale = exhaustScale(fan.diameterM);
     const sigma = fan.diameterM * 1.4;
-    delta +=
-      3.8 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    delta -=
+      3.2 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const fan of ctx.layout.roofExhaustFans) {
     const scale =
       (fan.diameterM / Math.max(DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
     const sigma = fan.diameterM * 1.6;
-    delta += 3 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    delta -= 2.5 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const fan of ctx.layout.circulationFans) {
     const scale = circulationScale(fan.diameterM);
     const sigma = fan.diameterM * 2.2;
-    delta += 1.1 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
+    delta -= 0.9 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
 
   for (const vent of ctx.layout.vents) {
@@ -210,7 +210,7 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
 
   const exhaustFlow = exhaustFlowSum(ctx);
   delta -= (1 - xNorm) * 5.5;
-  delta += xNorm * 3.2 * Math.min(exhaustFlow, 4);
+  delta -= xNorm * 2.8 * Math.min(exhaustFlow, 4);
 
   if (ctx.equipment.cooling === "fan_and_pad") {
     const pad = ctx.layout.padWalls[0];
@@ -221,7 +221,7 @@ function tempInfluenceAt(ctx: HeatmapFieldContext, x: number, y: number, z: numb
           ctx.equipment.sizing.padWallHeightM,
         );
     delta -= (1 - xNorm) * 5 * padFactor;
-    delta += xNorm * 2.5 * Math.min(exhaustFlow, 3) * padFactor;
+    delta -= xNorm * 2 * Math.min(exhaustFlow, 3) * padFactor;
   }
 
   return delta * spatialRetention(ctx.mixingFactor);
@@ -476,7 +476,7 @@ export function generateSurfaceHeatmap(
         }
       }
       if (surface === "wall_east") {
-        temp += 0.8 * (y / Math.max(ctx.eaveHeight, 1));
+        temp -= 0.6 * (y / Math.max(ctx.eaveHeight, 1));
         rh -= 1.5 * (y / Math.max(ctx.eaveHeight, 1));
       }
 

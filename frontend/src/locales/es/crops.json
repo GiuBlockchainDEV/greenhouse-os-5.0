@@ -38,7 +38,7 @@
     "totalPlants": "Plantas Totales",
     "plantDensity": "Densidad de Plantación",
     "bedLineCount": "Líneas de Cultivo (0 = auto)",
-    "bedLinesPerBay": "Líneas por Campo",
+    "bedLinesPerBay": "Líneas por Campo (0 = auto)",
     "totalBedLines": "Líneas Totales",
     "pathwayWidth": "Pasillo entre Líneas",
     "sideClearance": "Margen Lateral",

@@ -209,18 +209,13 @@ export function CultivationClimateControls() {
           onChange={(value) => setCropLayout({ tierCount: value })}
         />
         <SliderRow
-          label={tCrops("labels.bedLineCount")}
+          label={tCrops("labels.bedLinesPerBay")}
           value={crop.layout.bedLineCount}
           unit=""
           min={0}
           max={20}
           step={1}
           onChange={(value) => setCropLayout({ bedLineCount: value })}
-        />
-        <ReadOnlyMetricRow
-          label={tCrops("labels.bedLinesPerBay")}
-          value={metrics.bedLineCount}
-          unit=""
         />
         <ReadOnlyMetricRow
           label={tCrops("labels.totalBedLines")}

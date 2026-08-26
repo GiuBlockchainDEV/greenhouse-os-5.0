@@ -38,7 +38,7 @@
     "totalPlants": "Total Plants",
     "plantDensity": "Plant Density",
     "bedLineCount": "Cultivation Lines (0 = auto)",
-    "bedLinesPerBay": "Lines per Bay",
+    "bedLinesPerBay": "Lines per Bay (0 = auto)",
     "totalBedLines": "Total Lines",
     "pathwayWidth": "Pathway Between Lines",
     "sideClearance": "Side Clearance",

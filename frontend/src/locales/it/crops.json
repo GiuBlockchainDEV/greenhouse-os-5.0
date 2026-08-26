@@ -38,7 +38,7 @@
     "totalPlants": "Piante Totali",
     "plantDensity": "Densità Impianto",
     "bedLineCount": "Linee di Coltivazione (0 = auto)",
-    "bedLinesPerBay": "Linee per Campata",
+    "bedLinesPerBay": "Linee per Campata (0 = auto)",
     "totalBedLines": "Linee Totali",
     "pathwayWidth": "Larghezza Corsello tra Linee",
     "sideClearance": "Margine Laterale",
