@@ -65,7 +65,7 @@
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
     "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
     "legend": {
-      "temperature": "Scala temperatura (blu 0°C → rosso 50°C)",
+      "temperature": "Colori: range attuale sul pavimento (riferimento 0–50°C)",
       "humidity": "Scala umidità (0–100%)",
       "vpd": "Scala VPD (0–10 kPa)",
       "uniformity": "Indice uniformità interna (0–100%)"

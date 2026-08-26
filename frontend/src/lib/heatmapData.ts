@@ -179,3 +179,70 @@ export const HEATMAP_FIXED_SCALE: Record<HeatmapValueMode, HeatmapScale> = {
 export function computeHeatmapDisplayRange(mode: HeatmapValueMode): HeatmapScale {
   return HEATMAP_FIXED_SCALE[mode];
 }
+
+const MIN_VISUAL_SPAN: Record<HeatmapValueMode, number> = {
+  temperature: 14,
+  humidity: 22,
+  vpd: 0.9,
+  uniformity: 28,
+};
+
+function surfaceValueBounds(
+  surface: HeatmapSurfaceValues,
+  mode: HeatmapValueMode,
+  preview: HeatmapClimatePreview,
+): { min: number; max: number } {
+  const rows = surface.temperature.length;
+  const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
+  if (rows === 0 || cols === 0) {
+    if (mode === "humidity") return { min: preview.internalRh - 5, max: preview.internalRh + 5 };
+    if (mode === "vpd") return { min: 0.2, max: 1.2 };
+    if (mode === "uniformity") return { min: 40, max: 100 };
+    return { min: preview.internalTemp - 4, max: preview.internalTemp + 4 };
+  }
+
+  let min = Infinity;
+  let max = -Infinity;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const value = matrixValueAt(surface, mode, preview.internalRh, row, col);
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+  }
+  return { min, max };
+}
+
+/** Color range from actual field spread, clamped to absolute scale (0–50°C etc.). */
+export function computeHeatmapVisualRange(
+  surface: HeatmapSurfaceValues,
+  mode: HeatmapValueMode,
+  preview: HeatmapClimatePreview,
+): HeatmapScale {
+  const absolute = HEATMAP_FIXED_SCALE[mode];
+  const minSpan = MIN_VISUAL_SPAN[mode];
+  const { min: dataMin, max: dataMax } = surfaceValueBounds(surface, mode, preview);
+
+  let min = dataMin;
+  let max = dataMax;
+
+  if (mode === "temperature") {
+    min = Math.min(min, preview.internalTemp - minSpan / 2);
+    max = Math.max(max, preview.internalTemp + minSpan / 2);
+  } else if (mode === "humidity") {
+    min = Math.min(min, preview.internalRh - minSpan / 2);
+    max = Math.max(max, preview.internalRh + minSpan / 2);
+  }
+
+  if (max - min < minSpan) {
+    const mid = (min + max) / 2;
+    min = mid - minSpan / 2;
+    max = mid + minSpan / 2;
+  }
+
+  return {
+    min: Math.max(absolute.min, min),
+    max: Math.min(absolute.max, max),
+    unit: absolute.unit,
+  };
+}

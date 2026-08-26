@@ -3,17 +3,14 @@ import * as THREE from "three";
 
 import { heatmapFragmentShader, heatmapVertexShader } from "@/components/3d/shaders/heatmapShader";
 import {
-  computeHeatmapDisplayRange,
+  computeHeatmapVisualRange,
   heatmapColorMode,
   matrixValueAt,
   type HeatmapClimatePreview,
   type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
-import {
-  VISIBLE_HEATMAP_SURFACE_KINDS,
-  type HeatmapSurfaceKind,
-} from "@/lib/equipmentAwareHeatmap";
+import { VISIBLE_HEATMAP_SURFACE_KINDS } from "@/lib/equipmentAwareHeatmap";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -31,7 +28,7 @@ function buildHeatmapTexture(
 ): { texture: THREE.DataTexture; min: number; max: number } {
   const rows = surface.temperature.length;
   const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
-  const displayRange = computeHeatmapDisplayRange(mode);
+  const displayRange = computeHeatmapVisualRange(surface, mode, preview);
 
   if (rows === 0 || cols === 0) {
     const fallback = new THREE.DataTexture(new Float32Array([25]), 1, 1, THREE.RedFormat, THREE.FloatType);

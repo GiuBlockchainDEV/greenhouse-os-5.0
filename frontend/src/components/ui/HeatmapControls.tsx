@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { computeHeatmapDisplayRange } from "@/lib/heatmapData";
+import { computeHeatmapVisualRange } from "@/lib/heatmapData";
 import { solarAzimuthLabel } from "@/lib/solarIrradiance";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -107,8 +107,15 @@ export function HeatmapControls() {
   const valueMode =
     heatmapMode === "off" ? "temperature" : heatmapMode;
   const stats = useMemo(
-    () => (heatmapMode === "off" ? null : computeHeatmapDisplayRange(valueMode)),
-    [heatmapMode, valueMode],
+    () =>
+      heatmapMode === "off"
+        ? null
+        : computeHeatmapVisualRange(
+            heatmapSource.surfaces.floor,
+            valueMode,
+            heatmapSource.preview,
+          ),
+    [heatmapMode, valueMode, heatmapSource],
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";
