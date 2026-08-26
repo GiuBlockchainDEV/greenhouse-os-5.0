@@ -61,7 +61,7 @@ export function solarTempDeltaAt(
 }
 
 export function solarAzimuthLabel(azimuthDeg: number): string {
-  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
   const index = Math.round(((azimuthDeg % 360) + 360) % 360 / 45) % 8;
-  return dirs[index];
+  return dirs[index] ?? "N";
 }
