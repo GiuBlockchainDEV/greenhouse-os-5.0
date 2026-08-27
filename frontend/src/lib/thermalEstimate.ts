@@ -65,6 +65,39 @@ function envelopeVolume(
   return length * width * eaveHeight + (length * width * rise) / 2;
 }
 
+function roofArea(
+  length: number,
+  width: number,
+  eaveHeight: number,
+  ridgeHeight: number,
+): number {
+  const roofRise = Math.max(ridgeHeight - eaveHeight, 0.01);
+  const slopeLength = Math.sqrt((width / 2) ** 2 + roofRise ** 2);
+  return 2 * slopeLength * length;
+}
+
+function envelopeArea(
+  length: number,
+  width: number,
+  eaveHeight: number,
+  ridgeHeight: number,
+): number {
+  const wallArea = 2 * length * eaveHeight + 2 * width * eaveHeight;
+  return wallArea + roofArea(length, width, eaveHeight, ridgeHeight);
+}
+
+/** W/m² floor equivalent envelope conductance (matches backend thermal.py). */
+function envelopeConductancePerFloor(
+  length: number,
+  width: number,
+  eaveHeight: number,
+  ridgeHeight: number,
+  uValue: number,
+): number {
+  const floorArea = Math.max(length * width, 1);
+  return (uValue * envelopeArea(length, width, eaveHeight, ridgeHeight)) / floorArea;
+}
+
 export function ventilationAchWithSizing(
   equipment: ClimateEquipment,
   scenario: ClimateScenario,
@@ -85,7 +118,8 @@ export function ventilationAchWithSizing(
     sizing.sideVentCount * sizing.sideVentHeightM * 1.8;
 
   const forcedBoost = (fanArea / area) * 14 + (ventArea / area) * 4 * ventCapacityFactor(sizing);
-  const circulationBoost = sizing.circulationFanCount * 0.22;
+  const circulationBoost =
+    sizing.circulationFanCount * 0.22 * (300 / area);
 
   return base + windBonus + buoyancy + forcedBoost + circulationBoost;
 }
@@ -114,9 +148,15 @@ export function estimatePreviewMicroclimate(
 
   const ach = ventilationAchWithSizing(equipment, scenario, length, width);
   const volume = envelopeVolume(length, width, eaveHeight, ridgeHeight);
-  const area = floorArea(length, width);
-  const conductance = covering.uValue * 5.5;
-  const ventCoeff = (1.2 * 1005 * ach * volume) / (3600 * area);
+  const conductance = envelopeConductancePerFloor(
+    length,
+    width,
+    eaveHeight,
+    ridgeHeight,
+    covering.uValue,
+  );
+  const ventCoeff =
+    (1.2 * 1005 * ach * volume) / (3600 * Math.max(length * width, 1));
   const totalCoeff = conductance + ventCoeff;
 
   const laiFactor = Math.min(crop.lai / 3, 2);

@@ -45,6 +45,8 @@ export function heatmapInputRevision(
     s.fogLineCount,
     crop.lai,
     crop.type,
+    crop.layout.bedLineCount,
+    crop.layout.tierCount,
     covering.transmittance,
     scenario.externalTempC,
     scenario.externalRhPct,

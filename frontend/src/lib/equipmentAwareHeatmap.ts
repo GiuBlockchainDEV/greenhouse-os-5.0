@@ -90,6 +90,9 @@ interface HeatmapCoeffs {
   fanAndPadRhEastDry: number;
   heaterShare: number;
   fogScale: number;
+  lengthScale: number;
+  widthScale: number;
+  heightScale: number;
 }
 
 const TEMP_DISPLAY_MIN = HEATMAP_FIXED_SCALE.temperature.min;
@@ -97,6 +100,9 @@ const TEMP_DISPLAY_MAX = HEATMAP_FIXED_SCALE.temperature.max;
 const GRID_STEP_M = 1.25;
 const GRID_MIN = 8;
 const GRID_MAX = 24;
+const REF_GREENHOUSE_LENGTH_M = 30;
+const REF_GREENHOUSE_WIDTH_M = 10;
+const REF_GREENHOUSE_EAVE_M = 3;
 const MAX_LOCAL_TEMP_DELTA_C = 18;
 const MAX_LOCAL_RH_DELTA_PCT = 35;
 
@@ -154,6 +160,10 @@ function resolvePadFactor(ctx: Pick<HeatmapFieldContext, "layout" | "equipment">
   return padCapacityFromSizing(ctx.equipment.sizing);
 }
 
+function clampDimensionScale(value: number, min = 0.65, max = 2.2): number {
+  return Math.max(min, Math.min(max, value));
+}
+
 function buildHeatmapCoeffs(
   ctx: Omit<HeatmapFieldContext, "coeffs" | "solar">,
 ): HeatmapCoeffs {
@@ -171,6 +181,9 @@ function buildHeatmapCoeffs(
   const exhaustFlow = exhaustFlowSum(ctx.layout);
   const fanAndPad = ctx.equipment.cooling === "fan_and_pad";
   const padSystem = fanAndPad ? padFactor * (0.55 + exhaustCapacity * 0.65) : padFactor;
+  const lengthScale = clampDimensionScale(ctx.length / REF_GREENHOUSE_LENGTH_M);
+  const widthScale = clampDimensionScale(ctx.width / REF_GREENHOUSE_WIDTH_M, 0.65, 1.9);
+  const heightScale = clampDimensionScale(ctx.eaveHeight / REF_GREENHOUSE_EAVE_M, 0.7, 1.7);
 
   return {
     halfL,
@@ -180,7 +193,10 @@ function buildHeatmapCoeffs(
     invHalfW: 1 / Math.max(halfW, 0.1),
     spatialRetention,
     warmExcess,
-    ventTempCoeff: (0.16 + ctx.scenario.windSpeedMS * 0.012) * (0.7 + ventCapacity * 0.45),
+    ventTempCoeff:
+      (0.16 + ctx.scenario.windSpeedMS * 0.012) *
+      (0.7 + ventCapacity * 0.45) *
+      Math.sqrt(widthScale),
     rhEdgeExchange: 0.22,
     rhWarmDryCoeff: 0.35,
     exhaustFlow,
@@ -190,15 +206,20 @@ function buildHeatmapCoeffs(
     acCapacity,
     padFactor,
     fanAndPad,
-    fanAndPadTempWest: fanAndPad ? 7 * padSystem : 0,
-    fanAndPadTempEastWarm: fanAndPad ? 5.5 * padSystem * (0.75 + exhaustCapacity * 0.35) : 0,
-    fanAndPadRhWest: fanAndPad ? 18 * padSystem : 0,
-    fanAndPadRhEastDry: fanAndPad ? 14 * exhaustCapacity * padFactor : 0,
+    fanAndPadTempWest: fanAndPad ? 7 * padSystem * Math.sqrt(widthScale) : 0,
+    fanAndPadTempEastWarm: fanAndPad
+      ? 5.5 * padSystem * (0.75 + exhaustCapacity * 0.35) * lengthScale
+      : 0,
+    fanAndPadRhWest: fanAndPad ? 18 * padSystem * Math.sqrt(widthScale) : 0,
+    fanAndPadRhEastDry: fanAndPad ? 14 * exhaustCapacity * padFactor * lengthScale : 0,
     heaterShare:
       ctx.layout.heaters.length > 0
         ? heaterCapacityFactor(sizing) / ctx.layout.heaters.length
         : 0,
     fogScale: fogCapacityFactor(sizing),
+    lengthScale,
+    widthScale,
+    heightScale,
   };
 }
 
@@ -242,7 +263,6 @@ function influenceAt(
   z: number,
 ): { tempDelta: number; rhDelta: number } {
   const { coeffs, solar } = ctx;
-  const xNorm = (x + coeffs.halfL) * coeffs.invLength;
   const edge = edgeFactorAt(coeffs, x, z);
 
   const solarDelta = solarTempDeltaFromContext(solar, x, y, z);
@@ -324,14 +344,16 @@ function influenceAt(
   }
 
   if (coeffs.fanAndPad) {
+    const distFromPadM = Math.max(0, x + coeffs.halfL);
+    const transitNorm = Math.min(1, distFromPadM / Math.max(ctx.length * 0.95, 1));
     // Pad wall: cool humid air in; exhaust side: warmer drier air after crop transit.
-    tempDelta -= (1 - xNorm) * coeffs.fanAndPadTempWest;
-    tempDelta += xNorm ** 1.35 * coeffs.fanAndPadTempEastWarm;
-    rhDelta += (1 - xNorm) * coeffs.fanAndPadRhWest;
-    rhDelta -= xNorm ** 1.25 * coeffs.fanAndPadRhEastDry;
+    tempDelta -= (1 - transitNorm) * coeffs.fanAndPadTempWest;
+    tempDelta += transitNorm ** 1.35 * coeffs.fanAndPadTempEastWarm;
+    rhDelta += (1 - transitNorm) * coeffs.fanAndPadRhWest;
+    rhDelta -= transitNorm ** 1.25 * coeffs.fanAndPadRhEastDry;
   }
 
-  tempDelta += (y / Math.max(ctx.eaveHeight, 1)) * 0.35;
+  tempDelta += (y / Math.max(ctx.eaveHeight, 1)) * 0.35 * coeffs.heightScale;
 
   const retention = coeffs.spatialRetention;
   return {
