@@ -5,7 +5,10 @@ import {
   SUBSTRATE_SLAB_SPACING_M,
   SYSTEM_DEFAULT_DENSITY,
   SYSTEM_LINE_WIDTH_M,
-  maxBedLinesForLength,
+  bedLineWidthForSystem,
+  FIXED_LINE_WIDTH_SYSTEMS,
+  maxBedLinesForSystem,
+  MIN_FIELD_LINE_WIDTH_M,
 } from "@/lib/cultivationConstants";
 import { plantScaleForSystem } from "@/lib/plantGeometry";
 import { bayCenterZ } from "@/lib/structureUtils";
@@ -113,16 +116,32 @@ function computeBedZonesForBay(
     return [];
   }
 
-  const lineWidth = SYSTEM_LINE_WIDTH_M[system];
-  const maxLines = maxBedLinesForLength(usableWidth, lineWidth, pathwayWidthM);
+  const maxLines = maxBedLinesForSystem(system, usableWidth, pathwayWidthM);
   if (requestedLineCount <= 0 || maxLines === 0) {
     return [];
   }
 
   const lineCount = Math.min(Math.max(1, requestedLineCount), maxLines);
+  const resolvedLineWidth = bedLineWidthForSystem(
+    system,
+    usableWidth,
+    lineCount,
+    pathwayWidthM,
+  );
+  const minLineWidth = FIXED_LINE_WIDTH_SYSTEMS.has(system)
+    ? SYSTEM_LINE_WIDTH_M[system]
+    : MIN_FIELD_LINE_WIDTH_M;
+  if (resolvedLineWidth < minLineWidth) {
+    return [];
+  }
 
-  const blockWidth = lineCount * lineWidth + (lineCount - 1) * pathwayWidthM;
-  let zCursor = zMinBound + (usableWidth - blockWidth) / 2;
+  const isFixedWidthSystem = FIXED_LINE_WIDTH_SYSTEMS.has(system);
+  const blockWidth = isFixedWidthSystem
+    ? lineCount * resolvedLineWidth + (lineCount - 1) * pathwayWidthM
+    : usableWidth;
+  let zCursor = isFixedWidthSystem
+    ? zMinBound + (usableWidth - blockWidth) / 2
+    : zMinBound;
 
   const elevationM = SYSTEM_BED_ELEVATION_M[system];
   const depthM = SYSTEM_BED_DEPTH_M[system];
@@ -135,11 +154,11 @@ function computeBedZonesForBay(
       xMin,
       xMax,
       zMin: zCursor,
-      zMax: zCursor + lineWidth,
+      zMax: zCursor + resolvedLineWidth,
       elevationM,
       depthM,
     });
-    zCursor += lineWidth + pathwayWidthM;
+    zCursor += resolvedLineWidth + pathwayWidthM;
   }
 
   return beds;

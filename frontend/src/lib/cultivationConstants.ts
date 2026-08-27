@@ -18,6 +18,16 @@ export const SYSTEM_LINE_WIDTH_M: Record<CultivationSystem, number> = {
   ebb_flow: 1.2,
 };
 
+/** Hydro/gutter systems use fixed line width; field systems divide bay width among lines. */
+export const FIXED_LINE_WIDTH_SYSTEMS = new Set<CultivationSystem>([
+  "substrate",
+  "nft",
+  "dwc",
+  "aeroponic",
+]);
+
+export const MIN_FIELD_LINE_WIDTH_M = 0.8;
+
 export const CROP_PREFERRED_SYSTEMS: Record<CropType, CultivationSystem[]> = {
   tomato: ["drip", "substrate", "nft", "soil"],
   cucumber: ["substrate", "drip", "nft"],
@@ -50,4 +60,32 @@ export function maxBedLinesForLength(
 ): number {
   if (usableLengthM < lineWidthM) return 0;
   return Math.floor((usableLengthM + pathwayWidthM) / (lineWidthM + pathwayWidthM));
+}
+
+export function maxBedLinesForSystem(
+  system: CultivationSystem,
+  usableWidthM: number,
+  pathwayWidthM: number,
+): number {
+  if (FIXED_LINE_WIDTH_SYSTEMS.has(system)) {
+    return maxBedLinesForLength(
+      usableWidthM,
+      SYSTEM_LINE_WIDTH_M[system],
+      pathwayWidthM,
+    );
+  }
+  return maxBedLinesForLength(usableWidthM, MIN_FIELD_LINE_WIDTH_M, pathwayWidthM);
+}
+
+export function bedLineWidthForSystem(
+  system: CultivationSystem,
+  usableWidthM: number,
+  lineCount: number,
+  pathwayWidthM: number,
+): number {
+  if (FIXED_LINE_WIDTH_SYSTEMS.has(system)) {
+    return SYSTEM_LINE_WIDTH_M[system];
+  }
+  if (lineCount <= 0) return 0;
+  return (usableWidthM - (lineCount - 1) * pathwayWidthM) / lineCount;
 }
