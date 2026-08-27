@@ -4,7 +4,7 @@ import { devtools } from "zustand/middleware";
 import { roofRiseM } from "@/lib/structureUtils";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import { defaultSystemForCrop } from "@/lib/cultivationConstants";
-import { DEFAULT_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
+import { DEFAULT_CLIMATE_SIZING, applyCoolingSystemDefaults } from "@/lib/climateEquipmentLayout";
 import type {
   ClimateEquipment,
   ClimateEquipmentSizing,
@@ -323,9 +323,13 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       setClimateEquipment: (equipment) => {
         const current = get().climateEquipment;
-        const sizing = equipment.sizing
+        const nextCooling = equipment.cooling ?? current.cooling;
+        let sizing = equipment.sizing
           ? { ...current.sizing, ...equipment.sizing }
-          : current.sizing;
+          : { ...current.sizing };
+        if (equipment.cooling && equipment.cooling !== current.cooling) {
+          sizing = applyCoolingSystemDefaults(nextCooling, sizing);
+        }
         set(
           {
             climateEquipment: { ...current, ...equipment, sizing },

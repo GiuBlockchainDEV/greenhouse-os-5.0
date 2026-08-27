@@ -142,6 +142,7 @@ export function CultivationClimateControls() {
 
   const showFans =
     climateEquipment.cooling === "fan_and_pad" ||
+    climateEquipment.cooling === "evaporative" ||
     climateEquipment.ventilation === "forced_exhaust" ||
     climateEquipment.ventilation === "combined";
   const showPad =

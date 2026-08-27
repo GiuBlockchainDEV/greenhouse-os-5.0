@@ -137,20 +137,28 @@ function PadWall({ pad }: { pad: PadWallPlacement }) {
 }
 
 function AcUnit({ unit }: { unit: AcUnitPlacement }) {
+  const facingInward = unit.wall === "south" ? -1 : 1;
   return (
-    <group position={[unit.x, unit.y, unit.z]} rotation={[0, unit.wall === "south" ? Math.PI : 0, 0]}>
-      <mesh>
+    <group
+      position={[unit.x, unit.y, unit.z]}
+      rotation={[0, unit.wall === "south" ? Math.PI : 0, 0]}
+    >
+      <mesh position={[0, 0, facingInward * (unit.depthM * 0.15)]}>
         <boxGeometry args={[unit.widthM, unit.heightM, unit.depthM]} />
         <meshStandardMaterial color={AC_COLOR} metalness={0.55} roughness={0.35} />
       </mesh>
-      <mesh position={[0, 0, unit.depthM / 2 + 0.01]}>
+      <mesh position={[0, 0, facingInward * (unit.depthM * 0.5 + 0.02)]}>
         <boxGeometry args={[unit.widthM * 0.85, unit.heightM * 0.7, 0.04]} />
         <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.25} />
       </mesh>
       {Array.from({ length: 5 }, (_, index) => (
         <mesh
           key={`fin-${index}`}
-          position={[-unit.widthM * 0.35 + index * (unit.widthM * 0.18), 0, unit.depthM / 2 + 0.03]}
+          position={[
+            -unit.widthM * 0.35 + index * (unit.widthM * 0.18),
+            0,
+            facingInward * (unit.depthM * 0.5 + 0.04),
+          ]}
         >
           <boxGeometry args={[0.03, unit.heightM * 0.65, 0.02]} />
           <meshStandardMaterial color="#1e293b" metalness={0.6} roughness={0.3} />
@@ -272,21 +280,49 @@ function FogLines({
   lines: FogLinePlacement[];
   length: number;
 }) {
+  if (lines.length === 0) return null;
+
   return (
     <group>
       {lines.map((line, lineIndex) => (
         <group key={`fog-line-${lineIndex}`} position={[0, line.y, line.z]}>
           <mesh rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.015, 0.015, length * 0.9, 6]} />
-            <meshStandardMaterial color={FOG_COLOR} metalness={0.4} roughness={0.3} />
+            <cylinderGeometry args={[0.028, 0.028, length * 0.92, 8]} />
+            <meshStandardMaterial
+              color={FOG_COLOR}
+              emissive={FOG_COLOR}
+              emissiveIntensity={0.35}
+              metalness={0.45}
+              roughness={0.28}
+            />
           </mesh>
           {Array.from({ length: line.nozzleCount }, (_, nozzleIndex) => {
-            const x = -length * 0.45 + (nozzleIndex * length * 0.9) / Math.max(line.nozzleCount - 1, 1);
+            const x =
+              line.nozzleCount === 1
+                ? 0
+                : -length * 0.45 + (nozzleIndex * length * 0.9) / (line.nozzleCount - 1);
             return (
-              <mesh key={`nozzle-${lineIndex}-${nozzleIndex}`} position={[x, -0.05, 0]}>
-                <coneGeometry args={[0.03, 0.08, 6]} />
-                <meshStandardMaterial color={FOG_COLOR} metalness={0.5} roughness={0.25} />
-              </mesh>
+              <group key={`nozzle-${lineIndex}-${nozzleIndex}`} position={[x, -0.08, 0]}>
+                <mesh>
+                  <coneGeometry args={[0.045, 0.12, 8]} />
+                  <meshStandardMaterial
+                    color={FOG_COLOR}
+                    emissive={FOG_COLOR}
+                    emissiveIntensity={0.5}
+                    metalness={0.5}
+                    roughness={0.2}
+                  />
+                </mesh>
+                <mesh position={[0, -0.08, 0]}>
+                  <cylinderGeometry args={[0.01, 0.018, 0.06, 6]} />
+                  <meshStandardMaterial
+                    color="#cffafe"
+                    transparent
+                    opacity={0.55}
+                    roughness={0.15}
+                  />
+                </mesh>
+              </group>
             );
           })}
         </group>

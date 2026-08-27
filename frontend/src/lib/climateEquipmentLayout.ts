@@ -114,6 +114,39 @@ export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
   fogLineCount: 0,
 };
 
+/** Seed visible equipment when a cooling mode is first selected (counts still at zero). */
+export function applyCoolingSystemDefaults(
+  cooling: ClimateEquipment["cooling"],
+  sizing: ClimateEquipmentSizing,
+): ClimateEquipmentSizing {
+  const next = { ...sizing };
+  switch (cooling) {
+    case "fan_and_pad":
+      if (next.exhaustFanCount === 0) {
+        next.exhaustFanCount = REFERENCE_CLIMATE_SIZING.exhaustFanCount;
+      }
+      break;
+    case "evaporative":
+      if (next.exhaustFanCount === 0) {
+        next.exhaustFanCount = REFERENCE_CLIMATE_SIZING.exhaustFanCount;
+      }
+      break;
+    case "mechanical_ac":
+      if (next.acUnitCount === 0) {
+        next.acUnitCount = REFERENCE_CLIMATE_SIZING.acUnitCount;
+      }
+      break;
+    case "high_pressure_fog":
+      if (next.fogLineCount === 0) {
+        next.fogLineCount = REFERENCE_CLIMATE_SIZING.fogLineCount;
+      }
+      break;
+    default:
+      break;
+  }
+  return next;
+}
+
 function spreadAlongAxis(
   count: number,
   span: number,
@@ -146,6 +179,7 @@ function needsExhaustFans(
 ): boolean {
   return (
     cooling === "fan_and_pad" ||
+    cooling === "evaporative" ||
     ventilation === "forced_exhaust" ||
     ventilation === "combined"
   );
@@ -327,13 +361,14 @@ export function computeClimateEquipmentLayout(params: {
     const acXs = spreadAlongAxis(sizing.acUnitCount, length, length * 0.15);
     acXs.forEach((offsetX, index) => {
       const onSouth = index % 2 === 0;
+      const depthM = 0.55;
       acUnits.push({
         x: offsetX,
         y: eaveHeight * 0.55,
-        z: onSouth ? halfWidth + 0.15 : -halfWidth - 0.15,
+        z: onSouth ? halfWidth - depthM * 0.5 - 0.06 : -halfWidth + depthM * 0.5 + 0.06,
         widthM: sizing.acUnitWidthM,
         heightM: eaveHeight * 0.45,
-        depthM: 0.55,
+        depthM,
         wall: onSouth ? "south" : "north",
       });
     });
