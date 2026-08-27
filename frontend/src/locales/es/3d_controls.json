@@ -1,5 +1,8 @@
 {
   "dimensions": {
+    "title": "Longitud del Invernadero",
+    "heightTitle": "Altura del Invernadero",
+    "heightHint": "Alero y cumbrera afectan el volumen, la ventilación y la heatmap en paredes.",
     "length": "Longitud",
     "width": "Ancho",
     "ridgeHeight": "Altura de Cumbrera",

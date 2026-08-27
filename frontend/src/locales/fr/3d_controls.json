@@ -1,5 +1,8 @@
 {
   "dimensions": {
+    "title": "Longueur de la Serre",
+    "heightTitle": "Hauteur de la Serre",
+    "heightHint": "Gouttière et faîtage influencent le volume, la ventilation et la heatmap sur les parois.",
     "length": "Longueur",
     "width": "Largeur",
     "ridgeHeight": "Hauteur de Faîtage",

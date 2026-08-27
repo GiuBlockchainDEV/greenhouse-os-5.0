@@ -68,9 +68,9 @@ const DEFAULT_CROP: CropConfig = {
 };
 
 const DEFAULT_CLIMATE_EQUIPMENT: ClimateEquipment = {
-  cooling: "fan_and_pad",
+  cooling: "none",
   heating: "none",
-  ventilation: "roof_vents",
+  ventilation: "natural_ridge",
   sizing: DEFAULT_CLIMATE_SIZING,
 };
 
@@ -144,8 +144,8 @@ function computeVolumeMetrics(
     pathwayAreaM2: Number(cultivation.pathwayAreaM2.toFixed(2)),
     totalPlants: cultivation.totalPlants,
     plantsPerTier: cultivation.plantsPerTier,
-    bedLineCount: cultivation.bedLineCount,
-    totalBedLines: cultivation.bedLineCount * structure.bayCount,
+    bedLineCount: crop.layout.bedLineCount,
+    totalBedLines: crop.layout.bedLineCount * structure.bayCount,
     totalWidthM: Number(width.toFixed(2)),
     bayCount: structure.bayCount,
     bedCoveragePct: Number(

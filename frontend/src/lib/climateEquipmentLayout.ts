@@ -73,7 +73,7 @@ export interface ClimateEquipmentLayout {
   fogLines: FogLinePlacement[];
 }
 
-export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
+export const REFERENCE_CLIMATE_SIZING: ClimateEquipmentSizing = {
   exhaustFanCount: 4,
   exhaustFanDiameterM: 1.2,
   roofExhaustFanCount: 1,
@@ -91,6 +91,27 @@ export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
   heaterUnitCount: 2,
   pipeRowCount: 3,
   fogLineCount: 4,
+};
+
+/** Default installed equipment counts for a new greenhouse (empty install). */
+export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
+  exhaustFanCount: 0,
+  exhaustFanDiameterM: REFERENCE_CLIMATE_SIZING.exhaustFanDiameterM,
+  roofExhaustFanCount: 0,
+  roofExhaustFanDiameterM: REFERENCE_CLIMATE_SIZING.roofExhaustFanDiameterM,
+  circulationFanCount: 0,
+  circulationFanDiameterM: REFERENCE_CLIMATE_SIZING.circulationFanDiameterM,
+  padWallWidthM: REFERENCE_CLIMATE_SIZING.padWallWidthM,
+  padWallHeightM: REFERENCE_CLIMATE_SIZING.padWallHeightM,
+  acUnitCount: 0,
+  acUnitWidthM: REFERENCE_CLIMATE_SIZING.acUnitWidthM,
+  roofVentCount: 0,
+  roofVentWidthM: REFERENCE_CLIMATE_SIZING.roofVentWidthM,
+  sideVentCount: 0,
+  sideVentHeightM: REFERENCE_CLIMATE_SIZING.sideVentHeightM,
+  heaterUnitCount: 0,
+  pipeRowCount: 0,
+  fogLineCount: 0,
 };
 
 function spreadAlongAxis(
@@ -151,9 +172,9 @@ function distributeCirculationFansOnBeds(
   ridgeHeight: number,
   diameterM: number,
 ): CirculationFanPlacement[] {
-  if (totalCount <= 0 || beds.length === 0) return [];
+  if (totalCount <= 0 || beds.length === 0 || bedLineCount <= 0) return [];
 
-  const lineCount = Math.max(1, bedLineCount);
+  const lineCount = bedLineCount;
   const perLine = Math.floor(totalCount / lineCount);
   let lineRemainder = totalCount % lineCount;
   const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));

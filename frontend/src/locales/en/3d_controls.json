@@ -1,5 +1,8 @@
 {
   "dimensions": {
+    "title": "Greenhouse Length",
+    "heightTitle": "Greenhouse Height",
+    "heightHint": "Eave and ridge height affect volume, ventilation, and heatmap wall surfaces.",
     "length": "Length",
     "width": "Width",
     "ridgeHeight": "Ridge Height",

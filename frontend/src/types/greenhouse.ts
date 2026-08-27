@@ -61,7 +61,7 @@ export interface CultivationLayout {
   plantsPerTier: number;
   /** Planting density multiplier (0.7 = sparse, 1.3 = dense). */
   plantDensity: number;
-  /** Parallel cultivation lines per bay (0 = auto from dimensions). */
+  /** Parallel cultivation lines per bay (0 = no lines). */
   bedLineCount: number;
   /** Pathway width between parallel lines across bay width (Z). */
   pathwayWidthM: number;

@@ -115,14 +115,11 @@ function computeBedZonesForBay(
 
   const lineWidth = SYSTEM_LINE_WIDTH_M[system];
   const maxLines = maxBedLinesForLength(usableWidth, lineWidth, pathwayWidthM);
-  if (maxLines === 0) {
+  if (requestedLineCount <= 0 || maxLines === 0) {
     return [];
   }
 
-  const lineCount =
-    requestedLineCount > 0
-      ? Math.min(Math.max(1, requestedLineCount), maxLines)
-      : maxLines;
+  const lineCount = Math.min(Math.max(1, requestedLineCount), maxLines);
 
   const blockWidth = lineCount * lineWidth + (lineCount - 1) * pathwayWidthM;
   let zCursor = zMinBound + (usableWidth - blockWidth) / 2;

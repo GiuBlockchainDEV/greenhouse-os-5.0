@@ -160,21 +160,41 @@ export function DimensionControls() {
       </section>
 
       <section className="ui-divider flex flex-col gap-3 pt-4">
-        {(Object.keys(DIMENSION_LIMITS) as DimensionKey[]).map((key) => {
-          const limits = DIMENSION_LIMITS[key];
-          return (
-            <SliderRow
-              key={key}
-              label={tControls(`dimensions.${key}`)}
-              value={dimensions[key]}
-              unit={tCommon("units.meters")}
-              min={limits.min}
-              max={limits.max}
-              step={limits.step}
-              onChange={(value) => handleDimensionChange(key, value)}
-            />
-          );
-        })}
+        <h4 className="ui-section-title">{tControls("dimensions.title")}</h4>
+        <SliderRow
+          label={tControls("dimensions.length")}
+          value={dimensions.length}
+          unit={tCommon("units.meters")}
+          min={DIMENSION_LIMITS.length.min}
+          max={DIMENSION_LIMITS.length.max}
+          step={DIMENSION_LIMITS.length.step}
+          onChange={(value) => handleDimensionChange("length", value)}
+        />
+      </section>
+
+      <section className="ui-divider flex flex-col gap-3 pt-4">
+        <h4 className="ui-section-title">{tControls("dimensions.heightTitle")}</h4>
+        <p className="text-[10px] leading-relaxed text-label">
+          {tControls("dimensions.heightHint")}
+        </p>
+        <SliderRow
+          label={tControls("dimensions.eaveHeight")}
+          value={dimensions.eaveHeight}
+          unit={tCommon("units.meters")}
+          min={DIMENSION_LIMITS.eaveHeight.min}
+          max={DIMENSION_LIMITS.eaveHeight.max}
+          step={DIMENSION_LIMITS.eaveHeight.step}
+          onChange={(value) => handleDimensionChange("eaveHeight", value)}
+        />
+        <SliderRow
+          label={tControls("dimensions.ridgeHeight")}
+          value={dimensions.ridgeHeight}
+          unit={tCommon("units.meters")}
+          min={DIMENSION_LIMITS.ridgeHeight.min}
+          max={DIMENSION_LIMITS.ridgeHeight.max}
+          step={DIMENSION_LIMITS.ridgeHeight.step}
+          onChange={(value) => handleDimensionChange("ridgeHeight", value)}
+        />
       </section>
 
       <section className="ui-divider flex flex-col gap-2 pt-4">

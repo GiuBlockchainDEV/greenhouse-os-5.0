@@ -1,5 +1,8 @@
 {
   "dimensions": {
+    "title": "Lunghezza Serra",
+    "heightTitle": "Altezza Serra",
+    "heightHint": "Gronda e colmo influenzano volume, ventilazione e heatmap sulle pareti.",
     "length": "Lunghezza",
     "width": "Larghezza",
     "ridgeHeight": "Altezza Colmo",

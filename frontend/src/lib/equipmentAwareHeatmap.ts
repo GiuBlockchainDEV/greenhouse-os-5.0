@@ -1,7 +1,7 @@
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import {
   computeClimateEquipmentLayout,
-  DEFAULT_CLIMATE_SIZING,
+  REFERENCE_CLIMATE_SIZING,
   type ClimateEquipmentLayout,
   type PadWallPlacement,
 } from "@/lib/climateEquipmentLayout";
@@ -111,20 +111,20 @@ function gridSize(span: number): number {
 
 function padAreaFactor(widthM: number, heightM: number): number {
   const refArea =
-    DEFAULT_CLIMATE_SIZING.padWallWidthM * DEFAULT_CLIMATE_SIZING.padWallHeightM;
+    REFERENCE_CLIMATE_SIZING.padWallWidthM * REFERENCE_CLIMATE_SIZING.padWallHeightM;
   return (widthM * heightM) / Math.max(refArea, 0.1);
 }
 
 function acCapacityFactor(widthM: number): number {
-  return widthM / Math.max(DEFAULT_CLIMATE_SIZING.acUnitWidthM, 0.1);
+  return widthM / Math.max(REFERENCE_CLIMATE_SIZING.acUnitWidthM, 0.1);
 }
 
 function circulationScale(diameterM: number): number {
-  return (diameterM / Math.max(DEFAULT_CLIMATE_SIZING.circulationFanDiameterM, 0.1)) ** 2;
+  return (diameterM / Math.max(REFERENCE_CLIMATE_SIZING.circulationFanDiameterM, 0.1)) ** 2;
 }
 
 function exhaustScale(diameterM: number): number {
-  return (diameterM / Math.max(DEFAULT_CLIMATE_SIZING.exhaustFanDiameterM, 0.1)) ** 2;
+  return (diameterM / Math.max(REFERENCE_CLIMATE_SIZING.exhaustFanDiameterM, 0.1)) ** 2;
 }
 
 function computeMixingFactor(equipment: ClimateEquipment, scenario: ClimateScenario): number {
@@ -141,7 +141,7 @@ function exhaustFlowSum(layout: ClimateEquipmentLayout): number {
   }
   for (const fan of layout.roofExhaustFans) {
     flow +=
-      (fan.diameterM / Math.max(DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
+      (fan.diameterM / Math.max(REFERENCE_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
   }
   return flow;
 }
@@ -274,7 +274,7 @@ function influenceAt(
 
   for (const fan of ctx.layout.roofExhaustFans) {
     const scale =
-      (fan.diameterM / Math.max(DEFAULT_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
+      (fan.diameterM / Math.max(REFERENCE_CLIMATE_SIZING.roofExhaustFanDiameterM, 0.1)) ** 2;
     const sigma = fan.diameterM * 1.4;
     tempDelta -= 2.8 * scale * gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
   }
@@ -288,7 +288,7 @@ function influenceAt(
   }
 
   for (const vent of ctx.layout.vents) {
-    const ventWidthScale = vent.widthM / Math.max(DEFAULT_CLIMATE_SIZING.roofVentWidthM, 0.1);
+    const ventWidthScale = vent.widthM / Math.max(REFERENCE_CLIMATE_SIZING.roofVentWidthM, 0.1);
     const sigmaX = vent.kind === "roof" ? vent.widthM * 0.45 : 1.2 * ventWidthScale;
     const sigmaZ = vent.kind === "roof" ? ctx.structureBayWidth * 0.35 : 1.2 * ventWidthScale;
     const g = gaussian1d(x - vent.x, sigmaX) * gaussian1d(z - vent.z, sigmaZ);

@@ -125,23 +125,23 @@ class CultivationLayoutInput(BaseModel):
 
 
 class ClimateEquipmentSizingInput(BaseModel):
-    exhaust_fan_count: int = Field(default=4, ge=0, le=12)
+    exhaust_fan_count: int = Field(default=0, ge=0, le=12)
     exhaust_fan_diameter_m: float = Field(default=1.2, ge=0.8, le=1.8)
-    roof_exhaust_fan_count: int = Field(default=1, ge=0, le=20)
+    roof_exhaust_fan_count: int = Field(default=0, ge=0, le=20)
     roof_exhaust_fan_diameter_m: float = Field(default=1.0, ge=0.7, le=1.6)
-    circulation_fan_count: int = Field(default=6, ge=0, le=24)
+    circulation_fan_count: int = Field(default=0, ge=0, le=24)
     circulation_fan_diameter_m: float = Field(default=0.55, ge=0.4, le=1.0)
     pad_wall_width_m: float = Field(default=8.0, ge=2.0, le=20.0)
     pad_wall_height_m: float = Field(default=2.0, ge=1.2, le=3.5)
-    ac_unit_count: int = Field(default=2, ge=0, le=8)
+    ac_unit_count: int = Field(default=0, ge=0, le=8)
     ac_unit_width_m: float = Field(default=1.8, ge=1.0, le=3.0)
-    roof_vent_count: int = Field(default=3, ge=0, le=12)
+    roof_vent_count: int = Field(default=0, ge=0, le=12)
     roof_vent_width_m: float = Field(default=2.5, ge=1.0, le=4.0)
-    side_vent_count: int = Field(default=4, ge=0, le=10)
+    side_vent_count: int = Field(default=0, ge=0, le=10)
     side_vent_height_m: float = Field(default=1.5, ge=0.8, le=2.5)
-    heater_unit_count: int = Field(default=2, ge=0, le=8)
-    pipe_row_count: int = Field(default=3, ge=0, le=8)
-    fog_line_count: int = Field(default=4, ge=0, le=10)
+    heater_unit_count: int = Field(default=0, ge=0, le=8)
+    pipe_row_count: int = Field(default=0, ge=0, le=8)
+    fog_line_count: int = Field(default=0, ge=0, le=10)
 
 
 class ClimateEquipmentInput(BaseModel):

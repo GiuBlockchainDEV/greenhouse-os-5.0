@@ -1,4 +1,4 @@
-import { DEFAULT_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
+import { REFERENCE_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
 import type { ClimateEquipmentSizing } from "@/types/greenhouse";
 
 function fanFlowUnits(diameterM: number, count: number, refDiameter: number): number {
@@ -13,7 +13,7 @@ function normalizedRatio(actual: number, reference: number): number {
 
 /** 1.0 = default sizing; scales with count × diameter². */
 export function exhaustCapacityFactor(sizing: ClimateEquipmentSizing): number {
-  const ref = DEFAULT_CLIMATE_SIZING;
+  const ref = REFERENCE_CLIMATE_SIZING;
   const actual =
     fanFlowUnits(
       sizing.exhaustFanDiameterM,
@@ -40,7 +40,7 @@ export function exhaustCapacityFactor(sizing: ClimateEquipmentSizing): number {
 }
 
 export function circulationCapacityFactor(sizing: ClimateEquipmentSizing): number {
-  const ref = DEFAULT_CLIMATE_SIZING;
+  const ref = REFERENCE_CLIMATE_SIZING;
   const actual = fanFlowUnits(
     sizing.circulationFanDiameterM,
     sizing.circulationFanCount,
@@ -55,14 +55,14 @@ export function circulationCapacityFactor(sizing: ClimateEquipmentSizing): numbe
 }
 
 export function padCapacityFactor(sizing: ClimateEquipmentSizing): number {
-  const ref = DEFAULT_CLIMATE_SIZING;
+  const ref = REFERENCE_CLIMATE_SIZING;
   const actual = sizing.padWallWidthM * sizing.padWallHeightM;
   const baseline = ref.padWallWidthM * ref.padWallHeightM;
   return normalizedRatio(actual, baseline);
 }
 
 export function ventCapacityFactor(sizing: ClimateEquipmentSizing): number {
-  const ref = DEFAULT_CLIMATE_SIZING;
+  const ref = REFERENCE_CLIMATE_SIZING;
   const actual =
     sizing.roofVentCount * sizing.roofVentWidthM +
     sizing.sideVentCount * sizing.sideVentHeightM * 1.2;
@@ -73,7 +73,7 @@ export function ventCapacityFactor(sizing: ClimateEquipmentSizing): number {
 }
 
 export function acCapacityFactor(sizing: ClimateEquipmentSizing): number {
-  const ref = DEFAULT_CLIMATE_SIZING;
+  const ref = REFERENCE_CLIMATE_SIZING;
   const actual = sizing.acUnitCount * sizing.acUnitWidthM;
   const baseline = ref.acUnitCount * ref.acUnitWidthM;
   return normalizedRatio(actual, baseline);
@@ -82,13 +82,13 @@ export function acCapacityFactor(sizing: ClimateEquipmentSizing): number {
 export function heaterCapacityFactor(sizing: ClimateEquipmentSizing): number {
   return normalizedRatio(
     sizing.heaterUnitCount,
-    DEFAULT_CLIMATE_SIZING.heaterUnitCount,
+    REFERENCE_CLIMATE_SIZING.heaterUnitCount,
   );
 }
 
 export function fogCapacityFactor(sizing: ClimateEquipmentSizing): number {
   return normalizedRatio(
     sizing.fogLineCount,
-    DEFAULT_CLIMATE_SIZING.fogLineCount,
+    REFERENCE_CLIMATE_SIZING.fogLineCount,
   );
 }
