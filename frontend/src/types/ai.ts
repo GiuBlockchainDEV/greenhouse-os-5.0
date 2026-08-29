@@ -1,8 +1,10 @@
+import type { GaiaAnalysisSeason } from "./greenhouse";
+
 export type AIProviderType = "gemini";
 
 export type AIAnalysisType = "structural" | "thermal" | "efficiency";
 
-export type { GaiaAnalysisSeason } from "./greenhouse";
+export type { GaiaAnalysisSeason };
 
 export interface GreenhouseAIContext {
   crop_type: string;
