@@ -205,8 +205,8 @@ const GAIA_UNAVAILABLE: Record<Locale, string> = {
 };
 
 const TRUNCATED_NOTICE: Record<Locale, string> = {
-  en: "Response truncated due to length limit. Export the chat or ask GAIA to continue from the last section.",
-  it: "Risposta troncata per limite di lunghezza. Esporta la chat o chiedi a GAIA di continuare dall'ultima sezione.",
+  en: "Response truncated due to length limit. Export as PDF or ask GAIA to continue from the last section.",
+  it: "Risposta troncata per limite di lunghezza. Esporta in PDF o chiedi a GAIA di continuare dall'ultima sezione.",
   es: "Respuesta truncada por límite de longitud. Exporta el chat o pide a GAIA que continúe desde la última sección.",
   fr: "Réponse tronquée (limite de longueur). Exportez le chat ou demandez à GAIA de continuer depuis la dernière section.",
 };

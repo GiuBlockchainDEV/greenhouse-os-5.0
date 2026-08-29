@@ -29,12 +29,17 @@
       "efficiency": "Efficiency analysis · {{location}} · {{season}}"
     }
   },
+  "export": {
+    "userHeading": "Request",
+    "assistantHeading": "GAIA",
+    "exportedAt": "Exported"
+  },
   "actions": {
     "structural": "Structure",
     "thermal": "Thermal",
     "efficiency": "Efficiency",
     "send": "Send",
-    "export": "Export",
+    "export": "Export PDF",
     "clear": "Clear"
   },
   "status": {

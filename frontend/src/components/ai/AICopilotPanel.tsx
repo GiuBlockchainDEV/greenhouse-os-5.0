@@ -47,7 +47,12 @@ export function AICopilotPanel() {
 
   const handleExport = () => {
     const slug = locationLabel.trim() || "gaia";
-    exportGaiaChat(messages, slug);
+    void exportGaiaChat(messages, {
+      title: slug,
+      userHeading: t("export.userHeading"),
+      assistantHeading: t("export.assistantHeading"),
+      exportedAtLabel: t("export.exportedAt"),
+    });
   };
 
   return (
