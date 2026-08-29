@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     debug: bool = False
     api_prefix: str = "/api/v1"
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    cors_origin_regex: str = r"https://.*\.vercel\.app"
 
     gemini_api_key: str = ""
     gemini_base_url: str = "https://generativelanguage.googleapis.com"

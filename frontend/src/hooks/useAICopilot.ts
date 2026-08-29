@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { API_V1 } from "@/lib/apiConfig";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   AIAnalysisType,
@@ -10,7 +11,7 @@ import type {
   ProviderInfo,
 } from "@/types/ai";
 
-const API_BASE = "/api/v1/ai";
+const API_BASE = `${API_V1}/ai`;
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;

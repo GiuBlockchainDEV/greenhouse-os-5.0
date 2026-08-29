@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { wsUrl } from "@/lib/apiConfig";
 import { expandBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
@@ -14,8 +15,7 @@ const MAX_RECONNECT_MS = 30000;
 const DEBOUNCE_MS = 150;
 
 function buildWsUrl(): string {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${window.location.host}/ws/simulation`;
+  return wsUrl("/ws/simulation");
 }
 
 function buildUpdatePayload(): WSUpdatePayload {

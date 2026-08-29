@@ -1,3 +1,4 @@
+import { API_V1 } from "@/lib/apiConfig";
 import type { ClimateComputerExport, ClimateComputerFormat } from "@/types/supabase";
 import { expandBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -29,7 +30,7 @@ export async function exportClimateComputer(
     ventilation_system: state.climateEquipment.ventilation,
   };
 
-  const response = await fetch("/api/v1/export/climate-computer", {
+  const response = await fetch(`${API_V1}/export/climate-computer`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -131,7 +132,7 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
     },
   };
 
-  const response = await fetch("/api/v1/greenhouses", {
+  const response = await fetch(`${API_V1}/greenhouses`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
