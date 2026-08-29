@@ -28,14 +28,15 @@ export type {
   Database,
 } from "./supabase";
 export type {
+  AIAnalysisType,
   AIChatRequest,
   AIChatResponse,
   AIProviderType,
+  AnalyzeRequest,
   ClimateSetpoint,
   CopilotMessage,
   CopilotStatus,
   GreenhouseAIContext,
-  OptimizeClimateRequest,
   ProviderInfo,
 } from "./ai";
 export type {
