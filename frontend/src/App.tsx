@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
-import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
@@ -11,7 +10,7 @@ import { useSimulationWS } from "@/hooks/useSimulationWS";
 
 export function AppShell() {
   const { t } = useTranslation("common");
-  const { reconnect } = useSimulationWS();
+  useSimulationWS();
 
   return (
     <div className="flex h-screen flex-col bg-surface-page text-gray-900">
@@ -33,7 +32,6 @@ export function AppShell() {
         <div className="relative min-h-0">
           <Viewport3D />
           <HUDOverlay />
-          <ClimateDashboard onReconnect={reconnect} />
         </div>
         <AICopilotPanel />
       </main>
