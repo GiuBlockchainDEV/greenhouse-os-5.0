@@ -59,7 +59,16 @@ export function AICopilotPanel() {
     <aside className="ui-card flex h-full min-h-0 flex-col overflow-hidden">
       <header className="shrink-0 border-b border-border px-4 py-3">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-bold text-gray-900">{t("panel.title")}</h3>
+          <div className="flex items-center gap-2">
+            <img
+              src="/favicon.png"
+              alt=""
+              width={24}
+              height={24}
+              className="h-6 w-6 shrink-0 rounded object-contain"
+            />
+            <h3 className="text-sm font-bold text-gray-900">{t("panel.title")}</h3>
+          </div>
           {messages.length > 0 && (
             <div className="flex items-center gap-2">
               <button

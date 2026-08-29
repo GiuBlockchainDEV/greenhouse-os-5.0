@@ -21,11 +21,13 @@ export function HUDOverlay() {
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4">
       <div className="ui-card max-w-[min(100%,20rem)] px-4 py-3">
         <div className="flex items-start gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-status-optimalDark">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="currentColor" aria-hidden>
-              <path d="M12 3L4 9v12h16V9l-8-6zm0 2.2L18 10v9H6v-9l6-4.8z" />
-            </svg>
-          </div>
+          <img
+            src="/favicon.png"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8 shrink-0 rounded-lg object-contain"
+          />
           <div>
             <h2 className="text-sm font-bold text-gray-900">{name}</h2>
             <p className="mt-0.5 font-mono text-[11px] text-label">

@@ -15,11 +15,20 @@ export function AppShell() {
   return (
     <div className="flex h-screen flex-col bg-surface-page text-gray-900">
       <header className="flex items-center justify-between border-b border-border bg-white px-6 py-4 shadow-sm">
-        <div>
-          <h1 className="text-lg font-bold tracking-tight text-gray-900">
-            {t("app.title")}
-          </h1>
-          <p className="text-xs text-label">{t("app.subtitle")}</p>
+        <div className="flex items-center gap-3">
+          <img
+            src="/logo512.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10 shrink-0 rounded-lg object-contain"
+          />
+          <div>
+            <h1 className="text-lg font-bold tracking-tight text-gray-900">
+              {t("app.title")}
+            </h1>
+            <p className="text-xs text-label">{t("app.subtitle")}</p>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <AuthPanel />
