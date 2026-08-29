@@ -18,14 +18,16 @@ function buildWsUrl(): string {
   return wsUrl("/ws/simulation");
 }
 
+const SIM_LOCATION_FALLBACK = { lat: 25.2854, lon: 51.531 };
+
 function buildUpdatePayload(): WSUpdatePayload {
   const state = useGreenhouseStore.getState();
   return {
     event: "UPDATE_SIMULATION",
     data: {
       location: {
-        lat: state.location.lat,
-        lon: state.location.lon,
+        lat: state.location.lat ?? SIM_LOCATION_FALLBACK.lat,
+        lon: state.location.lon ?? SIM_LOCATION_FALLBACK.lon,
         elevation_m: state.location.elevationM,
       },
       geometry: {

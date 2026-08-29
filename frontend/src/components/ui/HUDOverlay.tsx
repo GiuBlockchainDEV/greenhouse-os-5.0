@@ -29,7 +29,13 @@ export function HUDOverlay() {
           <div>
             <h2 className="text-sm font-bold text-gray-900">{name}</h2>
             <p className="mt-0.5 font-mono text-[11px] text-label">
-              {location.lat.toFixed(4)}°, {location.lon.toFixed(4)}°
+              {location.label}
+              {location.lat != null && location.lon != null && (
+                <>
+                  {" "}
+                  · {location.lat.toFixed(4)}°, {location.lon.toFixed(4)}°
+                </>
+              )}
             </p>
             <p className="mt-1.5 text-xs text-label">
               {tCrops(`types.${crop.type}`)} · {tCrops(`systems.${crop.system}`)} ·{" "}

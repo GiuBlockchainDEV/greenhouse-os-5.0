@@ -144,11 +144,11 @@ export interface CropConfig {
 }
 
 export interface GeoLocation {
-  lat: number;
-  lon: number;
-  elevationM: number;
-  /** Human-readable site label sent to GAIA, e.g. "Rome, Italy". */
+  /** Human-readable site label sent to GAIA, e.g. "Qatar". */
   label: string;
+  lat?: number;
+  lon?: number;
+  elevationM: number;
 }
 
 /** Season preset for GAIA location-aware analyses. */

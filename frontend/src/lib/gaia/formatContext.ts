@@ -8,9 +8,14 @@ const SEASON_LABEL: Record<string, string> = {
 };
 
 export function formatGreenhouseContext(ctx: GreenhouseAIContext): string {
+  const siteLine =
+    ctx.latitude !== undefined && ctx.longitude !== undefined
+      ? `Location: ${ctx.location_label ?? "unspecified"} (${ctx.latitude}°, ${ctx.longitude}°, ${ctx.elevation_m ?? 0} m a.s.l.)`
+      : `Location: ${ctx.location_label ?? "unspecified"}`;
+
   const lines = [
     "=== SITE ===",
-    `Location: ${ctx.location_label ?? "unspecified"} (${ctx.latitude}°, ${ctx.longitude}°, ${ctx.elevation_m ?? 0} m a.s.l.)`,
+    siteLine,
     `Analysis season: ${SEASON_LABEL[ctx.analysis_season ?? "simulation"] ?? ctx.analysis_season}`,
     "",
     "=== CLIMATE SCENARIO (design inputs) ===",

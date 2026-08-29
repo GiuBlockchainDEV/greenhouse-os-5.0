@@ -10,6 +10,13 @@ interface GaiaSiteContextProps {
 
 const SEASONS: GaiaAnalysisSeason[] = ["simulation", "summer", "winter", "shoulder"];
 
+function parseOptionalCoord(value: string): number | undefined {
+  const trimmed = value.trim();
+  if (trimmed === "") return undefined;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 export function GaiaSiteContext({ season, onSeasonChange }: GaiaSiteContextProps) {
   const { t } = useTranslation("ai_copilot");
   const location = useGreenhouseStore((s) => s.location);
@@ -32,22 +39,28 @@ export function GaiaSiteContext({ season, onSeasonChange }: GaiaSiteContextProps
         </label>
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
-            <span className="mb-1 block text-[10px] text-label">{t("site.latitude")}</span>
+            <span className="mb-1 block text-[10px] text-label">
+              {t("site.latitude")} <span className="text-label/70">({t("site.optional")})</span>
+            </span>
             <input
               type="number"
               step="0.0001"
-              value={location.lat}
-              onChange={(e) => setLocation({ lat: Number(e.target.value) })}
+              value={location.lat ?? ""}
+              placeholder="—"
+              onChange={(e) => setLocation({ lat: parseOptionalCoord(e.target.value) })}
               className="ui-input w-full py-1.5 text-xs"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-[10px] text-label">{t("site.longitude")}</span>
+            <span className="mb-1 block text-[10px] text-label">
+              {t("site.longitude")} <span className="text-label/70">({t("site.optional")})</span>
+            </span>
             <input
               type="number"
               step="0.0001"
-              value={location.lon}
-              onChange={(e) => setLocation({ lon: Number(e.target.value) })}
+              value={location.lon ?? ""}
+              placeholder="—"
+              onChange={(e) => setLocation({ lon: parseOptionalCoord(e.target.value) })}
               className="ui-input w-full py-1.5 text-xs"
             />
           </label>

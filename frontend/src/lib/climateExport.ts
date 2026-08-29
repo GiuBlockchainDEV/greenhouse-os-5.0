@@ -69,8 +69,9 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
 
   const body = {
     name: state.name,
-    latitude: state.location.lat,
-    longitude: state.location.lon,
+    ...(state.location.lat != null && state.location.lon != null
+      ? { latitude: state.location.lat, longitude: state.location.lon }
+      : {}),
     dimensions: {
       length: state.dimensions.length,
       width: state.dimensions.width,

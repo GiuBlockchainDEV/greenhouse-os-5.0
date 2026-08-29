@@ -75,10 +75,8 @@ const DEFAULT_CLIMATE_EQUIPMENT: ClimateEquipment = {
 };
 
 const DEFAULT_LOCATION: GeoLocation = {
-  lat: 41.9028,
-  lon: 12.4964,
-  elevationM: 21,
-  label: "Rome, Italy",
+  label: "Qatar",
+  elevationM: 10,
 };
 
 const DEFAULT_CLIMATE_SCENARIO: ClimateScenario = {

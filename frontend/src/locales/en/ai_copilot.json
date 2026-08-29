@@ -9,9 +9,10 @@
   "site": {
     "title": "Analysis site",
     "place": "Location",
-    "placePlaceholder": "e.g. Rome, Italy",
+    "placePlaceholder": "e.g. Qatar",
     "latitude": "Latitude",
     "longitude": "Longitude",
+    "optional": "optional",
     "season": "Season / scenario",
     "seasons": {
       "simulation": "Simulation scenario (heatmap)",
