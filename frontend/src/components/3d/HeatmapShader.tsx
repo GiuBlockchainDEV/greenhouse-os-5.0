@@ -159,6 +159,7 @@ export function HeatmapPlane() {
   const structure = useGreenhouseStore((s) => s.structure);
   const climateScenario = useGreenhouseStore((s) => s.climateScenario);
   const covering = useGreenhouseStore((s) => s.covering);
+  const shadingScreen = useGreenhouseStore((s) => s.shadingScreen);
   const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
   const crop = useGreenhouseStore((s) => s.crop);
   const simulationResults = useGreenhouseStore((s) => s.simulationResults);
@@ -171,9 +172,10 @@ export function HeatmapPlane() {
         climateEquipment,
         crop,
         covering,
+        shadingScreen,
         climateScenario,
       ),
-    [dimensions, structure, climateEquipment, crop, covering, climateScenario],
+    [dimensions, structure, climateEquipment, crop, covering, shadingScreen, climateScenario],
   );
 
   const field = useMemo(
@@ -184,10 +186,11 @@ export function HeatmapPlane() {
         climateEquipment,
         crop,
         covering,
+        shadingScreen,
         climateScenario,
         simulationResults,
       ),
-    [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults, revision],
+    [dimensions, structure, climateEquipment, crop, covering, shadingScreen, climateScenario, simulationResults, revision],
   );
 
   const valueMode = heatmapValueMode(heatmapMode);

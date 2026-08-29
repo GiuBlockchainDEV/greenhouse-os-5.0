@@ -5,6 +5,7 @@ import type {
   CropConfig,
   GreenhouseDimensions,
   GreenhouseStructure,
+  ShadingScreen,
 } from "@/types/greenhouse";
 
 /** Stable revision token so heatmap meshes re-render when inputs change. */
@@ -14,6 +15,7 @@ export function heatmapInputRevision(
   equipment: ClimateEquipment,
   crop: CropConfig,
   covering: CoveringMaterial,
+  shadingScreen: ShadingScreen,
   scenario: ClimateScenario,
 ): string {
   const s = equipment.sizing;
@@ -48,6 +50,8 @@ export function heatmapInputRevision(
     crop.layout.bedLineCount,
     crop.layout.tierCount,
     covering.transmittance,
+    shadingScreen.installed,
+    shadingScreen.deploymentPct,
     scenario.externalTempC,
     scenario.externalRhPct,
     scenario.windSpeedMS,

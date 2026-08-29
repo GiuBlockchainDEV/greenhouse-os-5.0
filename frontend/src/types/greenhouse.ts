@@ -25,6 +25,14 @@ export interface CoveringMaterial {
   uValue: number;
 }
 
+/** Retractable shade / thermal screen under the roof — affects solar load globally. */
+export interface ShadingScreen {
+  /** Whether a shade or thermal screen is installed. */
+  installed: boolean;
+  /** Deployment level 0–100% (0 = fully open, 100 = fully closed). */
+  deploymentPct: number;
+}
+
 export type CropType =
   | "tomato"
   | "cucumber"
@@ -173,6 +181,7 @@ export interface GreenhouseState {
   structure: GreenhouseStructure;
   dimensions: GreenhouseDimensions;
   covering: CoveringMaterial;
+  shadingScreen: ShadingScreen;
   crop: CropConfig;
   climate: ClimateEquipment;
 }

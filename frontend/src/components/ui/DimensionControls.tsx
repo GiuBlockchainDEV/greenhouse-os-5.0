@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
+import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType, CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
 
@@ -87,10 +88,12 @@ export function DimensionControls() {
   const dimensions = useGreenhouseStore((state) => state.dimensions);
   const metrics = useGreenhouseStore((state) => state.metrics);
   const covering = useGreenhouseStore((state) => state.covering);
+  const shadingScreen = useGreenhouseStore((state) => state.shadingScreen);
   const crop = useGreenhouseStore((state) => state.crop);
   const setStructure = useGreenhouseStore((state) => state.setStructure);
   const setDimensions = useGreenhouseStore((state) => state.setDimensions);
   const setCovering = useGreenhouseStore((state) => state.setCovering);
+  const setShadingScreen = useGreenhouseStore((state) => state.setShadingScreen);
   const setCrop = useGreenhouseStore((state) => state.setCrop);
   const resetToDefaults = useGreenhouseStore((state) => state.resetToDefaults);
 
@@ -223,6 +226,43 @@ export function DimensionControls() {
           step={0.01}
           onChange={(value) => setCovering({ transmittance: value })}
         />
+      </section>
+
+      <section className="ui-divider flex flex-col gap-2 pt-4">
+        <h4 className="ui-section-title">{tControls("shading.title")}</h4>
+        <p className="text-[10px] leading-relaxed text-label">{tControls("shading.hint")}</p>
+        <label className="flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={shadingScreen.installed}
+            onChange={(event) =>
+              setShadingScreen({
+                installed: event.target.checked,
+                deploymentPct: event.target.checked ? shadingScreen.deploymentPct || 60 : 0,
+              })
+            }
+            className="h-4 w-4 rounded border-border text-status-optimalDark focus:ring-status-optimal/30"
+          />
+          <span className="text-xs text-gray-800">{tControls("shading.installed")}</span>
+        </label>
+        <SliderRow
+          label={tControls("shading.deployment")}
+          value={shadingScreen.deploymentPct}
+          unit="%"
+          min={0}
+          max={100}
+          step={5}
+          disabled={!shadingScreen.installed}
+          onChange={(value) => setShadingScreen({ deploymentPct: value })}
+        />
+        {shadingScreen.installed && (
+          <div className="ui-card-muted px-3 py-2">
+            <p className="text-xs text-label">{tControls("shading.effectiveTransmittance")}</p>
+            <p className="font-mono text-sm font-semibold text-gray-800">
+              {effectiveSolarTransmittance(covering, shadingScreen).toFixed(2)}
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="ui-divider flex flex-col gap-2 pt-4">

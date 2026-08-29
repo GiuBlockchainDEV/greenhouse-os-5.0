@@ -92,6 +92,10 @@ export async function saveGreenhouseDesign(userId: string): Promise<void> {
       transmittance: state.covering.transmittance,
       u_value: state.covering.uValue,
     },
+    shading_screen: {
+      installed: state.shadingScreen.installed,
+      deployment_pct: state.shadingScreen.deploymentPct,
+    },
     crop_config: {
       crop_type: state.crop.type,
       cultivation_system: state.crop.system,

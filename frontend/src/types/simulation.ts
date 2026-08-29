@@ -35,6 +35,11 @@ export interface WSMaterials {
   u_value: number;
 }
 
+export interface WSShadingScreen {
+  installed: boolean;
+  deployment_pct: number;
+}
+
 export interface WSCultivationLayout {
   tier_count: number;
   gutter_length_m: number;
@@ -95,6 +100,7 @@ export interface WSUpdatePayload {
     location: WSLocation;
     geometry: WSGeometry;
     materials: WSMaterials;
+    shading_screen?: WSShadingScreen;
     crop: WSCrop;
     equipment: WSClimateEquipment;
     climate?: WSClimateOverride;

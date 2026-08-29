@@ -17,6 +17,7 @@ import type {
   GeoLocation,
   GreenhouseDimensions,
   GreenhouseStructure,
+  ShadingScreen,
   StructureUpdate,
   SupportedLocale,
   VolumeMetrics,
@@ -47,6 +48,11 @@ const DEFAULT_COVERING: CoveringMaterial = {
   type: "glass",
   transmittance: 0.85,
   uValue: 5.8,
+};
+
+const DEFAULT_SHADING_SCREEN: ShadingScreen = {
+  installed: false,
+  deploymentPct: 0,
 };
 
 const DEFAULT_LAYOUT: CultivationLayout = {
@@ -222,6 +228,7 @@ interface GreenhouseStore {
   structure: GreenhouseStructure;
   dimensions: GreenhouseDimensions;
   covering: CoveringMaterial;
+  shadingScreen: ShadingScreen;
   crop: CropConfig;
   climateEquipment: ClimateEquipment;
   climateScenario: ClimateScenario;
@@ -237,6 +244,7 @@ interface GreenhouseStore {
   setStructure: (update: StructureUpdate) => void;
   setDimensions: (update: DimensionUpdate) => void;
   setCovering: (covering: Partial<CoveringMaterial>) => void;
+  setShadingScreen: (screen: Partial<ShadingScreen>) => void;
   setCrop: (crop: Partial<CropConfig>) => void;
   setCropLayout: (layout: Partial<CultivationLayout>) => void;
   setClimateEquipment: (equipment: Partial<ClimateEquipment>) => void;
@@ -259,6 +267,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       structure: DEFAULT_STRUCTURE,
       dimensions: initialDimensions,
       covering: DEFAULT_COVERING,
+      shadingScreen: DEFAULT_SHADING_SCREEN,
       crop: initialCrop,
       climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
       climateScenario: DEFAULT_CLIMATE_SCENARIO,
@@ -302,6 +311,13 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           { covering: { ...get().covering, ...covering } },
           false,
           "setCovering",
+        ),
+
+      setShadingScreen: (screen) =>
+        set(
+          { shadingScreen: { ...get().shadingScreen, ...screen } },
+          false,
+          "setShadingScreen",
         ),
 
       setCrop: (cropPatch) => {
@@ -379,6 +395,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             structure: DEFAULT_STRUCTURE,
             dimensions,
             covering: DEFAULT_COVERING,
+            shadingScreen: DEFAULT_SHADING_SCREEN,
             crop,
             climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
             climateScenario: DEFAULT_CLIMATE_SCENARIO,

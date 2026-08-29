@@ -1,3 +1,4 @@
+import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { GreenhouseAIContext } from "@/types/ai";
 import type { GaiaAnalysisSeason } from "@/types/greenhouse";
@@ -39,6 +40,9 @@ export function buildGreenhouseContext(options: BuildContextOptions = {}): Green
     covering_type: state.covering.type,
     transmittance: state.covering.transmittance,
     u_value: state.covering.uValue,
+    shading_screen_installed: state.shadingScreen.installed,
+    shading_screen_deployment_pct: state.shadingScreen.deploymentPct,
+    effective_transmittance: effectiveSolarTransmittance(state.covering, state.shadingScreen),
     exhaust_fan_count: sizing.exhaustFanCount,
     exhaust_fan_diameter_m: sizing.exhaustFanDiameterM,
     circulation_fan_count: sizing.circulationFanCount,

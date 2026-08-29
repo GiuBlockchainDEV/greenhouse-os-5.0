@@ -7,7 +7,9 @@ import type {
   CoveringMaterial,
   CropConfig,
   GreenhouseDimensions,
+  ShadingScreen,
 } from "@/types/greenhouse";
+import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { solarElevationFactor, solarIntensityFactor } from "@/lib/solarIrradiance";
 import {
   acCapacityFactor,
@@ -127,6 +129,7 @@ export function ventilationAchWithSizing(
 export function estimatePreviewMicroclimate(
   scenario: ClimateScenario,
   covering: CoveringMaterial,
+  shadingScreen: ShadingScreen,
   equipment: ClimateEquipment,
   dimensions: GreenhouseDimensions,
   crop: CropConfig,
@@ -139,8 +142,9 @@ export function estimatePreviewMicroclimate(
 } {
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
   const externalTemp = scenario.externalTempC - 3;
+  const solarTransmittance = effectiveSolarTransmittance(covering, shadingScreen);
   const qSolar =
-    covering.transmittance *
+    solarTransmittance *
     260 *
     0.72 *
     solarIntensityFactor(scenario) *

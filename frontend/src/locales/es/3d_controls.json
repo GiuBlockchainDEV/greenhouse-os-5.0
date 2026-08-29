@@ -34,6 +34,13 @@
     "transmittance": "Transmitancia",
     "uValue": "Valor U"
   },
+  "shading": {
+    "title": "Pantalla de Sombreado",
+    "hint": "Pantalla térmica retráctil bajo el techo — reduce la carga solar en heatmap, microclima y DLI.",
+    "installed": "Pantalla instalada",
+    "deployment": "Cierre de pantalla",
+    "effectiveTransmittance": "Transmitancia solar efectiva"
+  },
   "viewport": {
     "title": "Viewport 3D",
     "hint": "Arrastra para orbitar · Scroll para zoom · Usa gizmo para redimensionar",

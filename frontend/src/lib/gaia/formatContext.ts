@@ -34,6 +34,9 @@ export function formatGreenhouseContext(ctx: GreenhouseAIContext): string {
     "",
     "=== ENVELOPE & EQUIPMENT (as configured — do not assume unlisted systems) ===",
     `Covering: ${ctx.covering_type} (τ=${ctx.transmittance}, U=${ctx.u_value} W/m²K)`,
+    ctx.shading_screen_installed
+      ? `Shade screen: installed, ${ctx.shading_screen_deployment_pct}% deployed (effective τ=${ctx.effective_transmittance.toFixed(2)})`
+      : "Shade screen: not installed",
     `Cooling: ${ctx.cooling_system} | Heating: ${ctx.heating_system} | Ventilation: ${ctx.ventilation_system}`,
     `Exhaust fans: ${ctx.exhaust_fan_count} | Circulation fans: ${ctx.circulation_fan_count}`,
     `Roof vents: ${ctx.roof_vent_count} | Side vents: ${ctx.side_vent_count} | AC units: ${ctx.ac_unit_count}`,

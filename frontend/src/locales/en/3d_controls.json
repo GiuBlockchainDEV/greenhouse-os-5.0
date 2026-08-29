@@ -34,6 +34,13 @@
     "transmittance": "Transmittance",
     "uValue": "U-Value"
   },
+  "shading": {
+    "title": "Shade Screen",
+    "hint": "Retractable thermal screen under the roof — reduces solar load on heatmap, microclimate, and DLI.",
+    "installed": "Shade screen installed",
+    "deployment": "Screen deployment",
+    "effectiveTransmittance": "Effective solar transmittance"
+  },
   "viewport": {
     "title": "3D Viewport",
     "hint": "Drag to orbit · Scroll to zoom · Use gizmos to resize",

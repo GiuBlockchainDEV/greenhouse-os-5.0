@@ -34,6 +34,13 @@
     "transmittance": "Trasmittanza",
     "uValue": "Valore U"
   },
+  "shading": {
+    "title": "Schermatura",
+    "hint": "Schermatura termica retrattile sotto il tetto — riduce il carico solare su heatmap, microclima e DLI.",
+    "installed": "Schermatura installata",
+    "deployment": "Chiusura schermatura",
+    "effectiveTransmittance": "Trasmittanza solare effettiva"
+  },
   "viewport": {
     "title": "Viewport 3D",
     "hint": "Trascina per orbitare · Scroll per zoom · Usa i gizmo per ridimensionare",

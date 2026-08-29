@@ -38,6 +38,11 @@ class WSMaterials(BaseModel):
     u_value: float = Field(default=5.8, ge=0.0)
 
 
+class WSShadingScreen(BaseModel):
+    installed: bool = Field(default=False)
+    deployment_pct: float = Field(default=0.0, ge=0.0, le=100.0)
+
+
 class WSCultivationLayout(BaseModel):
     tier_count: int = Field(default=1, ge=1, le=6)
     gutter_length_m: float = Field(default=30.0, gt=0.0)
@@ -97,6 +102,7 @@ class WSUpdateData(BaseModel):
     location: WSLocation
     geometry: WSGeometry
     materials: WSMaterials = Field(default_factory=WSMaterials)
+    shading_screen: WSShadingScreen = Field(default_factory=WSShadingScreen)
     crop: WSCrop = Field(default_factory=WSCrop)
     equipment: WSClimateEquipment = Field(default_factory=WSClimateEquipment)
     climate: WSClimateOverride = Field(default_factory=WSClimateOverride)

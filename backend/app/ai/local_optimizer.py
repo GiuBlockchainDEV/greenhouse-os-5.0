@@ -88,14 +88,19 @@ def generate_local_optimization(ctx: GreenhouseContext, locale: str) -> tuple[st
             ))
 
     if internal_temp > 32.0:
-        setpoints.append(ClimateSetpoint(
-            parameter="shade_screen",
-            current_value=0.0,
-            recommended_value=60.0,
-            unit="%",
-            rationale="Deploy thermal shade to reduce solar load and prevent heat stress",
-        ))
-        messages.append(f"Internal temperature ({internal_temp:.1f}°C) is elevated. Deploy shade screen.")
+        current_shade = ctx.shading_screen_deployment_pct if ctx.shading_screen_installed else 0.0
+        if current_shade < 60.0:
+            setpoints.append(ClimateSetpoint(
+                parameter="shade_screen",
+                current_value=current_shade,
+                recommended_value=60.0,
+                unit="%",
+                rationale="Deploy thermal shade to reduce solar load and prevent heat stress",
+            ))
+            messages.append(
+                f"Internal temperature ({internal_temp:.1f}°C) is elevated. "
+                f"Increase shade screen from {current_shade:.0f}% to ~60% deployment."
+            )
 
     intro = _localized_intro(locale)
     content = intro + "\n\n" + "\n".join(messages)

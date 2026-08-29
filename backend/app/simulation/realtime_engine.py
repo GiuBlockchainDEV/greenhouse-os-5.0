@@ -3,6 +3,7 @@
 import time
 from datetime import date
 
+from app.simulation.shading_screen import effective_solar_transmittance
 from app.simulation.engine import SimulationEngine
 from app.simulation.fao56 import daylight_hours, estimate_solar_radiation
 from app.simulation.schemas import (
@@ -63,6 +64,12 @@ class RealtimeSimulationEngine:
         rh = climate_override.external_rh_pct if climate_override.external_rh_pct is not None else 65.0
         wind = climate_override.wind_speed_m_s if climate_override.wind_speed_m_s is not None else 2.0
 
+        effective_transmittance = effective_solar_transmittance(
+            payload.materials.transmittance,
+            payload.shading_screen.installed,
+            payload.shading_screen.deployment_pct,
+        )
+
         fao_request = SimulationRequest(
             climate=ClimateInput(
                 latitude_deg=payload.location.lat,
@@ -75,7 +82,7 @@ class RealtimeSimulationEngine:
             ),
             covering=CoveringMaterial(
                 type=payload.materials.covering_type,
-                transmittance=payload.materials.transmittance,
+                transmittance=effective_transmittance,
                 u_value=payload.materials.u_value,
             ),
             crop_type=CropType(payload.crop.type),
@@ -100,7 +107,7 @@ class RealtimeSimulationEngine:
             ),
             materials=CoveringMaterial(
                 type=payload.materials.covering_type,
-                transmittance=payload.materials.transmittance,
+                transmittance=effective_transmittance,
                 u_value=payload.materials.u_value,
             ),
             crop=CropInput(

@@ -32,6 +32,9 @@ export interface GreenhouseAIContext {
   covering_type: string;
   transmittance: number;
   u_value: number;
+  shading_screen_installed: boolean;
+  shading_screen_deployment_pct: number;
+  effective_transmittance: number;
   exhaust_fan_count: number;
   exhaust_fan_diameter_m: number;
   circulation_fan_count: number;

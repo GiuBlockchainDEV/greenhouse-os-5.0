@@ -48,6 +48,10 @@ function buildUpdatePayload(): WSUpdatePayload {
         transmittance: state.covering.transmittance,
         u_value: state.covering.uValue,
       },
+      shading_screen: {
+        installed: state.shadingScreen.installed,
+        deployment_pct: state.shadingScreen.deploymentPct,
+      },
       crop: {
         type: state.crop.type,
         system: state.crop.system,
@@ -224,6 +228,7 @@ export function useSimulationWS(): UseSimulationWSReturn {
         state.dimensions !== prev.dimensions ||
         state.structure !== prev.structure ||
         state.covering !== prev.covering ||
+        state.shadingScreen !== prev.shadingScreen ||
         state.crop !== prev.crop ||
         state.climateEquipment !== prev.climateEquipment ||
         state.climateScenario !== prev.climateScenario ||

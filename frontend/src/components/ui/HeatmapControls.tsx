@@ -88,6 +88,7 @@ export function HeatmapControls() {
   const structure = useGreenhouseStore((s) => s.structure);
   const crop = useGreenhouseStore((s) => s.crop);
   const covering = useGreenhouseStore((s) => s.covering);
+  const shadingScreen = useGreenhouseStore((s) => s.shadingScreen);
   const climateEquipment = useGreenhouseStore((s) => s.climateEquipment);
 
   const heatmapSource = useMemo(
@@ -98,10 +99,11 @@ export function HeatmapControls() {
         climateEquipment,
         crop,
         covering,
+        shadingScreen,
         climateScenario,
         simulationResults,
       ),
-    [dimensions, structure, climateEquipment, crop, covering, climateScenario, simulationResults],
+    [dimensions, structure, climateEquipment, crop, covering, shadingScreen, climateScenario, simulationResults],
   );
 
   const valueMode =

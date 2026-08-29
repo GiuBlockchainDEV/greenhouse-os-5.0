@@ -1,4 +1,4 @@
-import type { ClimateEquipment, ClimateScenario, CoveringMaterial, CropConfig, GreenhouseDimensions, GreenhouseStructure } from "@/types/greenhouse";
+import type { ClimateEquipment, ClimateScenario, CoveringMaterial, CropConfig, GreenhouseDimensions, GreenhouseStructure, ShadingScreen } from "@/types/greenhouse";
 import {
   buildHeatmapFieldContext,
   generateVisibleSurfaceHeatmaps,
@@ -15,6 +15,7 @@ export function resolveHeatmapField(
   equipment: ClimateEquipment,
   crop: CropConfig,
   covering: CoveringMaterial,
+  shadingScreen: ShadingScreen,
   scenario: ClimateScenario,
   simulationResults: SimulationData | null,
 ): {
@@ -27,6 +28,7 @@ export function resolveHeatmapField(
   const preview = estimatePreviewMicroclimate(
     scenario,
     covering,
+    shadingScreen,
     equipment,
     dimensions,
     crop,
