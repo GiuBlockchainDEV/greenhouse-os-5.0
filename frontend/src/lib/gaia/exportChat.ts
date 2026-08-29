@@ -11,41 +11,15 @@ export interface GaiaExportLabels {
   exportedAtLabel: string;
 }
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+const PAGE_MARGIN = 48;
+const LINE_HEIGHT = 14;
+const SECTION_GAP = 16;
 
-function buildExportHtml(messages: CopilotMessage[], labels: GaiaExportLabels): string {
-  const exportedAt = new Date().toLocaleString();
-
-  const sections = messages
-    .map((msg) => {
-      const heading = msg.role === "user" ? labels.userHeading : labels.assistantHeading;
-      const body =
-        msg.role === "assistant"
-          ? marked.parse(msg.content, { async: false })
-          : `<p>${escapeHtml(msg.content).replace(/\n/g, "<br/>")}</p>`;
-
-      return `
-        <section style="margin-bottom: 20px; page-break-inside: avoid;">
-          <h2 style="font-size: 13px; font-weight: 700; color: #111827; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb;">
-            ${escapeHtml(heading)}
-          </h2>
-          <div style="font-size: 11px; line-height: 1.55; color: #374151;">${body}</div>
-        </section>`;
-    })
-    .join("");
-
-  return `
-    <div class="gaia-export" style="font-family: Inter, system-ui, sans-serif; color: #111827;">
-      <h1 style="font-size: 18px; font-weight: 700; margin: 0 0 4px;">GAIA — ${escapeHtml(labels.title)}</h1>
-      <p style="font-size: 10px; color: #6b7280; margin: 0 0 20px;">${escapeHtml(labels.exportedAtLabel)}: ${escapeHtml(exportedAt)}</p>
-      ${sections}
-    </div>`;
+function markdownToPlainText(markdown: string): string {
+  const html = marked.parse(markdown, { async: false }) as string;
+  const el = document.createElement("div");
+  el.innerHTML = html;
+  return (el.textContent ?? el.innerText ?? markdown).replace(/\n{3,}/g, "\n\n").trim();
 }
 
 export async function exportGaiaChat(
@@ -54,27 +28,52 @@ export async function exportGaiaChat(
 ): Promise<void> {
   if (messages.length === 0) return;
 
-  const container = document.createElement("div");
-  container.style.cssText =
-    "position: fixed; left: -9999px; top: 0; width: 680px; padding: 24px; background: #fff;";
-  container.innerHTML = buildExportHtml(messages, labels);
-  document.body.appendChild(container);
+  const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const maxWidth = pageWidth - PAGE_MARGIN * 2;
+  let y = PAGE_MARGIN;
 
-  try {
-    const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
-    const filename = `${labels.title.replace(/\s+/g, "_").toLowerCase()}_gaia_${new Date().toISOString().slice(0, 10)}.pdf`;
+  const ensureSpace = (needed: number) => {
+    if (y + needed > pageHeight - PAGE_MARGIN) {
+      doc.addPage();
+      y = PAGE_MARGIN;
+    }
+  };
 
-    await doc.html(container, {
-      x: 24,
-      y: 24,
-      width: 547,
-      windowWidth: 680,
-      autoPaging: "text",
-      html2canvas: { scale: 0.72, useCORS: true },
-    });
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text(`GAIA — ${labels.title}`, PAGE_MARGIN, y);
+  y += 22;
 
-    doc.save(filename);
-  } finally {
-    document.body.removeChild(container);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  doc.text(`${labels.exportedAtLabel}: ${new Date().toLocaleString()}`, PAGE_MARGIN, y);
+  y += SECTION_GAP;
+  doc.setTextColor(17, 24, 39);
+
+  for (const msg of messages) {
+    const heading = msg.role === "user" ? labels.userHeading : labels.assistantHeading;
+    const body = msg.role === "assistant" ? markdownToPlainText(msg.content) : msg.content.trim();
+
+    ensureSpace(LINE_HEIGHT + 8);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text(heading, PAGE_MARGIN, y);
+    y += LINE_HEIGHT + 4;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const lines = doc.splitTextToSize(body, maxWidth);
+    for (const line of lines) {
+      ensureSpace(LINE_HEIGHT);
+      doc.text(line, PAGE_MARGIN, y);
+      y += LINE_HEIGHT;
+    }
+    y += SECTION_GAP;
   }
+
+  const filename = `${labels.title.replace(/\s+/g, "_").toLowerCase()}_gaia_${new Date().toISOString().slice(0, 10)}.pdf`;
+  doc.save(filename);
 }

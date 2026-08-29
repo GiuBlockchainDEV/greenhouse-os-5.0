@@ -20,38 +20,29 @@ export function HUDOverlay() {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4">
       <div className="ui-card max-w-[min(100%,20rem)] px-4 py-3">
-        <div className="flex items-start gap-2.5">
-          <img
-            src="/favicon.png"
-            alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 shrink-0 rounded-lg object-contain"
-          />
-          <div>
-            <h2 className="text-sm font-bold text-gray-900">{name}</h2>
-            <p className="mt-0.5 font-mono text-[11px] text-label">
-              {location.label}
-              {location.lat != null && location.lon != null && (
-                <>
-                  {" "}
-                  · {location.lat.toFixed(4)}°, {location.lon.toFixed(4)}°
-                </>
-              )}
-            </p>
-            <p className="mt-1.5 text-xs text-label">
-              {tCrops(`types.${crop.type}`)} · {tCrops(`systems.${crop.system}`)} ·{" "}
-              {tCrops(`stages.${crop.growthStage}`)}
-            </p>
-            <p className="mt-0.5 text-xs text-gray-400">
-              {structure.bayCount} {tControls("structure.baysShort")} ·{" "}
-              {tControls(`structure.archTypes.${structure.archType}`)}
-            </p>
-            <p className="mt-0.5 text-[11px] text-gray-400">
-              {crop.layout.tierCount} {tCrops("labels.tiersShort")} ·{" "}
-              {tSim(`equipment.coolingOptions.${climateEquipment.cooling}`)}
-            </p>
-          </div>
+        <div>
+          <h2 className="text-sm font-bold text-gray-900">{name}</h2>
+          <p className="mt-0.5 font-mono text-[11px] text-label">
+            {location.label}
+            {location.lat != null && location.lon != null && (
+              <>
+                {" "}
+                · {location.lat.toFixed(4)}°, {location.lon.toFixed(4)}°
+              </>
+            )}
+          </p>
+          <p className="mt-1.5 text-xs text-label">
+            {tCrops(`types.${crop.type}`)} · {tCrops(`systems.${crop.system}`)} ·{" "}
+            {tCrops(`stages.${crop.growthStage}`)}
+          </p>
+          <p className="mt-0.5 text-xs text-gray-400">
+            {structure.bayCount} {tControls("structure.baysShort")} ·{" "}
+            {tControls(`structure.archTypes.${structure.archType}`)}
+          </p>
+          <p className="mt-0.5 text-[11px] text-gray-400">
+            {crop.layout.tierCount} {tCrops("labels.tiersShort")} ·{" "}
+            {tSim(`equipment.coolingOptions.${climateEquipment.cooling}`)}
+          </p>
         </div>
       </div>
 
