@@ -1,10 +1,10 @@
 {
   "panel": {
-    "title": "AI Copilot",
-    "placeholder": "Ask Gemini about your greenhouse design...",
-    "welcome": "Powered by Google Gemini. Run a preset analysis (structural, thermal, or efficiency) or ask a free-form question about your current design.",
-    "poweredBy": "Google Gemini",
-    "geminiUnavailable": "— API key not configured"
+    "title": "GAIA",
+    "placeholder": "Ask GAIA about your greenhouse design...",
+    "welcome": "GAIA by Growa analyzes your greenhouse design. Run a preset analysis (structural, thermal, or efficiency) or ask a free-form question.",
+    "poweredBy": "GAIA by Growa",
+    "unavailable": "— service unavailable"
   },
   "actions": {
     "structural": "Structure",
@@ -14,8 +14,8 @@
     "clear": "Clear"
   },
   "status": {
-    "thinking": "Analyzing with Gemini...",
-    "error": "Request failed. Check backend connection and GEMINI_API_KEY."
+    "thinking": "GAIA is analyzing...",
+    "error": "Request failed. Check backend connection."
   },
   "setpoints": {
     "title": "Recommended Setpoints"

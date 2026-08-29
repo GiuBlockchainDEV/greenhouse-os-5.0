@@ -11,7 +11,7 @@ export function AICopilotPanel() {
   const {
     messages,
     status,
-    geminiAvailable,
+    gaiaAvailable,
     sendMessage,
     runAnalysis,
     clearMessages,
@@ -43,8 +43,8 @@ export function AICopilotPanel() {
         </div>
         <p className="mt-1 text-[10px] text-label">
           {t("panel.poweredBy")}
-          {!geminiAvailable && (
-            <span className="ml-1 text-amber-600">{t("panel.geminiUnavailable")}</span>
+          {!gaiaAvailable && (
+            <span className="ml-1 text-amber-600">{t("panel.unavailable")}</span>
           )}
         </p>
       </header>

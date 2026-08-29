@@ -4,7 +4,7 @@ from app.ai.base import AIMessage
 from app.ai.prompts import (
     analysis_prompt,
     format_context,
-    gemini_unavailable_message,
+    gaia_unavailable_message,
     system_prompt,
 )
 from app.ai.providers import GeminiProvider
@@ -28,7 +28,7 @@ class MultiAIGateway:
         return [
             ProviderInfo(
                 id=AIProviderType.GEMINI,
-                name="Google Gemini",
+                name="GAIA",
                 default_model=self._provider.default_model,
                 available=self._provider.is_available(),
                 requires_api_key=True,
@@ -44,7 +44,7 @@ class MultiAIGateway:
         if not self._provider.is_available():
             return AIChatResponse(
                 model="gemini-unconfigured",
-                content=gemini_unavailable_message(locale),
+                content=gaia_unavailable_message(locale),
                 used_local_engine=True,
             )
 
@@ -64,7 +64,7 @@ class MultiAIGateway:
         except Exception as exc:
             return AIChatResponse(
                 model="gemini-error",
-                content=f"{gemini_unavailable_message(locale)}\n\n({exc})",
+                content=f"{gaia_unavailable_message(locale)}\n\n({exc})",
                 used_local_engine=True,
             )
 

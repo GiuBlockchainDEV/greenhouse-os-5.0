@@ -1,10 +1,10 @@
 {
   "panel": {
-    "title": "Copilota IA",
-    "placeholder": "Chiedi a Gemini informazioni sul tuo progetto di serra...",
-    "welcome": "Alimentato da Google Gemini. Avvia un'analisi predefinita (strutturale, termica o efficienza) oppure fai una domanda libera sul design attuale.",
-    "poweredBy": "Google Gemini",
-    "geminiUnavailable": "— chiave API non configurata"
+    "title": "GAIA",
+    "placeholder": "Chiedi a GAIA informazioni sul tuo progetto di serra...",
+    "welcome": "GAIA di Growa analizza il tuo design di serra. Avvia un'analisi predefinita (strutturale, termica o efficienza) oppure fai una domanda libera.",
+    "poweredBy": "GAIA di Growa",
+    "unavailable": "— servizio non disponibile"
   },
   "actions": {
     "structural": "Struttura",
@@ -14,8 +14,8 @@
     "clear": "Cancella"
   },
   "status": {
-    "thinking": "Analisi con Gemini in corso...",
-    "error": "Richiesta fallita. Verifica backend e GEMINI_API_KEY."
+    "thinking": "GAIA sta analizzando...",
+    "error": "Richiesta fallita. Verifica la connessione al backend."
   },
   "setpoints": {
     "title": "Setpoint Consigliati"

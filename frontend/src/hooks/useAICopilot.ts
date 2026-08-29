@@ -76,7 +76,7 @@ export interface UseAICopilotReturn {
   messages: CopilotMessage[];
   status: CopilotStatus;
   providers: ProviderInfo[];
-  geminiAvailable: boolean;
+  gaiaAvailable: boolean;
   sendMessage: (message: string) => Promise<void>;
   runAnalysis: (analysisType: AIAnalysisType, label: string) => Promise<void>;
   clearMessages: () => void;
@@ -96,7 +96,7 @@ export function useAICopilot(): UseAICopilotReturn {
       .catch(() => setProviders([]));
   }, []);
 
-  const geminiAvailable = providers.some((p) => p.id === "gemini" && p.available);
+  const gaiaAvailable = providers.some((p) => p.id === "gemini" && p.available);
 
   const appendAssistant = useCallback((response: AIChatResponse) => {
     setMessages((prev) => [
@@ -197,7 +197,7 @@ export function useAICopilot(): UseAICopilotReturn {
     messages,
     status,
     providers,
-    geminiAvailable,
+    gaiaAvailable,
     sendMessage,
     runAnalysis,
     clearMessages,

@@ -1,10 +1,10 @@
 {
   "panel": {
-    "title": "Copiloto IA",
-    "placeholder": "Pregunta a Gemini sobre tu diseño de invernadero...",
-    "welcome": "Impulsado por Google Gemini. Ejecuta un análisis predefinido (estructural, térmico o eficiencia) o haz una pregunta libre sobre tu diseño actual.",
-    "poweredBy": "Google Gemini",
-    "geminiUnavailable": "— clave API no configurada"
+    "title": "GAIA",
+    "placeholder": "Pregunta a GAIA sobre tu diseño de invernadero...",
+    "welcome": "GAIA de Growa analiza tu diseño de invernadero. Ejecuta un análisis predefinido (estructural, térmico o eficiencia) o haz una pregunta libre.",
+    "poweredBy": "GAIA de Growa",
+    "unavailable": "— servicio no disponible"
   },
   "actions": {
     "structural": "Estructura",
@@ -14,8 +14,8 @@
     "clear": "Limpiar"
   },
   "status": {
-    "thinking": "Analizando con Gemini...",
-    "error": "Solicitud fallida. Verifica backend y GEMINI_API_KEY."
+    "thinking": "GAIA está analizando...",
+    "error": "Solicitud fallida. Verifica la conexión al backend."
   },
   "setpoints": {
     "title": "Setpoints Recomendados"
