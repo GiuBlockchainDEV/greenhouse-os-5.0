@@ -268,7 +268,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       simulationResults: null,
       gizmoMode: "off",
       heatmapMode: "off",
-      aiProvider: "openai",
+      aiProvider: "gemini",
 
       setLocale: (locale) => set({ locale }, false, "setLocale"),
 

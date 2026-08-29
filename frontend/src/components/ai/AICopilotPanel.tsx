@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { ProviderSelector } from "@/components/ai/ProviderSelector";
 import { useAICopilot } from "@/hooks/useAICopilot";
-import type { ClimateSetpoint } from "@/types/ai";
+import type { AIAnalysisType, ClimateSetpoint } from "@/types/ai";
+
+const ANALYSIS_TYPES: AIAnalysisType[] = ["structural", "thermal", "efficiency"];
 
 export function AICopilotPanel() {
   const { t } = useTranslation("ai_copilot");
   const {
     messages,
     status,
-    providers,
-    provider,
-    setProvider,
+    geminiAvailable,
     sendMessage,
-    optimizeClimate,
+    runAnalysis,
     clearMessages,
   } = useAICopilot();
 
@@ -42,13 +41,12 @@ export function AICopilotPanel() {
             </button>
           )}
         </div>
-        <div className="mt-2">
-          <ProviderSelector
-            provider={provider}
-            providers={providers}
-            onChange={setProvider}
-          />
-        </div>
+        <p className="mt-1 text-[10px] text-label">
+          {t("panel.poweredBy")}
+          {!geminiAvailable && (
+            <span className="ml-1 text-amber-600">{t("panel.geminiUnavailable")}</span>
+          )}
+        </p>
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
@@ -72,23 +70,18 @@ export function AICopilotPanel() {
       </div>
 
       <footer className="border-t border-border p-3">
-        <div className="mb-2 flex gap-2">
-          <button
-            type="button"
-            onClick={() => void optimizeClimate()}
-            disabled={status === "loading"}
-            className="ui-btn-primary flex-1 py-1.5 disabled:opacity-50"
-          >
-            {t("actions.optimize")}
-          </button>
-          <button
-            type="button"
-            onClick={() => void sendMessage(t("prompts.explainMetrics"))}
-            disabled={status === "loading"}
-            className="ui-btn-secondary flex-1 py-1.5 disabled:opacity-50"
-          >
-            {t("actions.explain")}
-          </button>
+        <div className="mb-2 grid grid-cols-3 gap-2">
+          {ANALYSIS_TYPES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => void runAnalysis(type, t(`actions.${type}`))}
+              disabled={status === "loading"}
+              className="ui-btn-secondary py-1.5 text-[10px] disabled:opacity-50"
+            >
+              {t(`actions.${type}`)}
+            </button>
+          ))}
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
@@ -118,11 +111,9 @@ interface MessageBubbleProps {
 }
 
 function MessageBubble({ role, content }: MessageBubbleProps) {
-  if (content === "[optimize-climate]") return null;
-
   return (
     <div
-      className={`rounded-xl px-3 py-2 text-xs leading-relaxed ${
+      className={`rounded-xl px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${
         role === "user"
           ? "ml-4 bg-emerald-50 text-gray-800 ring-1 ring-emerald-100"
           : "mr-4 bg-surface-muted text-gray-700"

@@ -1,31 +1,23 @@
 {
   "panel": {
     "title": "Copilota IA",
-    "placeholder": "Chiedi al copilota di ottimizzare i setpoint climatici...",
-    "welcome": "Analizzo i dati microclimatici live e suggerisco regolazioni compatibili con Priva/Ridder. Prova Ottimizza Clima o fai una domanda."
-  },
-  "providers": {
-    "label": "Provider IA",
-    "unavailable": "fallback locale",
-    "openai": "OpenAI",
-    "anthropic": "Anthropic",
-    "gemini": "Google Gemini",
-    "ollama": "Ollama (Locale)"
+    "placeholder": "Chiedi a Gemini informazioni sul tuo progetto di serra...",
+    "welcome": "Alimentato da Google Gemini. Avvia un'analisi predefinita (strutturale, termica o efficienza) oppure fai una domanda libera sul design attuale.",
+    "poweredBy": "Google Gemini",
+    "geminiUnavailable": "— chiave API non configurata"
   },
   "actions": {
-    "optimize": "Ottimizza Clima",
-    "explain": "Spiega Metriche",
+    "structural": "Struttura",
+    "thermal": "Termico",
+    "efficiency": "Efficienza",
     "send": "Invia",
     "clear": "Cancella"
   },
   "status": {
-    "thinking": "Analisi microclima in corso...",
-    "error": "Richiesta fallita. Verifica la connessione al backend."
+    "thinking": "Analisi con Gemini in corso...",
+    "error": "Richiesta fallita. Verifica backend e GEMINI_API_KEY."
   },
   "setpoints": {
     "title": "Setpoint Consigliati"
-  },
-  "prompts": {
-    "explainMetrics": "Spiega le metriche VPD, temperatura e ET0 attuali e se sono ottimali per la fase di crescita della mia coltura."
   }
 }

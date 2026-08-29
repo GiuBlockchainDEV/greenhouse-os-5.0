@@ -26,20 +26,28 @@ class GeminiProvider(AIProvider):
             raise RuntimeError("Gemini API key not configured")
 
         used_model = model or self.default_model
-        combined = "\n\n".join(
-            f"[{m.role.upper()}]\n{m.content}" for m in messages
-        )
+        system_parts: list[str] = []
+        user_parts: list[str] = []
+        for message in messages:
+            if message.role == "system":
+                system_parts.append(message.content)
+            else:
+                user_parts.append(message.content)
 
         url = (
             f"{settings.gemini_base_url}/v1beta/models/"
             f"{used_model}:generateContent?key={settings.gemini_api_key}"
         )
-        payload = {
-            "contents": [{"parts": [{"text": combined}]}],
-            "generationConfig": {"temperature": 0.4, "maxOutputTokens": 1024},
+        payload: dict = {
+            "contents": [{"role": "user", "parts": [{"text": "\n\n".join(user_parts)}]}],
+            "generationConfig": {"temperature": 0.35, "maxOutputTokens": 2048},
         }
+        if system_parts:
+            payload["systemInstruction"] = {
+                "parts": [{"text": "\n\n".join(system_parts)}],
+            }
 
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             response = await client.post(url, json=payload)
             response.raise_for_status()
             data = response.json()

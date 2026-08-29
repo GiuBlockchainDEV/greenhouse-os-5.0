@@ -1,31 +1,23 @@
 {
   "panel": {
     "title": "AI Copilot",
-    "placeholder": "Ask the copilot to optimize climate setpoints...",
-    "welcome": "I analyze your live microclimate data and suggest Priva/Ridder-compatible setpoint adjustments. Try Optimize Climate or ask a question."
-  },
-  "providers": {
-    "label": "AI Provider",
-    "unavailable": "local fallback",
-    "openai": "OpenAI",
-    "anthropic": "Anthropic",
-    "gemini": "Google Gemini",
-    "ollama": "Ollama (Local)"
+    "placeholder": "Ask Gemini about your greenhouse design...",
+    "welcome": "Powered by Google Gemini. Run a preset analysis (structural, thermal, or efficiency) or ask a free-form question about your current design.",
+    "poweredBy": "Google Gemini",
+    "geminiUnavailable": "— API key not configured"
   },
   "actions": {
-    "optimize": "Optimize Climate",
-    "explain": "Explain Metrics",
+    "structural": "Structure",
+    "thermal": "Thermal",
+    "efficiency": "Efficiency",
     "send": "Send",
     "clear": "Clear"
   },
   "status": {
-    "thinking": "Analyzing microclimate...",
-    "error": "Request failed. Check backend connection."
+    "thinking": "Analyzing with Gemini...",
+    "error": "Request failed. Check backend connection and GEMINI_API_KEY."
   },
   "setpoints": {
     "title": "Recommended Setpoints"
-  },
-  "prompts": {
-    "explainMetrics": "Explain the current VPD, temperature, and ET0 metrics and whether they are optimal for my crop stage."
   }
 }
