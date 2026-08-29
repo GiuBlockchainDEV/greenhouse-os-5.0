@@ -71,6 +71,14 @@ body {
   .ui-range-track {
     @apply h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gray-200;
   }
+
+  .gaia-markdown .katex {
+    font-size: 1.05em;
+  }
+
+  .gaia-markdown .katex-display {
+    @apply my-2 overflow-x-auto;
+  }
 }
 
 input[type="range"]::-webkit-slider-thumb {

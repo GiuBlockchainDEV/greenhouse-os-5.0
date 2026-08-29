@@ -1,29 +1,37 @@
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+
+import { preprocessGaiaMarkdown } from "@/lib/gaia/preprocessMarkdown";
+
+import "katex/dist/katex.min.css";
 
 const markdownComponents: Components = {
   h1: ({ children }) => (
     <h3 className="mb-2 mt-3 text-sm font-bold text-gray-900 first:mt-0">{children}</h3>
   ),
   h2: ({ children }) => (
-    <h4 className="mb-1.5 mt-2.5 text-xs font-bold uppercase tracking-wide text-gray-900 first:mt-0">
+    <h4 className="mb-2 mt-4 border-b border-emerald-100 pb-1.5 text-xs font-bold leading-snug text-gray-900 first:mt-0">
       {children}
     </h4>
   ),
   h3: ({ children }) => (
-    <h5 className="mb-1 mt-2 text-xs font-semibold text-gray-800 first:mt-0">{children}</h5>
+    <h5 className="mb-1 mt-3 text-[11px] font-semibold uppercase tracking-wide text-emerald-800 first:mt-0">
+      {children}
+    </h5>
   ),
   p: ({ children }) => <p className="my-1.5 leading-relaxed">{children}</p>,
   ul: ({ children }) => (
-    <ul className="my-2 list-disc space-y-1 pl-4 marker:text-emerald-600">{children}</ul>
+    <ul className="my-2 list-disc space-y-2 pl-4 marker:text-emerald-600">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="my-2 list-decimal space-y-1 pl-4 marker:font-semibold marker:text-emerald-700">
+    <ol className="my-2 list-decimal space-y-2 pl-4 marker:font-semibold marker:text-emerald-700">
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  li: ({ children }) => <li className="leading-relaxed [&_.katex]:text-[11px]">{children}</li>,
   strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
   em: ({ children }) => <em className="italic text-gray-600">{children}</em>,
   blockquote: ({ children }) => (
@@ -78,10 +86,16 @@ interface GaiaMarkdownProps {
 }
 
 export function GaiaMarkdown({ content }: GaiaMarkdownProps) {
+  const normalized = preprocessGaiaMarkdown(content);
+
   return (
     <div className="gaia-markdown text-xs leading-relaxed text-gray-700">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-        {content}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={markdownComponents}
+      >
+        {normalized}
       </ReactMarkdown>
     </div>
   );
