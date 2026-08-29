@@ -14,7 +14,8 @@ export interface GaiaExportLabels {
 }
 
 const EXPORT_WIDTH_PX = 794;
-const PAGE_MARGIN_PT = 36;
+const PAGE_MARGIN_X_PT = 40;
+const PAGE_MARGIN_Y_PT = 48;
 
 const EXPORT_STYLES = `
   * { box-sizing: border-box; }
@@ -24,6 +25,7 @@ const EXPORT_STYLES = `
     font-size: 11px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    padding: 8px 0 24px;
   }
   .gaia-pdf-header {
     background: linear-gradient(135deg, #047857 0%, #059669 50%, #10B981 100%);
@@ -216,27 +218,59 @@ function buildExportHtml(messages: CopilotMessage[], labels: GaiaExportLabels): 
     </div>`;
 }
 
-function addCanvasToPdf(doc: jsPDF, canvas: HTMLCanvasElement, margin: number): void {
+/** Slice canvas into page-sized strips with consistent top/bottom margins on every page. */
+function addCanvasToPdf(
+  doc: jsPDF,
+  canvas: HTMLCanvasElement,
+  marginX: number,
+  marginY: number,
+): void {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const contentWidth = pageWidth - margin * 2;
-  const contentHeight = pageHeight - margin * 2;
+  const contentWidth = pageWidth - marginX * 2;
+  const contentHeight = pageHeight - marginY * 2;
 
-  const imgWidth = contentWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  const imgData = canvas.toDataURL("image/jpeg", 0.92);
+  const scale = contentWidth / canvas.width;
+  const sliceHeightPx = contentHeight / scale;
 
-  let heightLeft = imgHeight;
-  let y = margin;
+  let sourceY = 0;
+  let pageIndex = 0;
 
-  doc.addImage(imgData, "JPEG", margin, y, imgWidth, imgHeight);
-  heightLeft -= contentHeight;
+  while (sourceY < canvas.height) {
+    if (pageIndex > 0) {
+      doc.addPage();
+    }
 
-  while (heightLeft > 0) {
-    y = margin - (imgHeight - heightLeft);
-    doc.addPage();
-    doc.addImage(imgData, "JPEG", margin, y, imgWidth, imgHeight);
-    heightLeft -= contentHeight;
+    const sliceHeight = Math.min(sliceHeightPx, canvas.height - sourceY);
+    const pageCanvas = document.createElement("canvas");
+    pageCanvas.width = canvas.width;
+    pageCanvas.height = sliceHeight;
+
+    const ctx = pageCanvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Canvas 2D context unavailable");
+    }
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+    ctx.drawImage(
+      canvas,
+      0,
+      sourceY,
+      canvas.width,
+      sliceHeight,
+      0,
+      0,
+      canvas.width,
+      sliceHeight,
+    );
+
+    const imgData = pageCanvas.toDataURL("image/jpeg", 0.92);
+    const renderHeight = sliceHeight * scale;
+    doc.addImage(imgData, "JPEG", marginX, marginY, contentWidth, renderHeight);
+
+    sourceY += sliceHeight;
+    pageIndex += 1;
   }
 }
 
@@ -274,28 +308,28 @@ function exportPlainTextPdf(
 ): void {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const maxWidth = pageWidth - PAGE_MARGIN_PT * 2;
-  let y = PAGE_MARGIN_PT;
+  const maxWidth = pageWidth - PAGE_MARGIN_X_PT * 2;
+  let y = PAGE_MARGIN_Y_PT;
 
   const ensureSpace = (needed: number) => {
-    if (y + needed > pageHeight - PAGE_MARGIN_PT) {
+    if (y + needed > pageHeight - PAGE_MARGIN_Y_PT) {
       doc.addPage();
-      y = PAGE_MARGIN_PT;
+      y = PAGE_MARGIN_Y_PT;
     }
   };
 
   doc.setFillColor(5, 150, 105);
-  doc.rect(PAGE_MARGIN_PT, y - 12, maxWidth, 28, "F");
+  doc.rect(PAGE_MARGIN_X_PT, y - 12, maxWidth, 28, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text(`GAIA — ${labels.title}`, PAGE_MARGIN_PT + 4, y + 8);
+  doc.text(`GAIA — ${labels.title}`, PAGE_MARGIN_X_PT + 4, y + 8);
   y += 32;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(107, 114, 128);
-  doc.text(`${labels.exportedAtLabel}: ${new Date().toLocaleString()}`, PAGE_MARGIN_PT, y);
+  doc.text(`${labels.exportedAtLabel}: ${new Date().toLocaleString()}`, PAGE_MARGIN_X_PT, y);
   y += 20;
   doc.setTextColor(17, 24, 39);
 
@@ -310,7 +344,7 @@ function exportPlainTextPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor(msg.role === "assistant" ? 4 : 107, msg.role === "assistant" ? 120 : 114, msg.role === "assistant" ? 87 : 128);
-    doc.text(heading.toUpperCase(), PAGE_MARGIN_PT, y);
+    doc.text(heading.toUpperCase(), PAGE_MARGIN_X_PT, y);
     y += 14;
     doc.setTextColor(55, 65, 81);
     doc.setFont("helvetica", "normal");
@@ -318,7 +352,7 @@ function exportPlainTextPdf(
 
     for (const line of doc.splitTextToSize(body, maxWidth)) {
       ensureSpace(14);
-      doc.text(line, PAGE_MARGIN_PT, y);
+      doc.text(line, PAGE_MARGIN_X_PT, y);
       y += 14;
     }
     y += 12;
@@ -351,7 +385,7 @@ export async function exportGaiaChat(
 
   try {
     const canvas = await captureExportCanvas(container);
-    addCanvasToPdf(doc, canvas, PAGE_MARGIN_PT);
+    addCanvasToPdf(doc, canvas, PAGE_MARGIN_X_PT, PAGE_MARGIN_Y_PT);
     doc.save(filename);
   } catch {
     exportPlainTextPdf(doc, messages, labels);
