@@ -15,7 +15,7 @@
   },
   "status": {
     "thinking": "GAIA analyse en cours...",
-    "error": "Requête échouée. Vérifiez la connexion au backend."
+    "error": "Requête échouée. Veuillez réessayer dans un instant."
   },
   "setpoints": {
     "title": "Consignes Recommandées"

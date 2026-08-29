@@ -15,7 +15,7 @@
   },
   "status": {
     "thinking": "GAIA está analizando...",
-    "error": "Solicitud fallida. Verifica la conexión al backend."
+    "error": "Solicitud fallida. Inténtalo de nuevo en unos instantes."
   },
   "setpoints": {
     "title": "Setpoints Recomendados"

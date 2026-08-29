@@ -15,7 +15,7 @@
   },
   "status": {
     "thinking": "GAIA is analyzing...",
-    "error": "Request failed. Check backend connection."
+    "error": "Request failed. Please try again shortly."
   },
   "setpoints": {
     "title": "Recommended Setpoints"
