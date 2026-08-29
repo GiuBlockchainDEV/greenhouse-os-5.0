@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAICopilot } from "@/hooks/useAICopilot";
+import { GaiaMarkdown } from "@/components/ai/GaiaMarkdown";
 import type { AIAnalysisType, ClimateSetpoint } from "@/types/ai";
 
 const ANALYSIS_TYPES: AIAnalysisType[] = ["structural", "thermal", "efficiency"];
@@ -113,13 +114,17 @@ interface MessageBubbleProps {
 function MessageBubble({ role, content }: MessageBubbleProps) {
   return (
     <div
-      className={`rounded-xl px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${
+      className={`rounded-xl px-3 py-2 ${
         role === "user"
-          ? "ml-4 bg-emerald-50 text-gray-800 ring-1 ring-emerald-100"
-          : "mr-4 bg-surface-muted text-gray-700"
+          ? "ml-4 bg-emerald-50 text-xs leading-relaxed text-gray-800 ring-1 ring-emerald-100"
+          : "mr-4 bg-surface-muted"
       }`}
     >
-      {content}
+      {role === "assistant" ? (
+        <GaiaMarkdown content={content} />
+      ) : (
+        <p className="whitespace-pre-wrap">{content}</p>
+      )}
     </div>
   );
 }

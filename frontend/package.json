@@ -16,6 +16,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.4.0",
+    "react-markdown": "^9.0.3",
+    "remark-gfm": "^4.0.1",
     "three": "^0.171.0",
     "zustand": "^5.0.2",
     "@supabase/supabase-js": "^2.49.1"
