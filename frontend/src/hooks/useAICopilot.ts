@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { buildGreenhouseContext } from "@/lib/gaia/buildContext";
-import { gaiaAnalyze, gaiaChat, isGaiaConfigured } from "@/lib/gaia/client";
+import { checkGaiaStatus, gaiaAnalyze, gaiaChat } from "@/lib/gaia/client";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   AIAnalysisType,
@@ -26,9 +26,13 @@ export interface UseAICopilotReturn {
 export function useAICopilot(): UseAICopilotReturn {
   const [messages, setMessages] = useState<CopilotMessage[]>([]);
   const [status, setStatus] = useState<CopilotStatus>("idle");
+  const [gaiaAvailable, setGaiaAvailable] = useState(false);
 
   const locale = useGreenhouseStore((s) => s.locale);
-  const gaiaAvailable = isGaiaConfigured();
+
+  useEffect(() => {
+    void checkGaiaStatus().then((result) => setGaiaAvailable(result.available));
+  }, []);
 
   const appendAssistant = useCallback((response: AIChatResponse) => {
     setMessages((prev) => [
@@ -58,6 +62,7 @@ export function useAICopilot(): UseAICopilotReturn {
 
       try {
         const data = await gaiaChat(trimmed, buildGreenhouseContext(), locale);
+        if (!data.used_local_engine) setGaiaAvailable(true);
         appendAssistant(data);
         setStatus("idle");
       } catch {
@@ -83,6 +88,7 @@ export function useAICopilot(): UseAICopilotReturn {
 
       try {
         const data = await gaiaAnalyze(analysisType, buildGreenhouseContext(), locale);
+        if (!data.used_local_engine) setGaiaAvailable(true);
         appendAssistant(data);
         setStatus("idle");
       } catch {
