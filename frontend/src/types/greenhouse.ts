@@ -147,7 +147,12 @@ export interface GeoLocation {
   lat: number;
   lon: number;
   elevationM: number;
+  /** Human-readable site label sent to GAIA, e.g. "Rome, Italy". */
+  label: string;
 }
+
+/** Season preset for GAIA location-aware analyses. */
+export type GaiaAnalysisSeason = "simulation" | "summer" | "winter" | "shoulder";
 
 /** External weather inputs used by the simulation and preview heatmap. */
 export interface ClimateScenario {

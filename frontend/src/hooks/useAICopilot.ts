@@ -9,6 +9,7 @@ import type {
   CopilotMessage,
   CopilotStatus,
 } from "@/types/ai";
+import type { GaiaAnalysisSeason } from "@/types/greenhouse";
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -19,7 +20,11 @@ export interface UseAICopilotReturn {
   status: CopilotStatus;
   gaiaAvailable: boolean;
   sendMessage: (message: string) => Promise<void>;
-  runAnalysis: (analysisType: AIAnalysisType, label: string) => Promise<void>;
+  runAnalysis: (
+    analysisType: AIAnalysisType,
+    label: string,
+    season: GaiaAnalysisSeason,
+  ) => Promise<void>;
   clearMessages: () => void;
 }
 
@@ -73,7 +78,7 @@ export function useAICopilot(): UseAICopilotReturn {
   );
 
   const runAnalysis = useCallback(
-    async (analysisType: AIAnalysisType, label: string) => {
+    async (analysisType: AIAnalysisType, label: string, season: GaiaAnalysisSeason) => {
       setMessages((prev) => [
         ...prev,
         {
@@ -87,7 +92,11 @@ export function useAICopilot(): UseAICopilotReturn {
       setStatus("loading");
 
       try {
-        const data = await gaiaAnalyze(analysisType, buildGreenhouseContext(), locale);
+        const data = await gaiaAnalyze(
+          analysisType,
+          buildGreenhouseContext({ analysisSeason: season }),
+          locale,
+        );
         if (!data.used_local_engine) setGaiaAvailable(true);
         appendAssistant(data);
         setStatus("idle");

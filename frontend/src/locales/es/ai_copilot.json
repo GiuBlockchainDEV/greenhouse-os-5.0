@@ -2,9 +2,31 @@
   "panel": {
     "title": "GAIA",
     "placeholder": "Pregunta a GAIA sobre tu diseño de invernadero...",
-    "welcome": "GAIA de Growa analiza tu diseño de invernadero. Ejecuta un análisis predefinido (estructural, térmico o eficiencia) o haz una pregunta libre.",
+    "welcome": "Configura el sitio y la estación, luego ejecuta un análisis. GAIA evalúa el diseño según el clima local.",
     "poweredBy": "GAIA de Growa",
     "unavailable": "— servicio no disponible"
+  },
+  "site": {
+    "title": "Sitio de análisis",
+    "place": "Ubicación",
+    "placePlaceholder": "ej. Roma, Italia",
+    "latitude": "Latitud",
+    "longitude": "Longitud",
+    "season": "Estación / escenario",
+    "seasons": {
+      "simulation": "Escenario simulación (heatmap)",
+      "summer": "Verano — pico solar",
+      "winter": "Invierno — día frío",
+      "shoulder": "Temporada media (primavera/otoño)"
+    },
+    "scenarioHint": "Usa T ext {{temp}}°C, HR {{rh}}% del panel heatmap."
+  },
+  "analysis": {
+    "request": {
+      "structural": "Análisis estructural · {{location}} · {{season}}",
+      "thermal": "Análisis térmico · {{location}} · {{season}}",
+      "efficiency": "Análisis eficiencia · {{location}} · {{season}}"
+    }
   },
   "actions": {
     "structural": "Estructura",

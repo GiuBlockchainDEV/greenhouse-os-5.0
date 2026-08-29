@@ -2,6 +2,8 @@ export type AIProviderType = "gemini";
 
 export type AIAnalysisType = "structural" | "thermal" | "efficiency";
 
+export type { GaiaAnalysisSeason } from "./greenhouse";
+
 export interface GreenhouseAIContext {
   crop_type: string;
   cultivation_system: string;
@@ -50,6 +52,15 @@ export interface GreenhouseAIContext {
   q_net_delta?: number;
   latitude?: number;
   longitude?: number;
+  elevation_m?: number;
+  location_label?: string;
+  analysis_season?: GaiaAnalysisSeason;
+  scenario_external_temp_c?: number;
+  scenario_external_rh_pct?: number;
+  scenario_wind_speed_m_s?: number;
+  scenario_solar_elevation_deg?: number;
+  scenario_solar_intensity_pct?: number;
+  has_live_simulation?: boolean;
 }
 
 export interface ClimateSetpoint {

@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { GaiaSiteContext } from "@/components/ai/GaiaSiteContext";
 import { useAICopilot } from "@/hooks/useAICopilot";
 import { GaiaMarkdown } from "@/components/ai/GaiaMarkdown";
 import type { AIAnalysisType, ClimateSetpoint } from "@/types/ai";
+import type { GaiaAnalysisSeason } from "@/types/greenhouse";
+import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 const ANALYSIS_TYPES: AIAnalysisType[] = ["structural", "thermal", "efficiency"];
 
@@ -19,6 +22,14 @@ export function AICopilotPanel() {
   } = useAICopilot();
 
   const [input, setInput] = useState("");
+  const [season, setSeason] = useState<GaiaAnalysisSeason>("simulation");
+  const locationLabel = useGreenhouseStore((s) => s.location.label);
+
+  const analysisLabel = (type: AIAnalysisType) =>
+    t(`analysis.request.${type}`, {
+      location: locationLabel || t("site.placePlaceholder"),
+      season: t(`site.seasons.${season}`),
+    });
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -50,6 +61,8 @@ export function AICopilotPanel() {
         </p>
       </header>
 
+      <GaiaSiteContext season={season} onSeasonChange={setSeason} />
+
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {messages.length === 0 && (
           <p className="text-xs leading-relaxed text-label">{t("panel.welcome")}</p>
@@ -76,7 +89,7 @@ export function AICopilotPanel() {
             <button
               key={type}
               type="button"
-              onClick={() => void runAnalysis(type, t(`actions.${type}`))}
+              onClick={() => void runAnalysis(type, analysisLabel(type), season)}
               disabled={status === "loading"}
               className="ui-btn-secondary py-1.5 text-[10px] disabled:opacity-50"
             >

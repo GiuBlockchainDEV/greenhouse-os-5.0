@@ -78,6 +78,7 @@ const DEFAULT_LOCATION: GeoLocation = {
   lat: 41.9028,
   lon: 12.4964,
   elevationM: 21,
+  label: "Rome, Italy",
 };
 
 const DEFAULT_CLIMATE_SCENARIO: ClimateScenario = {

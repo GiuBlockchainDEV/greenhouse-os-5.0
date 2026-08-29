@@ -2,9 +2,31 @@
   "panel": {
     "title": "GAIA",
     "placeholder": "Ask GAIA about your greenhouse design...",
-    "welcome": "GAIA by Growa analyzes your greenhouse design. Run a preset analysis (structural, thermal, or efficiency) or ask a free-form question.",
+    "welcome": "Set the site and season, then run an analysis. GAIA evaluates your design against the local climate.",
     "poweredBy": "GAIA by Growa",
     "unavailable": "— service unavailable"
+  },
+  "site": {
+    "title": "Analysis site",
+    "place": "Location",
+    "placePlaceholder": "e.g. Rome, Italy",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "season": "Season / scenario",
+    "seasons": {
+      "simulation": "Simulation scenario (heatmap)",
+      "summer": "Summer — peak solar",
+      "winter": "Winter — cold design day",
+      "shoulder": "Shoulder season (spring/fall)"
+    },
+    "scenarioHint": "Uses ext. T {{temp}}°C, RH {{rh}}% from the heatmap panel."
+  },
+  "analysis": {
+    "request": {
+      "structural": "Structural analysis · {{location}} · {{season}}",
+      "thermal": "Thermal analysis · {{location}} · {{season}}",
+      "efficiency": "Efficiency analysis · {{location}} · {{season}}"
+    }
   },
   "actions": {
     "structural": "Structure",

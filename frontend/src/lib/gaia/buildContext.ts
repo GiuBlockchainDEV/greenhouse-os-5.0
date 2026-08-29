@@ -1,10 +1,17 @@
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { GreenhouseAIContext } from "@/types/ai";
+import type { GaiaAnalysisSeason } from "@/types/greenhouse";
 
-export function buildGreenhouseContext(): GreenhouseAIContext {
+interface BuildContextOptions {
+  analysisSeason?: GaiaAnalysisSeason;
+}
+
+export function buildGreenhouseContext(options: BuildContextOptions = {}): GreenhouseAIContext {
   const state = useGreenhouseStore.getState();
   const sim = state.simulationResults;
   const sizing = state.climateEquipment.sizing;
+  const scenario = state.climateScenario;
+  const season = options.analysisSeason ?? "simulation";
 
   return {
     crop_type: state.crop.type,
@@ -54,5 +61,14 @@ export function buildGreenhouseContext(): GreenhouseAIContext {
     q_net_delta: sim?.thermal_balance.q_net_delta,
     latitude: state.location.lat,
     longitude: state.location.lon,
+    elevation_m: state.location.elevationM,
+    location_label: state.location.label,
+    analysis_season: season,
+    scenario_external_temp_c: scenario.externalTempC,
+    scenario_external_rh_pct: scenario.externalRhPct,
+    scenario_wind_speed_m_s: scenario.windSpeedMS,
+    scenario_solar_elevation_deg: scenario.solarElevationDeg,
+    scenario_solar_intensity_pct: scenario.solarIntensityPct,
+    has_live_simulation: sim !== null,
   };
 }

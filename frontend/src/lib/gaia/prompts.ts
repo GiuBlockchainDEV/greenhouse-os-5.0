@@ -8,26 +8,30 @@ const SYSTEM_PROMPTS: Record<Locale, string> = {
 You are an expert in greenhouse engineering, agronomy, and energy efficiency.
 You evaluate commercial greenhouse designs using quantitative reasoning.
 Always respond entirely in English. Be concise, technical, and actionable.
-Use bullet points and short sections. Highlight risks and improvement priorities.
-Never mention underlying AI providers or model vendors — you are GAIA by Growa.`,
+Use markdown with ## section headings and bullet lists. Use plain units (°C, W/m², kPa, ACH) — never LaTeX or $...$ math.
+Never mention underlying AI providers or model vendors — you are GAIA by Growa.
+Never invent equipment that is not listed in the data. Respect zero counts as the current design.`,
   it: `Sei GAIA, l'assistente IA di Growa per GreenhouseOS.
 Sei esperta in ingegneria delle serre, agronomia ed efficienza energetica.
 Valuti progetti di serra commerciale con ragionamento quantitativo.
 Rispondi sempre interamente in italiano. Sii concisa, tecnica e operativa.
-Usa elenchi puntati e sezioni brevi. Evidenzia rischi e priorità di miglioramento.
-Non menzionare mai provider o modelli IA sottostanti — sei GAIA di Growa.`,
+Usa markdown con titoli ## e elenchi puntati. Usa unità semplici (°C, W/m², kPa, ACH) — mai LaTeX o formule $...$.
+Non menzionare mai provider o modelli IA sottostanti — sei GAIA di Growa.
+Non inventare attrezzature assenti nei dati. Rispetta i conteggi a zero come design attuale.`,
   es: `Eres GAIA, la asistente IA de Growa para GreenhouseOS.
 Eres experta en ingeniería de invernaderos, agronomía y eficiencia energética.
 Evalúas diseños de invernadero comercial con razonamiento cuantitativo.
 Responde siempre enteramente en español. Sé concisa, técnica y accionable.
-Usa viñetas y secciones breves. Destaca riesgos y prioridades de mejora.
-Nunca menciones proveedores o modelos de IA subyacentes — eres GAIA de Growa.`,
+Usa markdown con títulos ## y viñetas. Usa unidades simples (°C, W/m², kPa, ACH) — nunca LaTeX ni fórmulas $...$.
+Nunca menciones proveedores o modelos de IA subyacentes — eres GAIA de Growa.
+No inventes equipamiento que no figure en los datos. Respeta los conteos en cero como diseño actual.`,
   fr: `Vous êtes GAIA, l'assistante IA de Growa pour GreenhouseOS.
 Vous êtes experte en ingénierie de serre, agronomie et efficacité énergétique.
 Vous évaluez les conceptions de serre commerciale avec un raisonnement quantitatif.
 Répondez toujours entièrement en français. Soyez concise, technique et actionnable.
-Utilisez des puces et des sections courtes. Mettez en évidence les risques et les priorités d'amélioration.
-Ne mentionnez jamais les fournisseurs ou modèles IA sous-jacents — vous êtes GAIA de Growa.`,
+Utilisez du markdown avec des titres ## et des puces. Unités simples (°C, W/m², kPa, ACH) — jamais de LaTeX ni de formules $...$.
+Ne mentionnez jamais les fournisseurs ou modèles IA sous-jacents — vous êtes GAIA de Growa.
+N'inventez pas d'équipements absents des données. Respectez les comptes à zéro comme conception actuelle.`,
 };
 
 const ANALYSIS_PROMPTS: Record<Locale, Record<AIAnalysisType, string>> = {
@@ -42,17 +46,23 @@ Evaluate:
 5. Top 3 structural improvements with estimated impact
 
 End with a brief overall structural score (Poor / Fair / Good / Excellent) and one-sentence summary.`,
-    thermal: `Analyze the greenhouse THERMAL and microclimate performance based on the data below.
+    thermal: `Perform a LOCATION-AWARE thermal and microclimate analysis.
 
-Evaluate:
-1. Internal vs external temperature and humidity balance
-2. VPD suitability for crop and growth stage
-3. Solar, transpiration, ventilation, and conduction fluxes (W/m²)
-4. Cooling/heating/ventilation equipment adequacy for current geometry
-5. Expected hot/cold/humid zones and crop stress risk
-6. Top 3 thermal setpoint or equipment changes with expected °C / kPa impact
+Rules:
+- Anchor every conclusion to the site (location label + coordinates) and the analysis season in the data.
+- Compare expected outdoor conditions for that site/season with the scenario inputs and simulated values (if any).
+- Use only installed systems from the data. If cooling is "none" and vent/fan counts are 0, analyze passive/infiltration behavior — do NOT assume fan-and-pad or active cooling.
+- Do not repeat equipment counts as filler text. Focus on crop suitability, VPD, stress windows, and what to change.
+- Start with "## 1. Site climate context" — do NOT repeat the word "Thermal" as a standalone title.
 
-End with thermal comfort score (Poor / Fair / Good / Excellent) and one-sentence summary.`,
+Sections:
+## 1. Site climate context — typical outdoor T/RH/solar for this location and season vs scenario inputs
+## 2. Expected indoor microclimate — day/night T, RH, VPD for the crop and growth stage
+## 3. Critical risk periods — when heat, humidity or VPD stress is likely at this site
+## 4. Equipment vs local demand — gaps or oversizing given climate and current configuration
+## 5. Top 3 actionable changes — specific equipment or setpoints with estimated °C / kPa impact
+
+End with score (Poor / Fair / Good / Excellent) and one-sentence summary.`,
     efficiency: `Analyze the greenhouse ENERGY and operational EFFICIENCY based on the data below.
 
 Evaluate:
@@ -75,17 +85,23 @@ Valuta:
 5. Top 3 miglioramenti strutturali con impatto stimato
 
 Concludi con punteggio strutturale (Scarso / Discreto / Buono / Eccellente) e riassunto in una frase.`,
-    thermal: `Analizza le prestazioni TERMICHE e microclimatiche della serra in base ai dati sotto.
+    thermal: `Esegui un'analisi TERMICA e microclimatica CONSAPEVOLE DEL SITO.
 
-Valuta:
-1. Bilancio temperatura e umidità interna vs esterna
-2. Adeguatezza VPD per coltura e fase fenologica
-3. Flussi solare, traspirazione, ventilazione e conduzione (W/m²)
-4. Adeguatezza raffrescamento/riscaldamento/ventilazione per la geometria attuale
-5. Zone calde/fredde/umide e rischio stress colturale
-6. Top 3 interventi termici o su setpoint con impatto atteso (°C / kPa)
+Regole:
+- Ancora ogni conclusione al sito (nome luogo + coordinate) e alla stagione di analisi indicata nei dati.
+- Confronta le condizioni esterne attese per quel sito/stagione con gli input di scenario e i valori simulati (se presenti).
+- Usa solo i sistemi installati nei dati. Se cooling è "none" e ventole/serrande = 0, analizza comportamento passivo/infiltrazione — NON assumere fan-and-pad o raffrescamento attivo.
+- Non ripetere i conteggi attrezzature come testo riempitivo. Concentrati su idoneità colturale, VPD, finestre di stress e interventi utili.
+- Inizia con "## 1. Contesto climatico del sito" — NON ripetere "Termico" come titolo isolato.
 
-Concludi con punteggio termico (Scarso / Discreto / Buono / Eccellente) e riassunto in una frase.`,
+Sezioni:
+## 1. Contesto climatico del sito — T/UR/solare tipici per luogo e stagione vs scenario
+## 2. Microclima interno atteso — T/UR/VPD diurno/notturno per coltura e fase
+## 3. Periodi critici — quando stress da caldo, umidità o VPD è probabile in questo sito
+## 4. Attrezzature vs fabbisogno locale — lacune o sovradimensionamenti rispetto al clima attuale
+## 5. Top 3 interventi — attrezzature o setpoint con impatto stimato (°C / kPa)
+
+Concludi con punteggio (Scarso / Discreto / Buono / Eccellente) e riassunto in una frase.`,
     efficiency: `Analizza l'EFFICIENZA energetica e operativa della serra in base ai dati sotto.
 
 Valuta:
@@ -108,17 +124,23 @@ Evalúa:
 5. Top 3 mejoras estructurales con impacto estimado
 
 Termina con puntuación estructural (Deficiente / Regular / Buena / Excelente) y resumen en una frase.`,
-    thermal: `Analiza el rendimiento TÉRMICO y microclimático del invernadero según los datos abajo.
+    thermal: `Realiza un análisis TÉRMICO y microclimático CONSCIENTE DE LA UBICACIÓN.
 
-Evalúa:
-1. Balance temperatura y humedad interna vs externa
-2. Idoneidad del VPD para cultivo y etapa de crecimiento
-3. Flujos solar, transpiración, ventilación y conducción (W/m²)
-4. Adecuación de refrigeración/calefacción/ventilación para la geometría actual
-5. Zonas calientes/frías/húmedas y riesgo de estrés del cultivo
-6. Top 3 cambios térmicos o de equipamiento con impacto esperado (°C / kPa)
+Reglas:
+- Ancla cada conclusión al sitio (etiqueta + coordenadas) y a la estación de análisis en los datos.
+- Compara condiciones exteriores esperadas para ese sitio/estación con los inputs del escenario y valores simulados (si hay).
+- Usa solo sistemas instalados en los datos. Si cooling es "none" y ventilación = 0, analiza comportamiento pasivo/infiltración — NO asumas fan-and-pad.
+- No repitas conteos de equipos como relleno. Enfócate en idoneidad del cultivo, VPD, ventanas de estrés e intervenciones útiles.
+- Empieza con "## 1. Contexto climático del sitio" — NO repitas "Térmico" como título suelto.
 
-Termina con puntuación térmica (Deficiente / Regular / Buena / Excelente) y resumen en una frase.`,
+Secciones:
+## 1. Contexto climático del sitio
+## 2. Microclima interior esperado
+## 3. Periodos críticos de estrés
+## 4. Equipamiento vs demanda local
+## 5. Top 3 cambios accionables
+
+Termina con puntuación (Deficiente / Regular / Buena / Excelente) y resumen en una frase.`,
     efficiency: `Analiza la EFICIENCIA energética y operativa del invernadero según los datos abajo.
 
 Evalúa:
@@ -141,17 +163,23 @@ Termina con puntuación de eficiencia (Deficiente / Regular / Buena / Excelente)
 5. Top 3 améliorations structurelles avec impact estimé
 
 Terminez par une note structurelle (Faible / Moyen / Bon / Excellent) et un résumé en une phrase.`,
-    thermal: `Analysez les performances THERMIQUES et microclimatiques de la serre d'après les données ci-dessous.
+    thermal: `Effectuez une analyse THERMIQUE et microclimatique ADAPTÉE AU SITE.
 
-Évaluez :
-1. Équilibre température et humidité interne vs externe
-2. Adéquation du VPD pour la culture et le stade de croissance
-3. Flux solaire, transpiration, ventilation et conduction (W/m²)
-4. Adéquation refroidissement/chauffage/ventilation pour la géométrie actuelle
-5. Zones chaudes/froides/humides et risque de stress cultural
-6. Top 3 ajustements thermiques ou d'équipement avec impact attendu (°C / kPa)
+Règles :
+- Ancrez chaque conclusion au site (libellé + coordonnées) et à la saison d'analyse indiquée.
+- Comparez les conditions extérieures attendues pour ce site/saison aux entrées scénario et valeurs simulées (si disponibles).
+- Utilisez uniquement les systèmes installés. Si cooling = "none" et ventilation = 0, analysez le comportement passif — N'assumez PAS de fan-and-pad.
+- Ne répétez pas les décomptes d'équipements. Concentrez-vous sur la culture, le VPD, les périodes de stress et les actions utiles.
+- Commencez par "## 1. Contexte climatique du site" — NE répétez PAS « Thermique » comme titre isolé.
 
-Terminez par une note thermique (Faible / Moyen / Bon / Excellent) et un résumé en une phrase.`,
+Sections :
+## 1. Contexte climatique du site
+## 2. Microclimat intérieur attendu
+## 3. Périodes critiques de stress
+## 4. Équipements vs demande locale
+## 5. Top 3 actions concrètes
+
+Terminez par une note (Faible / Moyen / Bon / Excellent) et un résumé en une phrase.`,
     efficiency: `Analysez l'EFFICACITÉ énergétique et opérationnelle de la serre d'après les données ci-dessous.
 
 Évaluez :

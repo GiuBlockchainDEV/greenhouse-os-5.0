@@ -2,9 +2,31 @@
   "panel": {
     "title": "GAIA",
     "placeholder": "Chiedi a GAIA informazioni sul tuo progetto di serra...",
-    "welcome": "GAIA di Growa analizza il tuo design di serra. Avvia un'analisi predefinita (strutturale, termica o efficienza) oppure fai una domanda libera.",
+    "welcome": "Imposta il sito e la stagione, poi avvia un'analisi. GAIA valuta il design rispetto al clima locale reale.",
     "poweredBy": "GAIA di Growa",
     "unavailable": "— servizio non disponibile"
+  },
+  "site": {
+    "title": "Sito di analisi",
+    "place": "Luogo",
+    "placePlaceholder": "es. Roma, Italia",
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
+    "season": "Stagione / scenario",
+    "seasons": {
+      "simulation": "Scenario simulazione (heatmap)",
+      "summer": "Estate — picco solare",
+      "winter": "Inverno — giornata fredda",
+      "shoulder": "Mezza stagione (primavera/autunno)"
+    },
+    "scenarioHint": "Usa T ext {{temp}}°C, UR {{rh}}% dal pannello heatmap."
+  },
+  "analysis": {
+    "request": {
+      "structural": "Analisi strutturale · {{location}} · {{season}}",
+      "thermal": "Analisi termica · {{location}} · {{season}}",
+      "efficiency": "Analisi efficienza · {{location}} · {{season}}"
+    }
   },
   "actions": {
     "structural": "Struttura",

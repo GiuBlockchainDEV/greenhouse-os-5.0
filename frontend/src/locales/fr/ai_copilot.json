@@ -2,9 +2,31 @@
   "panel": {
     "title": "GAIA",
     "placeholder": "Demandez à GAIA des informations sur votre serre...",
-    "welcome": "GAIA de Growa analyse votre conception de serre. Lancez une analyse prédéfinie (structurelle, thermique ou efficacité) ou posez une question libre.",
+    "welcome": "Définissez le site et la saison, puis lancez une analyse. GAIA évalue la conception selon le climat local.",
     "poweredBy": "GAIA de Growa",
     "unavailable": "— service indisponible"
+  },
+  "site": {
+    "title": "Site d'analyse",
+    "place": "Lieu",
+    "placePlaceholder": "ex. Rome, Italie",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "season": "Saison / scénario",
+    "seasons": {
+      "simulation": "Scénario simulation (heatmap)",
+      "summer": "Été — pic solaire",
+      "winter": "Hiver — journée froide",
+      "shoulder": "Mi-saison (printemps/automne)"
+    },
+    "scenarioHint": "Utilise T ext {{temp}}°C, HR {{rh}}% du panneau heatmap."
+  },
+  "analysis": {
+    "request": {
+      "structural": "Analyse structurelle · {{location}} · {{season}}",
+      "thermal": "Analyse thermique · {{location}} · {{season}}",
+      "efficiency": "Analyse efficacité · {{location}} · {{season}}"
+    }
   },
   "actions": {
     "structural": "Structure",
