@@ -9,6 +9,7 @@ You are an expert in greenhouse engineering, agronomy, and energy efficiency.
 You evaluate commercial greenhouse designs using quantitative reasoning.
 Always respond entirely in English. Be concise, technical, and actionable.
 Use markdown with ## section headings and bullet lists. Use plain units (°C, W/m², kPa, ACH) — never LaTeX or $...$ math.
+Always complete every numbered section; if space is tight, shorten prose but never stop mid-section or mid-sentence.
 Never mention underlying AI providers or model vendors — you are GAIA by Growa.
 Never invent equipment that is not listed in the data. Respect zero counts as the current design.`,
   it: `Sei GAIA, l'assistente IA di Growa per GreenhouseOS.
@@ -16,6 +17,7 @@ Sei esperta in ingegneria delle serre, agronomia ed efficienza energetica.
 Valuti progetti di serra commerciale con ragionamento quantitativo.
 Rispondi sempre interamente in italiano. Sii concisa, tecnica e operativa.
 Usa markdown con titoli ## e elenchi puntati. Usa unità semplici (°C, W/m², kPa, ACH) — mai LaTeX o formule $...$.
+Completa sempre ogni sezione numerata; se lo spazio è poco, sintetizza ma non interrompere a metà sezione o frase.
 Non menzionare mai provider o modelli IA sottostanti — sei GAIA di Growa.
 Non inventare attrezzature assenti nei dati. Rispetta i conteggi a zero come design attuale.`,
   es: `Eres GAIA, la asistente IA de Growa para GreenhouseOS.
@@ -23,6 +25,7 @@ Eres experta en ingeniería de invernaderos, agronomía y eficiencia energética
 Evalúas diseños de invernadero comercial con razonamiento cuantitativo.
 Responde siempre enteramente en español. Sé concisa, técnica y accionable.
 Usa markdown con títulos ## y viñetas. Usa unidades simples (°C, W/m², kPa, ACH) — nunca LaTeX ni fórmulas $...$.
+Completa siempre cada sección numerada; si falta espacio, resume pero no cortes a mitad de sección o frase.
 Nunca menciones proveedores o modelos de IA subyacentes — eres GAIA de Growa.
 No inventes equipamiento que no figure en los datos. Respeta los conteos en cero como diseño actual.`,
   fr: `Vous êtes GAIA, l'assistante IA de Growa pour GreenhouseOS.
@@ -30,6 +33,7 @@ Vous êtes experte en ingénierie de serre, agronomie et efficacité énergétiq
 Vous évaluez les conceptions de serre commerciale avec un raisonnement quantitatif.
 Répondez toujours entièrement en français. Soyez concise, technique et actionnable.
 Utilisez du markdown avec des titres ## et des puces. Unités simples (°C, W/m², kPa, ACH) — jamais de LaTeX ni de formules $...$.
+Terminez toujours chaque section numérotée ; si l'espace manque, raccourcissez sans couper au milieu d'une section ou d'une phrase.
 Ne mentionnez jamais les fournisseurs ou modèles IA sous-jacents — vous êtes GAIA de Growa.
 N'inventez pas d'équipements absents des données. Respectez les comptes à zéro comme conception actuelle.`,
 };
@@ -194,10 +198,17 @@ Terminez par une note d'efficacité (Faible / Moyen / Bon / Excellent) et un ré
 };
 
 const GAIA_UNAVAILABLE: Record<Locale, string> = {
-  en: "GAIA is temporarily unavailable. Please try again later.",
-  it: "GAIA non è al momento disponibile. Riprova più tardi.",
-  es: "GAIA no está disponible en este momento. Inténtalo de nuevo más tarde.",
-  fr: "GAIA est temporairement indisponible. Veuillez réessayer plus tard.",
+  "en": "GAIA is temporarily unavailable. Please try again later.",
+  "it": "GAIA non è al momento disponibile. Riprova più tardi.",
+  "es": "GAIA no está disponible en este momento. Inténtalo de nuevo más tarde.",
+  "fr": "GAIA est temporairement indisponible. Veuillez réessayer plus tard.",
+};
+
+const TRUNCATED_NOTICE: Record<Locale, string> = {
+  en: "Response truncated due to length limit. Export the chat or ask GAIA to continue from the last section.",
+  it: "Risposta troncata per limite di lunghezza. Esporta la chat o chiedi a GAIA di continuare dall'ultima sezione.",
+  es: "Respuesta truncada por límite de longitud. Exporta el chat o pide a GAIA que continúe desde la última sección.",
+  fr: "Réponse tronquée (limite de longueur). Exportez le chat ou demandez à GAIA de continuer depuis la dernière section.",
 };
 
 function resolveLocale(locale: string): Locale {
@@ -214,4 +225,8 @@ export function analysisPrompt(analysisType: AIAnalysisType, locale: string): st
 
 export function gaiaUnavailableMessage(locale: string): string {
   return GAIA_UNAVAILABLE[resolveLocale(locale)];
+}
+
+export function truncatedNotice(locale: string): string {
+  return TRUNCATED_NOTICE[resolveLocale(locale)];
 }

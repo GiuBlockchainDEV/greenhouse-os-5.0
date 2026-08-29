@@ -49,6 +49,7 @@ export function useAICopilot(): UseAICopilotReturn {
         setpoints: response.setpoints.length > 0 ? response.setpoints : undefined,
         usedLocalEngine: response.used_local_engine,
         analysisType: response.analysis_type,
+        truncated: response.truncated,
         timestamp: Date.now(),
       },
     ]);

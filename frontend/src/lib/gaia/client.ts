@@ -1,7 +1,7 @@
 import type { AIAnalysisType, AIChatResponse, GreenhouseAIContext } from "@/types/ai";
 
 import { formatGreenhouseContext } from "./formatContext";
-import { analysisPrompt, gaiaUnavailableMessage, systemPrompt } from "./prompts";
+import { analysisPrompt, gaiaUnavailableMessage, systemPrompt, truncatedNotice } from "./prompts";
 
 const GAIA_API = "/api/gaia";
 
@@ -13,6 +13,7 @@ interface GaiaStatus {
 interface GaiaProxySuccess {
   content: string;
   model: string;
+  truncated?: boolean;
 }
 
 interface GaiaProxyError {
@@ -76,12 +77,17 @@ async function callGaia(locale: string, userContent: string): Promise<AIChatResp
     const success = data as GaiaProxySuccess;
     cachedAvailable = true;
 
+    const content = success.truncated
+      ? `${success.content}\n\n---\n\n*${truncatedNotice(locale)}*`
+      : success.content;
+
     return {
       provider: "gemini",
       model: success.model,
-      content: success.content,
+      content,
       setpoints: [],
       used_local_engine: false,
+      truncated: success.truncated,
     };
   } catch (error) {
     const detail = error instanceof Error ? error.message : "network_error";

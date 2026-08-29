@@ -80,12 +80,15 @@ export function gaiaDevProxy(): Plugin {
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: body.systemPrompt }] },
               contents: [{ role: "user", parts: [{ text: body.userContent }] }],
-              generationConfig: { temperature: 0.35, maxOutputTokens: 2048 },
+              generationConfig: { temperature: 0.35, maxOutputTokens: 8192 },
             }),
           });
 
           const data = (await upstream.json()) as {
-            candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+            candidates?: Array<{
+              content?: { parts?: Array<{ text?: string }> };
+              finishReason?: string;
+            }>;
             error?: { message?: string };
           };
 
@@ -97,13 +100,17 @@ export function gaiaDevProxy(): Plugin {
             return;
           }
 
-          const content = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          const candidate = data.candidates?.[0];
+          const parts = candidate?.content?.parts ?? [];
+          const content = parts.map((part) => part.text ?? "").join("").trim();
+          const truncated = candidate?.finishReason === "MAX_TOKENS";
+
           if (!content) {
             sendJson(res, 502, { error: "empty_response" });
             return;
           }
 
-          sendJson(res, 200, { content, model: usedModel });
+          sendJson(res, 200, { content, model: usedModel, truncated });
         } catch (error) {
           sendJson(res, 502, {
             error: "proxy_error",

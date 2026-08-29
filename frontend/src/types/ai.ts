@@ -94,6 +94,7 @@ export interface AIChatResponse {
   setpoints: ClimateSetpoint[];
   used_local_engine: boolean;
   analysis_type?: AIAnalysisType;
+  truncated?: boolean;
 }
 
 export interface ProviderInfo {
@@ -111,6 +112,7 @@ export interface CopilotMessage {
   setpoints?: ClimateSetpoint[];
   usedLocalEngine?: boolean;
   analysisType?: AIAnalysisType;
+  truncated?: boolean;
   timestamp: number;
 }
 

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { GaiaSiteContext } from "@/components/ai/GaiaSiteContext";
 import { useAICopilot } from "@/hooks/useAICopilot";
 import { GaiaMarkdown } from "@/components/ai/GaiaMarkdown";
+import { exportGaiaChat } from "@/lib/gaia/exportChat";
 import type { AIAnalysisType, ClimateSetpoint } from "@/types/ai";
 import type { GaiaAnalysisSeason } from "@/types/greenhouse";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -24,12 +25,18 @@ export function AICopilotPanel() {
   const [input, setInput] = useState("");
   const [season, setSeason] = useState<GaiaAnalysisSeason>("simulation");
   const locationLabel = useGreenhouseStore((s) => s.location.label);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const analysisLabel = (type: AIAnalysisType) =>
     t(`analysis.request.${type}`, {
       location: locationLabel || t("site.placePlaceholder"),
       season: t(`site.seasons.${season}`),
     });
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, status]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,19 +45,33 @@ export function AICopilotPanel() {
     setInput("");
   };
 
+  const handleExport = () => {
+    const slug = locationLabel.trim() || "gaia";
+    exportGaiaChat(messages, slug);
+  };
+
   return (
-    <aside className="ui-card flex h-full flex-col">
-      <header className="border-b border-border px-4 py-3">
-        <div className="flex items-center justify-between">
+    <aside className="ui-card flex h-full min-h-0 flex-col overflow-hidden">
+      <header className="shrink-0 border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-bold text-gray-900">{t("panel.title")}</h3>
           {messages.length > 0 && (
-            <button
-              type="button"
-              onClick={clearMessages}
-              className="text-[10px] text-label hover:text-gray-700"
-            >
-              {t("actions.clear")}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExport}
+                className="text-[10px] font-medium text-status-optimalDark hover:underline"
+              >
+                {t("actions.export")}
+              </button>
+              <button
+                type="button"
+                onClick={clearMessages}
+                className="text-[10px] text-label hover:text-gray-700"
+              >
+                {t("actions.clear")}
+              </button>
+            </div>
           )}
         </div>
         <p className="mt-1 text-[10px] text-label">
@@ -63,7 +84,10 @@ export function AICopilotPanel() {
 
       <GaiaSiteContext season={season} onSeasonChange={setSeason} />
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+      <div
+        ref={scrollRef}
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-3"
+      >
         {messages.length === 0 && (
           <p className="text-xs leading-relaxed text-label">{t("panel.welcome")}</p>
         )}
@@ -81,9 +105,10 @@ export function AICopilotPanel() {
         {status === "error" && (
           <p className="text-xs text-red-500">{t("status.error")}</p>
         )}
+        <div ref={bottomRef} className="h-px shrink-0" aria-hidden />
       </div>
 
-      <footer className="border-t border-border p-3">
+      <footer className="shrink-0 border-t border-border p-3">
         <div className="mb-2 grid grid-cols-3 gap-2">
           {ANALYSIS_TYPES.map((type) => (
             <button

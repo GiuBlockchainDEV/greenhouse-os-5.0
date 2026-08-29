@@ -27,7 +27,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="grid flex-1 grid-cols-[320px_1fr_300px] gap-4 overflow-hidden p-4">
+      <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_300px] gap-4 overflow-hidden p-4">
         <DimensionControls />
         <div className="relative min-h-0">
           <Viewport3D />

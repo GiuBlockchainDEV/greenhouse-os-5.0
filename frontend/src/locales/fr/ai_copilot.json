@@ -34,6 +34,7 @@
     "thermal": "Thermique",
     "efficiency": "Efficacité",
     "send": "Envoyer",
+    "export": "Exporter",
     "clear": "Effacer"
   },
   "status": {

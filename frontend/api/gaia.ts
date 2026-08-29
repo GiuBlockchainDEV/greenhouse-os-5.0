@@ -1,10 +1,17 @@
 const GEMINI_BASE_URL =
   process.env.GEMINI_BASE_URL?.trim() || "https://generativelanguage.googleapis.com";
 
+const MAX_OUTPUT_TOKENS = 8192;
+
 interface GaiaProxyBody {
   systemPrompt?: string;
   userContent?: string;
   model?: string;
+}
+
+interface GeminiCandidate {
+  content?: { parts?: Array<{ text?: string }> };
+  finishReason?: string;
 }
 
 interface VercelRequest {
@@ -18,6 +25,17 @@ interface VercelResponse {
     json(body: unknown): void;
     end(): void;
   };
+}
+
+function extractGeminiText(data: { candidates?: GeminiCandidate[] }): {
+  content: string;
+  truncated: boolean;
+} {
+  const candidate = data.candidates?.[0];
+  const parts = candidate?.content?.parts ?? [];
+  const content = parts.map((part) => part.text ?? "").join("").trim();
+  const truncated = candidate?.finishReason === "MAX_TOKENS";
+  return { content, truncated };
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -65,12 +83,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: [{ role: "user", parts: [{ text: userContent }] }],
-        generationConfig: { temperature: 0.35, maxOutputTokens: 2048 },
+        generationConfig: { temperature: 0.35, maxOutputTokens: MAX_OUTPUT_TOKENS },
       }),
     });
 
     const data = (await upstream.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      candidates?: GeminiCandidate[];
       error?: { message?: string };
     };
 
@@ -82,13 +100,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       return;
     }
 
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const { content, truncated } = extractGeminiText(data);
     if (!content) {
       res.status(502).json({ error: "empty_response" });
       return;
     }
 
-    res.status(200).json({ content, model: usedModel });
+    res.status(200).json({ content, model: usedModel, truncated });
   } catch (error) {
     res.status(502).json({
       error: "proxy_error",
