@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     gemini_api_key: str = ""
     gemini_base_url: str = "https://generativelanguage.googleapis.com"
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3.5-flash"
 
     supabase_url: str = ""
     supabase_anon_key: str = ""

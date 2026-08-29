@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   if (req.method === "GET") {
     res.status(200).json({
       available: Boolean(process.env.GEMINI_API_KEY?.trim()),
-      model: process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash",
+      model: process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash",
     });
     return;
   }
@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const usedModel = model?.trim() || process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+  const usedModel = model?.trim() || process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
   const url = `${GEMINI_BASE_URL}/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
 
   try {

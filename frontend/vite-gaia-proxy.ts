@@ -40,7 +40,7 @@ export function gaiaDevProxy(): Plugin {
         const env = loadEnv(server.config.mode, server.config.envDir ?? process.cwd(), "");
         const apiKey = env.GEMINI_API_KEY?.trim();
         const baseUrl = env.GEMINI_BASE_URL?.trim() || "https://generativelanguage.googleapis.com";
-        const defaultModel = env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+        const defaultModel = env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
 
         if (req.method === "GET") {
           sendJson(res, 200, { available: Boolean(apiKey), model: defaultModel });
