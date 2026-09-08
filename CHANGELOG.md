@@ -8,7 +8,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- **GAIA Vercel env resolution** — `/api/gaia` now reads `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, and `GOOGLE_API_KEY` at runtime (no build-time inlining), with explicit serverless function config in `vercel.json`.
+- **GAIA Vercel env resolution** — `/api/gaia` now reads `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, and `GOOGLE_API_KEY` at runtime with dynamic `process.env` access.
 
 ## [5.0.0] - 2026-08-03
 

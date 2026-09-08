@@ -1,12 +1,8 @@
-import {
-  resolveGeminiApiKey,
-  resolveGeminiBaseUrl,
-  resolveGeminiModel,
-} from "./geminiEnv";
-
-export const config = {
-  runtime: "nodejs",
-};
+const GEMINI_API_KEY_NAMES = [
+  "GEMINI_API_KEY",
+  "GOOGLE_GENERATIVE_AI_API_KEY",
+  "GOOGLE_API_KEY",
+] as const;
 
 const MAX_OUTPUT_TOKENS = 8192;
 
@@ -32,6 +28,33 @@ interface VercelResponse {
     json(body: unknown): void;
     end(): void;
   };
+}
+
+function readEnv(name: string): string | undefined {
+  const value = process.env[name];
+  return typeof value === "string" ? value.trim() : undefined;
+}
+
+function resolveGeminiApiKey(): string | undefined {
+  for (const name of GEMINI_API_KEY_NAMES) {
+    const value = readEnv(name);
+    if (value) return value;
+  }
+
+  const dynamic = readEnv(`GEMINI_${"API_KEY"}`);
+  return dynamic || undefined;
+}
+
+function resolveGeminiModel(): string {
+  return (
+    readEnv("GEMINI_MODEL") ??
+    readEnv("GOOGLE_GENERATIVE_AI_MODEL") ??
+    "gemini-3.5-flash"
+  );
+}
+
+function resolveGeminiBaseUrl(): string {
+  return readEnv("GEMINI_BASE_URL") ?? "https://generativelanguage.googleapis.com";
 }
 
 function extractGeminiText(data: { candidates?: GeminiCandidate[] }): {
