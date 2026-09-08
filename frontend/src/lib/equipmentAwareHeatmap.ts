@@ -342,8 +342,8 @@ function influenceAt(
       const sx = segment.start.x + dx * t;
       const sz = segment.start.z + dz * t;
       const g = gaussian1d(x - sx, sigma) * gaussian1d(z - sz, sigma);
-      tempDelta -= 0.85 * scale * g;
-      rhDelta -= 2.5 * scale * g;
+      tempDelta -= 1.05 * scale * g;
+      rhDelta -= 3 * scale * g;
     }
   }
 
@@ -354,8 +354,8 @@ function influenceAt(
       : coeffs.acCapacity;
     const sigma = diffuser.reachM;
     const g = gaussian1d(x - diffuser.x, sigma) * gaussian1d(z - diffuser.z, sigma);
-    tempDelta -= 2.6 * scale * g;
-    rhDelta -= 11 * scale * g;
+    tempDelta -= 2.9 * scale * g;
+    rhDelta -= 12 * scale * g;
     if (y >= diffuser.y - 0.4 && y <= diffuser.y + 1.2) {
       tempDelta -= 0.8 * scale * g;
     }

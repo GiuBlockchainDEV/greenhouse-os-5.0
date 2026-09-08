@@ -6,7 +6,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- **Mechanical AC supply ducts** — Each AC unit generates an insulated trunk, ceiling spine along its length zone, and diffusers every 4 m; visible in 3D and drives spatial cooling on the preview heatmap.
+- **Mechanical AC supply ducts** — Full-length wall headers, cross-ducts spanning greenhouse width every ~5.5 m, and ceiling diffusers; scales with `acUnitCount`.
 
 ### Fixed
 
