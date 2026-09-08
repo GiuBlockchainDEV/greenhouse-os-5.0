@@ -12,7 +12,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- **HAF circulation fan layout** — Even fan count enforcement, per-bay balanced rows with 3 m end offset, dynamic step along length, and auto-normalization when bay count changes.
+- **HAF circulation fan layout** — Even fan count enforcement, per-bay balanced rows with 3 m end offset, full-length X slot grid with round-robin bay assignment for maximum floor coverage.
 
 ## [5.0.0] - 2026-08-03
 

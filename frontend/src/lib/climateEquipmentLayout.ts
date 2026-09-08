@@ -241,29 +241,29 @@ export function hafFansPerBayPerRow(totalCount: number, bayCount = 1): number {
 }
 
 function computeHafRowXUserPositions(
-  fansPerBayPerRow: number,
+  fanSlotCount: number,
   length: number,
   wallOffsetM: number,
 ): { row1: number[]; row2: number[] } {
   const effectiveOffset = Math.min(wallOffsetM, Math.max((length - 0.5) / 2, 0));
   const usefulSpace = Math.max(length - 2 * effectiveOffset, 0.5);
 
-  if (fansPerBayPerRow <= 0) {
+  if (fanSlotCount <= 0) {
     return { row1: [], row2: [] };
   }
 
-  if (fansPerBayPerRow === 1) {
+  if (fanSlotCount === 1) {
     const center = effectiveOffset + usefulSpace / 2;
     return { row1: [center], row2: [center] };
   }
 
-  const step = usefulSpace / (fansPerBayPerRow - 1);
+  const step = usefulSpace / (fanSlotCount - 1);
   const row1 = Array.from(
-    { length: fansPerBayPerRow },
+    { length: fanSlotCount },
     (_, index) => effectiveOffset + index * step,
   );
   const row2 = Array.from(
-    { length: fansPerBayPerRow },
+    { length: fanSlotCount },
     (_, index) => length - effectiveOffset - index * step,
   );
   return { row1, row2 };
@@ -277,7 +277,8 @@ function userXToSceneX(xUser: number, length: number): number {
  * Balanced HAF circulation layout per bay:
  * - Row 1 at Z = bayCenter − bayWidth/4, blowing +X (outbound)
  * - Row 2 at Z = bayCenter + bayWidth/4, blowing −X (return)
- * - Fans spaced uniformly along length with a fixed 3 m end offset
+ * - All fans in a row share distinct X slots along the full useful length
+ * - Bays are filled round-robin so airflow covers length × width, not just a few lines
  */
 export function distributeHafCirculationFans(params: {
   totalCount: number;
@@ -306,39 +307,38 @@ export function distributeHafCirculationFans(params: {
   const { total } = normalizeHafFanCount(totalCount, bays);
   if (total <= 0) return [];
 
-  const fansPerBayPerRow = total / 2 / bays;
-  const { row1: row1XUser, row2: row2XUser } = computeHafRowXUserPositions(
-    fansPerBayPerRow,
+  const fansPerRow = total / 2;
+  const { row1: outboundXUser, row2: returnXUser } = computeHafRowXUserPositions(
+    fansPerRow,
     length,
     wallOffsetM,
   );
   const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
   const fans: CirculationFanPlacement[] = [];
 
-  for (let bayIndex = 0; bayIndex < bays; bayIndex++) {
+  for (let fanIndex = 0; fanIndex < fansPerRow; fanIndex++) {
+    const bayIndex = fanIndex % bays;
     const bayCenter = bayCenterZ(bayIndex, bayWidthM, width);
     const row1Z = bayCenter - bayWidthM / 4;
     const row2Z = bayCenter + bayWidthM / 4;
 
-    for (const xUser of row1XUser) {
-      fans.push({
-        x: userXToSceneX(xUser, length),
-        y: hangY,
-        z: row1Z,
-        diameterM,
-        yaw: 0,
-      });
-    }
+    const outboundX = outboundXUser[fanIndex] ?? outboundXUser[0] ?? 0;
+    const returnX = returnXUser[fanIndex] ?? returnXUser[0] ?? 0;
 
-    for (const xUser of row2XUser) {
-      fans.push({
-        x: userXToSceneX(xUser, length),
-        y: hangY,
-        z: row2Z,
-        diameterM,
-        yaw: Math.PI,
-      });
-    }
+    fans.push({
+      x: userXToSceneX(outboundX, length),
+      y: hangY,
+      z: row1Z,
+      diameterM,
+      yaw: 0,
+    });
+    fans.push({
+      x: userXToSceneX(returnX, length),
+      y: hangY,
+      z: row2Z,
+      diameterM,
+      yaw: Math.PI,
+    });
   }
 
   return fans;
