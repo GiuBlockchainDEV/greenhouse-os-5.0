@@ -1,3 +1,9 @@
 {
+  "functions": {
+    "api/gaia.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "rewrites": [{ "source": "/((?!api|ws).*)", "destination": "/index.html" }]
 }

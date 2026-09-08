@@ -254,6 +254,14 @@ Autonomous microclimate optimization with structured Priva/Ridder-compatible set
 
 **Response 200:** Same schema as `/ai/chat`.
 
+### Frontend GAIA Proxy (Vercel)
+
+`GET /api/gaia` — Returns `{ "available": boolean, "model": string }`.
+
+`POST /api/gaia` — Proxies Gemini `generateContent` with `{ systemPrompt, userContent, model? }`.
+
+Set `GEMINI_API_KEY` on the **Vercel frontend project** (Root Directory: `frontend`), scoped to **Production** and **Preview**, then redeploy. Accepted aliases: `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_API_KEY`.
+
 ### Environment Variables
 
 | Variable | Description |

@@ -1,5 +1,12 @@
-const GEMINI_BASE_URL =
-  process.env.GEMINI_BASE_URL?.trim() || "https://generativelanguage.googleapis.com";
+import {
+  resolveGeminiApiKey,
+  resolveGeminiBaseUrl,
+  resolveGeminiModel,
+} from "./geminiEnv";
+
+export const config = {
+  runtime: "nodejs",
+};
 
 const MAX_OUTPUT_TOKENS = 8192;
 
@@ -48,10 +55,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  const apiKey = resolveGeminiApiKey();
+  const defaultModel = resolveGeminiModel();
+
   if (req.method === "GET") {
     res.status(200).json({
-      available: Boolean(process.env.GEMINI_API_KEY?.trim()),
-      model: process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash",
+      available: Boolean(apiKey),
+      model: defaultModel,
     });
     return;
   }
@@ -61,7 +71,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     res.status(503).json({ error: "not_configured" });
     return;
@@ -73,8 +82,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const usedModel = model?.trim() || process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
-  const url = `${GEMINI_BASE_URL}/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
+  const usedModel = model?.trim() || defaultModel;
+  const baseUrl = resolveGeminiBaseUrl();
+  const url = `${baseUrl}/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
 
   try {
     const upstream = await fetch(url, {

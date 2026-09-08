@@ -38,9 +38,15 @@ export function gaiaDevProxy(): Plugin {
         }
 
         const env = loadEnv(server.config.mode, server.config.envDir ?? process.cwd(), "");
-        const apiKey = env.GEMINI_API_KEY?.trim();
+        const apiKey =
+          env.GEMINI_API_KEY?.trim() ||
+          env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+          env.GOOGLE_API_KEY?.trim();
         const baseUrl = env.GEMINI_BASE_URL?.trim() || "https://generativelanguage.googleapis.com";
-        const defaultModel = env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
+        const defaultModel =
+          env.GEMINI_MODEL?.trim() ||
+          env.GOOGLE_GENERATIVE_AI_MODEL?.trim() ||
+          "gemini-3.5-flash";
 
         if (req.method === "GET") {
           sendJson(res, 200, { available: Boolean(apiKey), model: defaultModel });
