@@ -117,7 +117,7 @@ const GRID_MAX = 24;
 const REF_GREENHOUSE_LENGTH_M = 30;
 const REF_GREENHOUSE_WIDTH_M = 10;
 const REF_GREENHOUSE_EAVE_M = 3;
-const MAX_LOCAL_TEMP_DELTA_C = 7;
+const MAX_LOCAL_TEMP_DELTA_C = 10;
 const MAX_LOCAL_RH_DELTA_PCT = 28;
 
 function gaussian1d(dist: number, sigma: number): number {
@@ -152,7 +152,7 @@ function computeMixingFactor(equipment: ClimateEquipment, scenario: ClimateScena
   const exhaust = exhaustCapacityFactor(equipment.sizing);
   const circulation = circulationCapacityFactor(equipment.sizing);
   const windMix = scenario.windSpeedMS * 0.02;
-  return Math.min(0.78, circulation * 0.09 + exhaust * 0.07 + windMix);
+  return Math.min(0.65, circulation * 0.07 + exhaust * 0.055 + windMix);
 }
 
 function exhaustFlowSum(layout: ClimateEquipmentLayout): number {
@@ -186,7 +186,7 @@ function buildHeatmapCoeffs(
   const halfW = ctx.width / 2;
   const warmExcess = Math.max(ctx.baseTemp - ctx.externalTemp, 0);
   const mixingFactor = computeMixingFactor(ctx.equipment, ctx.scenario);
-  const spatialRetention = 1 - mixingFactor * 0.05;
+  const spatialRetention = 1 - mixingFactor * 0.03;
   const padFactor = resolvePadFactor(ctx);
   const sizing = ctx.equipment.sizing;
   const exhaustCapacity = exhaustCapacityFactor(sizing);
@@ -201,10 +201,10 @@ function buildHeatmapCoeffs(
       ? computeFanAndPadCoolingC(ctx.externalTemp, ctx.scenario.externalRhPct, sizing)
       : null;
   const padTransitCool = padCoolingEstimate
-    ? Math.min(4.5, padCoolingEstimate.tempDropC * 0.55)
+    ? Math.min(5.5, padCoolingEstimate.tempDropC * 0.72)
     : 0;
   const padTransitRh = padCoolingEstimate
-    ? Math.min(16, padCoolingEstimate.rhBoostPct * 0.45)
+    ? Math.min(18, padCoolingEstimate.rhBoostPct * 0.52)
     : 0;
   const lengthScale = clampDimensionScale(ctx.length / REF_GREENHOUSE_LENGTH_M);
   const widthScale = clampDimensionScale(ctx.width / REF_GREENHOUSE_WIDTH_M, 0.65, 1.9);
@@ -298,9 +298,9 @@ function circulationMixingAt(
     const scale = circulationScale(fan.diameterM) * ctx.coeffs.circulationCapacity;
     const sigma = fan.diameterM * 2.4;
     const g = gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
-    mix += 0.42 * scale * g;
+    mix += 0.28 * scale * g;
   }
-  return Math.min(0.8, mix);
+  return Math.min(0.55, mix);
 }
 
 /** Single-pass local microclimate perturbation (temp °C + RH % deltas). */
@@ -315,7 +315,7 @@ function influenceAt(
 
   const solarDelta = solarTempDeltaFromContext(solar, x, y, z);
 
-  let tempDelta = solarDelta * 0.75;
+  let tempDelta = solarDelta * 0.9;
   let rhDelta = -solarDelta * 0.22;
 
   tempDelta -= edge * coeffs.warmExcess * coeffs.ventTempCoeff;
@@ -323,16 +323,16 @@ function influenceAt(
   rhDelta -= edge * coeffs.warmExcess * coeffs.rhWarmDryCoeff;
 
   const cooling = ctx.equipment.cooling;
-  const padPlumeScale = coeffs.fanAndPad ? 0.5 : 1;
+  const padPlumeScale = coeffs.fanAndPad ? 0.65 : 1;
 
   if (usesEvaporativePad(cooling)) {
     for (const pad of ctx.layout.padWalls) {
       const plume =
         padPlumeStrength(ctx, x, y, z, pad) * padAreaFactor(pad.widthM, pad.heightM);
-      tempDelta -= 3.5 * plume * padPlumeScale;
-      rhDelta += 9 * plume * padPlumeScale;
+      tempDelta -= 4.8 * plume * padPlumeScale;
+      rhDelta += 11 * plume * padPlumeScale;
       if (y <= pad.heightM + 0.35) {
-        tempDelta -= 1.2 * plume * padPlumeScale;
+        tempDelta -= 1.6 * plume * padPlumeScale;
         rhDelta += 4 * plume * padPlumeScale;
       }
     }
@@ -343,7 +343,7 @@ function influenceAt(
       const scale = exhaustScale(fan.diameterM) * coeffs.exhaustCapacity;
       const sigma = fan.diameterM * 1.2;
       const g = gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
-      tempDelta -= 3.5 * scale * g;
+      tempDelta -= 4.2 * scale * g;
       rhDelta -= 8 * scale * g;
     }
 
@@ -456,8 +456,8 @@ function influenceAt(
 
   tempDelta += (y / Math.max(ctx.eaveHeight, 1)) * 0.35 * coeffs.heightScale;
 
-  tempDelta *= 1 - mixFactor * 0.55;
-  rhDelta *= 1 - mixFactor * 0.45;
+  tempDelta *= 1 - mixFactor * 0.25;
+  rhDelta *= 1 - mixFactor * 0.2;
 
   const retention = coeffs.spatialRetention;
   return {

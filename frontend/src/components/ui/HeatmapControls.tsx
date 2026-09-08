@@ -5,6 +5,8 @@ import {
   computeHeatmapFieldSummary,
   computeHeatmapVisualRange,
   cropWorkingTempRange,
+  GREENHOUSE_TEMP_MAX_C,
+  GREENHOUSE_TEMP_MIN_C,
 } from "@/lib/heatmapData";
 import { HeatmapScaleLegend } from "@/components/ui/HeatmapScaleLegend";
 import { solarAzimuthLabel } from "@/lib/solarIrradiance";
@@ -239,14 +241,29 @@ export function HeatmapControls() {
               <div className="mt-2">
                 <HeatmapScaleLegend
                   mode={valueMode}
-                  visualMin={visualRange.min}
-                  visualMax={visualRange.max}
+                  referenceMin={
+                    valueMode === "temperature"
+                      ? GREENHOUSE_TEMP_MIN_C
+                      : valueMode === "humidity"
+                        ? 0
+                        : visualRange.min
+                  }
+                  referenceMax={
+                    valueMode === "temperature"
+                      ? GREENHOUSE_TEMP_MAX_C
+                      : valueMode === "humidity"
+                        ? 100
+                        : visualRange.max
+                  }
+                  colorMin={visualRange.min}
+                  colorMax={visualRange.max}
                   unit={visualRange.unit}
                   summary={fieldSummary}
                   workingRange={workingRange}
                   estimatedLabel={t("heatmap.estimatedValue")}
                   workingRangeLabel={t("heatmap.workingRange")}
                   floorRangeLabel={t("heatmap.floorRange")}
+                  colorScaleLabel={t("heatmap.colorScale")}
                 />
               </div>
               <p className="mt-2 text-[10px] text-label">

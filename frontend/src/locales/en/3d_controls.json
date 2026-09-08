@@ -77,8 +77,9 @@
     "estimatedValue": "Estimated",
     "workingRange": "Crop working range",
     "floorRange": "Floor span",
+    "colorScale": "Color contrast range",
     "legend": {
-      "temperature": "Absolute scale 0–50°C — marker = estimated internal temperature",
+      "temperature": "Reference 0–50°C; highlighted band = colors used on floor map",
       "humidity": "Absolute scale 0–100% — marker = estimated internal RH",
       "vpd": "VPD scale (0–10 kPa)",
       "uniformity": "Internal uniformity index (0–100%)"

@@ -257,10 +257,10 @@ export function computeHeatmapDisplayRange(mode: HeatmapValueMode): HeatmapScale
 }
 
 const MIN_VISUAL_SPAN: Record<HeatmapValueMode, number> = {
-  temperature: 14,
-  humidity: 22,
+  temperature: 10,
+  humidity: 18,
   vpd: 0.9,
-  uniformity: 28,
+  uniformity: 24,
 };
 
 function surfaceValueBounds(
@@ -289,20 +289,61 @@ function surfaceValueBounds(
   return { min, max };
 }
 
-/** Color range: fixed absolute scale so 0–50°C (and RH/VPD bands) stay readable. */
+/** Color range for shader: adaptive around field + estimate, clamped to absolute scale. */
 export function computeHeatmapVisualRange(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   preview: HeatmapClimatePreview,
 ): HeatmapScale {
   const absolute = HEATMAP_FIXED_SCALE[mode];
+  const minSpan = MIN_VISUAL_SPAN[mode];
+  const summary = computeHeatmapFieldSummary(surface, mode, preview);
+  const { min: dataMin, max: dataMax } = surfaceValueBounds(surface, mode, preview);
 
-  if (mode === "temperature" || mode === "humidity" || mode === "uniformity") {
-    return absolute;
+  if (mode === "temperature") {
+    let min = Math.min(dataMin, summary.estimated - minSpan * 0.4);
+    let max = Math.max(dataMax, summary.estimated + minSpan * 0.4);
+    if (max - min < minSpan) {
+      const mid = summary.estimated;
+      min = mid - minSpan / 2;
+      max = mid + minSpan / 2;
+    }
+    return {
+      min: Math.max(absolute.min, min),
+      max: Math.min(absolute.max, max),
+      unit: absolute.unit,
+    };
   }
 
-  const minSpan = MIN_VISUAL_SPAN[mode];
-  const { min: dataMin, max: dataMax } = surfaceValueBounds(surface, mode, preview);
+  if (mode === "humidity") {
+    let min = Math.min(dataMin, summary.estimated - minSpan / 2);
+    let max = Math.max(dataMax, summary.estimated + minSpan / 2);
+    if (max - min < minSpan) {
+      const mid = summary.estimated;
+      min = mid - minSpan / 2;
+      max = mid + minSpan / 2;
+    }
+    return {
+      min: Math.max(absolute.min, min),
+      max: Math.min(absolute.max, max),
+      unit: absolute.unit,
+    };
+  }
+
+  if (mode === "uniformity") {
+    let min = dataMin;
+    let max = dataMax;
+    if (max - min < minSpan) {
+      const mid = (min + max) / 2;
+      min = mid - minSpan / 2;
+      max = mid + minSpan / 2;
+    }
+    return {
+      min: Math.max(absolute.min, min),
+      max: Math.min(absolute.max, max),
+      unit: absolute.unit,
+    };
+  }
 
   let min = dataMin;
   let max = dataMax;
