@@ -92,6 +92,32 @@
       "pipeRowCount": "File di Tubi",
       "fogLineCount": "Linee Nebulizzazione"
     },
+    "ratedTitle": "Capacità Nominali",
+    "ratedHint": "Valori di targa usati dal motore fisico (portata, kW, COP, SHR).",
+    "rated": {
+      "leakageAch": "Infiltrazioni Involucro",
+      "exhaustFanFlow": "Portata Ventola Aspirazione (cad.)",
+      "roofExhaustFanFlow": "Portata Ventola Tetto (cad.)",
+      "circulationFanFlow": "Portata HAF (cad.)",
+      "circulationFanMotorW": "Potenza Motore HAF (cad.)",
+      "padEfficiency": "Efficienza Saturazione Pad",
+      "acKwPerUnit": "Refrigerazione AC (per unità)",
+      "acShr": "Rapporto Calore Sensibile AC",
+      "acCop": "COP AC",
+      "acSupplyAirflow": "Portata Aria di Mandata AC (totale)",
+      "heaterKwPerUnit": "Potenza Riscaldatore (per unità)",
+      "geothermalKw": "Capacità Pompa di Calore",
+      "geothermalCop": "COP Pompa di Calore",
+      "hotWaterKw": "Capacità Rete Acqua Calda",
+      "fogFlowPerLine": "Portata Acqua Nebbia (per linea)",
+      "fogEvaporationEfficiency": "Efficienza Evaporazione Nebbia",
+      "units": {
+        "flowM3h": "m³/h",
+        "litersPerHour": "L/h",
+        "ach": "ACH",
+        "ratio": "—"
+      }
+    },
     "coolingOptions": {
       "none": "Nessuno",
       "fan_and_pad": "Fan & Pad",

@@ -134,6 +134,38 @@ export interface ClimateEquipmentSizing {
   pipeRowCount: number;
   /** High-pressure fog lines under the roof. */
   fogLineCount: number;
+  /** Rated exhaust fan volumetric flow per unit (m³/h). */
+  exhaustFanRatedFlowM3h: number;
+  /** Rated roof/gable exhaust fan flow per unit (m³/h). */
+  roofExhaustFanRatedFlowM3h: number;
+  /** Rated HAF circulation fan flow per unit (m³/h). */
+  circulationFanRatedFlowM3h: number;
+  /** HAF fan motor electrical power per unit (W). */
+  circulationFanMotorW: number;
+  /** Rated cooling capacity per AC unit (kW). */
+  acRatedCoolingKwPerUnit: number;
+  /** AC sensible heat ratio (0–1). */
+  acShr: number;
+  /** AC coefficient of performance at design conditions. */
+  acCop: number;
+  /** Total AC supply airflow (m³/h). */
+  acSupplyAirflowM3h: number;
+  /** Rated heat output per heater unit (kW). */
+  heaterRatedKwPerUnit: number;
+  /** Geothermal / heat-pump total capacity (kW). */
+  geothermalRatedKw: number;
+  /** Geothermal / heat-pump COP. */
+  geothermalCop: number;
+  /** Hot-water pipe network total heating capacity (kW). */
+  hotWaterHeatingKw: number;
+  /** Evaporative pad saturation efficiency (0–1). */
+  padEfficiency: number;
+  /** Fog nozzle water flow per line (L/h). */
+  fogNozzleFlowLhPerLine: number;
+  /** Fraction of fog water that evaporates (0–1). */
+  fogEvaporationEfficiency: number;
+  /** Envelope air leakage (ACH). */
+  leakageAch: number;
 }
 
 export interface ClimateEquipment {

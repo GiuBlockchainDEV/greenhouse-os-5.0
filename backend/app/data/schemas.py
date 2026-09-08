@@ -49,6 +49,22 @@ class ClimateEquipmentSizingDB(BaseModel):
     heater_unit_count: int = Field(default=0)
     pipe_row_count: int = Field(default=0)
     fog_line_count: int = Field(default=0)
+    exhaust_fan_rated_flow_m3h: float = Field(default=32_500.0)
+    roof_exhaust_fan_rated_flow_m3h: float = Field(default=22_000.0)
+    circulation_fan_rated_flow_m3h: float = Field(default=8_500.0)
+    circulation_fan_motor_w: float = Field(default=450.0)
+    ac_rated_cooling_kw_per_unit: float = Field(default=30.0)
+    ac_shr: float = Field(default=0.75)
+    ac_cop: float = Field(default=3.2)
+    ac_supply_airflow_m3h: float = Field(default=12_000.0)
+    heater_rated_kw_per_unit: float = Field(default=25.0)
+    geothermal_rated_kw: float = Field(default=45.0)
+    geothermal_cop: float = Field(default=4.2)
+    hot_water_heating_kw: float = Field(default=35.0)
+    pad_efficiency: float = Field(default=0.82)
+    fog_nozzle_flow_lh_per_line: float = Field(default=18.0)
+    fog_evaporation_efficiency: float = Field(default=0.72)
+    leakage_ach: float = Field(default=0.35)
 
 
 class ClimateEquipmentDB(BaseModel):

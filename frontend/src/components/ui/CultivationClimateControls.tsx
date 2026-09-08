@@ -170,6 +170,16 @@ export function CultivationClimateControls() {
     climateEquipment.heating === "unit_heater" ||
     climateEquipment.heating === "air_heater";
   const showGeothermal = climateEquipment.heating === "geothermal";
+  const showHotWaterPipes = climateEquipment.heating === "hot_water_pipes";
+  const showRatedCapacities =
+    showFans ||
+    showPad ||
+    showAc ||
+    showFog ||
+    showHeaters ||
+    showGeothermal ||
+    showHotWaterPipes ||
+    sizing.circulationFanCount > 0;
 
   return (
     <>
@@ -476,6 +486,17 @@ export function CultivationClimateControls() {
                 onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
               />
             )}
+            {showHotWaterPipes && (
+              <SliderRow
+                label={tSim("equipment.sizing.pipeRowCount")}
+                value={sizing.pipeRowCount}
+                unit=""
+                min={1}
+                max={8}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ pipeRowCount: value })}
+              />
+            )}
           </div>
         )}
 
@@ -523,6 +544,193 @@ export function CultivationClimateControls() {
             onChange={(value) => setClimateEquipmentSizing({ circulationFanDiameterM: value })}
           />
         </div>
+
+        {showRatedCapacities && (
+          <div className="ui-card-muted mt-2 flex flex-col gap-2 p-3">
+            <h5 className="ui-section-title">{tSim("equipment.ratedTitle")}</h5>
+            <p className="text-[10px] text-label">{tSim("equipment.ratedHint")}</p>
+            <SliderRow
+              label={tSim("equipment.rated.leakageAch")}
+              value={sizing.leakageAch}
+              unit={tSim("equipment.rated.units.ach")}
+              min={0.05}
+              max={2}
+              step={0.05}
+              onChange={(value) => setClimateEquipmentSizing({ leakageAch: value })}
+            />
+            {showFans && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.rated.exhaustFanFlow")}
+                  value={sizing.exhaustFanRatedFlowM3h}
+                  unit={tSim("equipment.rated.units.flowM3h")}
+                  min={5_000}
+                  max={80_000}
+                  step={500}
+                  onChange={(value) => setClimateEquipmentSizing({ exhaustFanRatedFlowM3h: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.roofExhaustFanFlow")}
+                  value={sizing.roofExhaustFanRatedFlowM3h}
+                  unit={tSim("equipment.rated.units.flowM3h")}
+                  min={3_000}
+                  max={60_000}
+                  step={500}
+                  onChange={(value) =>
+                    setClimateEquipmentSizing({ roofExhaustFanRatedFlowM3h: value })
+                  }
+                />
+              </>
+            )}
+            {(showPad || showFans) && (
+              <SliderRow
+                label={tSim("equipment.rated.padEfficiency")}
+                value={sizing.padEfficiency}
+                unit={tSim("equipment.rated.units.ratio")}
+                min={0.4}
+                max={0.98}
+                step={0.01}
+                onChange={(value) => setClimateEquipmentSizing({ padEfficiency: value })}
+              />
+            )}
+            {showAc && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.rated.acKwPerUnit")}
+                  value={sizing.acRatedCoolingKwPerUnit}
+                  unit={tCommon("units.kilowatts")}
+                  min={5}
+                  max={120}
+                  step={1}
+                  onChange={(value) =>
+                    setClimateEquipmentSizing({ acRatedCoolingKwPerUnit: value })
+                  }
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.acShr")}
+                  value={sizing.acShr}
+                  unit={tSim("equipment.rated.units.ratio")}
+                  min={0.35}
+                  max={1}
+                  step={0.01}
+                  onChange={(value) => setClimateEquipmentSizing({ acShr: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.acCop")}
+                  value={sizing.acCop}
+                  unit=""
+                  min={1.8}
+                  max={6}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ acCop: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.acSupplyAirflow")}
+                  value={sizing.acSupplyAirflowM3h}
+                  unit={tSim("equipment.rated.units.flowM3h")}
+                  min={2_000}
+                  max={80_000}
+                  step={500}
+                  onChange={(value) => setClimateEquipmentSizing({ acSupplyAirflowM3h: value })}
+                />
+              </>
+            )}
+            {showFog && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.rated.fogFlowPerLine")}
+                  value={sizing.fogNozzleFlowLhPerLine}
+                  unit={tSim("equipment.rated.units.litersPerHour")}
+                  min={4}
+                  max={80}
+                  step={1}
+                  onChange={(value) =>
+                    setClimateEquipmentSizing({ fogNozzleFlowLhPerLine: value })
+                  }
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.fogEvaporationEfficiency")}
+                  value={sizing.fogEvaporationEfficiency}
+                  unit={tSim("equipment.rated.units.ratio")}
+                  min={0.2}
+                  max={1}
+                  step={0.01}
+                  onChange={(value) =>
+                    setClimateEquipmentSizing({ fogEvaporationEfficiency: value })
+                  }
+                />
+              </>
+            )}
+            {showHeaters && (
+              <SliderRow
+                label={tSim("equipment.rated.heaterKwPerUnit")}
+                value={sizing.heaterRatedKwPerUnit}
+                unit={tCommon("units.kilowatts")}
+                min={5}
+                max={120}
+                step={1}
+                onChange={(value) => setClimateEquipmentSizing({ heaterRatedKwPerUnit: value })}
+              />
+            )}
+            {showGeothermal && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.rated.geothermalKw")}
+                  value={sizing.geothermalRatedKw}
+                  unit={tCommon("units.kilowatts")}
+                  min={10}
+                  max={250}
+                  step={5}
+                  onChange={(value) => setClimateEquipmentSizing({ geothermalRatedKw: value })}
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.geothermalCop")}
+                  value={sizing.geothermalCop}
+                  unit=""
+                  min={1.5}
+                  max={8}
+                  step={0.1}
+                  onChange={(value) => setClimateEquipmentSizing({ geothermalCop: value })}
+                />
+              </>
+            )}
+            {showHotWaterPipes && (
+              <SliderRow
+                label={tSim("equipment.rated.hotWaterKw")}
+                value={sizing.hotWaterHeatingKw}
+                unit={tCommon("units.kilowatts")}
+                min={5}
+                max={200}
+                step={5}
+                onChange={(value) => setClimateEquipmentSizing({ hotWaterHeatingKw: value })}
+              />
+            )}
+            {sizing.circulationFanCount > 0 && (
+              <>
+                <SliderRow
+                  label={tSim("equipment.rated.circulationFanFlow")}
+                  value={sizing.circulationFanRatedFlowM3h}
+                  unit={tSim("equipment.rated.units.flowM3h")}
+                  min={1_000}
+                  max={30_000}
+                  step={250}
+                  onChange={(value) =>
+                    setClimateEquipmentSizing({ circulationFanRatedFlowM3h: value })
+                  }
+                />
+                <SliderRow
+                  label={tSim("equipment.rated.circulationFanMotorW")}
+                  value={sizing.circulationFanMotorW}
+                  unit={tCommon("units.watts")}
+                  min={100}
+                  max={2_500}
+                  step={25}
+                  onChange={(value) => setClimateEquipmentSizing({ circulationFanMotorW: value })}
+                />
+              </>
+            )}
+          </div>
+        )}
       </section>
     </>
   );

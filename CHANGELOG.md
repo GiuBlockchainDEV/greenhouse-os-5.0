@@ -8,6 +8,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Qatar-corrected thermal physics engine** — Flow-based ventilation (mechanical/wind/stack/infiltration), humidity-ratio moisture balance, kW-rated AC/heating with high-ambient derating, HAF mixing-only, energy-conserving spatial heatmap, hot-water pipe 3D layout. Spec: `docs/THERMAL_EQUIPMENT_AUDIT.csv`.
 
+- **Equipment rated capacity UI** — Explicit m³/h, kW, COP, SHR, pad/fog efficiency, and leakage ACH fields in climate controls; wired through WebSocket and backend solver.
+
 - **Heatmap 0–50°C absolute scale** — Fixed color mapping 0–50°C with crop working-range band and estimated-value marker on the legend; external temp slider extended to 50°C.
 
 - **Heatmap system audit** — Per-cooling-mode temperature floors, HAF mixing (not cooling), fog full-length bands, heating only below setpoint, reduced fan-and-pad double-counting; backend WS heatmap aligned for AC/fog/heating.

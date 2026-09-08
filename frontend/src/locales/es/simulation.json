@@ -83,6 +83,32 @@
       "pipeRowCount": "Filas de Tuberías",
       "fogLineCount": "Líneas de Niebla"
     },
+    "ratedTitle": "Capacidades Nominales",
+    "ratedHint": "Valores de placa usados por el motor físico (caudal, kW, COP, SHR).",
+    "rated": {
+      "leakageAch": "Filtraciones del Envoltorio",
+      "exhaustFanFlow": "Caudal Ventilador Extracción (c/u)",
+      "roofExhaustFanFlow": "Caudal Ventilador Techo (c/u)",
+      "circulationFanFlow": "Caudal HAF (c/u)",
+      "circulationFanMotorW": "Potencia Motor HAF (c/u)",
+      "padEfficiency": "Eficiencia de Saturación del Pad",
+      "acKwPerUnit": "Refrigeración AC (por unidad)",
+      "acShr": "Relación de Calor Sensible AC",
+      "acCop": "COP AC",
+      "acSupplyAirflow": "Caudal de Aire de Suministro AC (total)",
+      "heaterKwPerUnit": "Potencia Calefactor (por unidad)",
+      "geothermalKw": "Capacidad Bomba de Calor",
+      "geothermalCop": "COP Bomba de Calor",
+      "hotWaterKw": "Capacidad Red Agua Caliente",
+      "fogFlowPerLine": "Caudal Agua Niebla (por línea)",
+      "fogEvaporationEfficiency": "Eficiencia de Evaporación Niebla",
+      "units": {
+        "flowM3h": "m³/h",
+        "litersPerHour": "L/h",
+        "ach": "ACH",
+        "ratio": "—"
+      }
+    },
     "coolingOptions": {
       "none": "Ninguno",
       "fan_and_pad": "Ventilador y Panel",

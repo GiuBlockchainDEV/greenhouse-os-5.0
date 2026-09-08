@@ -5,12 +5,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from app.simulation.climate_equipment import (
-    ac_capacity_factor,
-    fan_and_pad_cooling_c,
-    fog_capacity_factor,
-    heater_capacity_factor,
-)
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
 from app.simulation.cultivation import (
     CULTIVATION_ET_FACTOR,
@@ -79,6 +73,41 @@ def _fan_flow_m3h(count: int, diameter_m: float, face_velocity: float, runtime: 
     return area * face_velocity * 3600.0 * runtime
 
 
+def _pick_positive(value: float, fallback: float) -> float:
+    return value if value > 0 else fallback
+
+
+def _resolve_exhaust_flow_m3h(sizing, runtime: float = 1.0) -> float:
+    per_fan = _pick_positive(sizing.exhaust_fan_rated_flow_m3h, 32_500.0)
+    if sizing.exhaust_fan_rated_flow_m3h > 0:
+        return sizing.exhaust_fan_count * per_fan * runtime
+    return _fan_flow_m3h(sizing.exhaust_fan_count, sizing.exhaust_fan_diameter_m, EXHAUST_FACE_VELOCITY, runtime)
+
+
+def _resolve_roof_exhaust_flow_m3h(sizing, runtime: float = 1.0) -> float:
+    per_fan = _pick_positive(sizing.roof_exhaust_fan_rated_flow_m3h, 22_000.0)
+    if sizing.roof_exhaust_fan_rated_flow_m3h > 0:
+        return sizing.roof_exhaust_fan_count * per_fan * runtime
+    return _fan_flow_m3h(
+        sizing.roof_exhaust_fan_count,
+        sizing.roof_exhaust_fan_diameter_m,
+        ROOF_EXHAUST_FACE_VELOCITY,
+        runtime,
+    )
+
+
+def _resolve_circulation_flow_m3h(sizing, runtime: float = 1.0) -> float:
+    per_fan = _pick_positive(sizing.circulation_fan_rated_flow_m3h, 8_500.0)
+    if sizing.circulation_fan_rated_flow_m3h > 0:
+        return sizing.circulation_fan_count * per_fan * runtime
+    return _fan_flow_m3h(
+        sizing.circulation_fan_count,
+        sizing.circulation_fan_diameter_m,
+        CIRC_FACE_VELOCITY,
+        runtime,
+    )
+
+
 def _uses_mechanical_ventilation(cooling: str, ventilation: str) -> bool:
     return cooling in {"fan_and_pad", "evaporative"} or ventilation in {"forced_exhaust", "combined"}
 
@@ -103,15 +132,7 @@ def _ventilation_flows(
     sizing = equipment.sizing
     mechanical = 0.0
     if _uses_mechanical_ventilation(equipment.cooling, equipment.ventilation):
-        mechanical = (
-            _fan_flow_m3h(sizing.exhaust_fan_count, sizing.exhaust_fan_diameter_m, EXHAUST_FACE_VELOCITY, runtime)
-            + _fan_flow_m3h(
-                sizing.roof_exhaust_fan_count,
-                sizing.roof_exhaust_fan_diameter_m,
-                ROOF_EXHAUST_FACE_VELOCITY,
-                runtime,
-            )
-        )
+        mechanical = _resolve_exhaust_flow_m3h(sizing, runtime) + _resolve_roof_exhaust_flow_m3h(sizing, runtime)
 
     a_eff = _vent_opening_area_m2(equipment)
     wind = (
@@ -129,7 +150,7 @@ def _ventilation_flows(
         if a_eff > 0 and delta_t > 0.05
         else 0.0
     )
-    infiltration = DEFAULT_LEAKAGE_ACH * max(volume_m3, 1.0)
+    infiltration = _pick_positive(sizing.leakage_ach, DEFAULT_LEAKAGE_ACH) * max(volume_m3, 1.0)
     natural = math.sqrt(wind**2 + stack**2)
     total = mechanical + natural + infiltration
     return total, mechanical
@@ -231,42 +252,47 @@ def solve_microclimate(params: ThermalInput) -> MicroclimateState:
         sizing = params.equipment.sizing
 
         if cooling in {"fan_and_pad", "evaporative"}:
-            temp_drop, _ = fan_and_pad_cooling_c(t_ext, rh_ext, sizing)
-            pad_eff = DEFAULT_PAD_EFFICIENCY if cooling == "fan_and_pad" else DEFAULT_PAD_EFFICIENCY * 0.75
+            pad_eff = _pick_positive(sizing.pad_efficiency, DEFAULT_PAD_EFFICIENCY)
+            if cooling == "evaporative":
+                pad_eff *= 0.75
             wet_bulb = approx_wet_bulb_c(t_ext, rh_ext)
             supply_temp_c = t_ext - pad_eff * (t_ext - wet_bulb)
             m_dot_air = RHO_AIR * mechanical_flow / 3600.0
             q_equipment += (m_dot_air * CP_AIR * (supply_temp_c - t_in)) / max(floor_area, 1.0)
         elif cooling == "mechanical_ac":
-            rated_kw = DEFAULT_AC_KW_PER_REF * 2.0 * ac_capacity_factor(sizing) * _ac_derating(t_ext)
+            shr = max(0.35, min(1.0, _pick_positive(sizing.ac_shr, DEFAULT_AC_SHR)))
+            rated_kw = sizing.ac_unit_count * _pick_positive(
+                sizing.ac_rated_cooling_kw_per_unit,
+                DEFAULT_AC_KW_PER_REF,
+            ) * _ac_derating(t_ext)
             q_total = rated_kw * 1000.0
-            q_sens = q_total * DEFAULT_AC_SHR
+            q_sens = q_total * shr
             deficit = max(0.0, t_in - t_ext)
             applied = min(q_sens, deficit * 1200.0 * floor_area)
             q_equipment -= applied / max(floor_area, 1.0)
             supply_temp_c = max(t_ext + 4.0, t_in - 8.0)
-            moisture_source -= (q_total * (1.0 - DEFAULT_AC_SHR)) / LATENT_HEAT_J_KG / max(floor_area, 1.0)
+            moisture_source -= (q_total * (1.0 - shr)) / LATENT_HEAT_J_KG / max(floor_area, 1.0)
         elif cooling == "high_pressure_fog":
-            nozzle_flow_lh = sizing.fog_line_count * 18.0 * fog_capacity_factor(sizing)
-            m_dot_evap = (nozzle_flow_lh / 3600.0) * 0.72
+            nozzle_flow_lh = sizing.fog_line_count * _pick_positive(sizing.fog_nozzle_flow_lh_per_line, 18.0)
+            m_dot_evap = (nozzle_flow_lh / 3600.0) * _pick_positive(sizing.fog_evaporation_efficiency, 0.72)
             q_lat = m_dot_evap * LATENT_HEAT_J_KG
             q_equipment -= q_lat / max(floor_area, 1.0)
             moisture_source += m_dot_evap / max(floor_area, 1.0)
 
         deficit = params.heating_setpoint_c - t_in
         if deficit > 0 and params.equipment.heating != "none":
-            rated_kw = DEFAULT_HEATER_KW
             if params.equipment.heating == "geothermal":
-                rated_kw *= 1.4 * min(max(sizing.pipe_row_count, 1), 8) / 3.0
-            elif params.equipment.heating in {"unit_heater", "air_heater"}:
-                rated_kw *= heater_capacity_factor(sizing)
+                rated_kw = _pick_positive(sizing.geothermal_rated_kw, 45.0)
             elif params.equipment.heating == "hot_water_pipes":
-                rated_kw *= 0.9 * min(max(sizing.pipe_row_count, 1), 8) / 3.0
+                rated_kw = _pick_positive(sizing.hot_water_heating_kw, 35.0)
+            else:
+                rated_kw = sizing.heater_unit_count * _pick_positive(sizing.heater_rated_kw_per_unit, DEFAULT_HEATER_KW)
             applied_kw = min(rated_kw, rated_kw * min(deficit / 5.0, 1.5))
             q_equipment += applied_kw * 1000.0 / max(floor_area, 1.0)
             supply_temp_c = t_in + min(12.0, deficit * 0.6)
 
-        haf_w = sizing.circulation_fan_count * DEFAULT_HAF_MOTOR_W
+        motor_w = _pick_positive(sizing.circulation_fan_motor_w, DEFAULT_HAF_MOTOR_W)
+        haf_w = sizing.circulation_fan_count * motor_w
         q_equipment += haf_w / max(floor_area, 1.0)
 
         q_net = q_solar + q_transpiration + q_cond + q_ground + q_vent + q_equipment
@@ -290,11 +316,7 @@ def solve_microclimate(params: ThermalInput) -> MicroclimateState:
         t_in,
         t_ext,
     )
-    recirc = _fan_flow_m3h(
-        params.equipment.sizing.circulation_fan_count,
-        params.equipment.sizing.circulation_fan_diameter_m,
-        CIRC_FACE_VELOCITY,
-    )
+    recirc = _resolve_circulation_flow_m3h(params.equipment.sizing)
     mix_eff = min(0.92, 0.12 + (total_flow / max(volume, 1.0)) * 0.08 + (recirc / max(volume, 1.0)) * 0.18)
 
     q_cond = -params.materials.u_value * (envelope_area / max(floor_area, 1.0)) * (t_in - t_ext)

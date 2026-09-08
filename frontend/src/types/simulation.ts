@@ -76,6 +76,22 @@ export interface WSClimateEquipmentSizing {
   heater_unit_count: number;
   pipe_row_count: number;
   fog_line_count: number;
+  exhaust_fan_rated_flow_m3h: number;
+  roof_exhaust_fan_rated_flow_m3h: number;
+  circulation_fan_rated_flow_m3h: number;
+  circulation_fan_motor_w: number;
+  ac_rated_cooling_kw_per_unit: number;
+  ac_shr: number;
+  ac_cop: number;
+  ac_supply_airflow_m3h: number;
+  heater_rated_kw_per_unit: number;
+  geothermal_rated_kw: number;
+  geothermal_cop: number;
+  hot_water_heating_kw: number;
+  pad_efficiency: number;
+  fog_nozzle_flow_lh_per_line: number;
+  fog_evaporation_efficiency: number;
+  leakage_ach: number;
 }
 
 export interface WSClimateEquipment {

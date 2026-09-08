@@ -83,6 +83,32 @@
       "pipeRowCount": "Rangées de Tuyaux",
       "fogLineCount": "Lignes de Brouillard"
     },
+    "ratedTitle": "Capacités Nominale",
+    "ratedHint": "Valeurs constructeur utilisées par le moteur physique (débit, kW, COP, SHR).",
+    "rated": {
+      "leakageAch": "Fuites d'Enveloppe",
+      "exhaustFanFlow": "Débit Ventilateur Extraction (chacun)",
+      "roofExhaustFanFlow": "Débit Ventilateur Toit (chacun)",
+      "circulationFanFlow": "Débit HAF (chacun)",
+      "circulationFanMotorW": "Puissance Moteur HAF (chacun)",
+      "padEfficiency": "Efficacité de Saturation du Pad",
+      "acKwPerUnit": "Froid AC (par unité)",
+      "acShr": "Ratio Chaleur Sensible AC",
+      "acCop": "COP AC",
+      "acSupplyAirflow": "Débit d'Air de Soufflage AC (total)",
+      "heaterKwPerUnit": "Puissance Chauffage (par unité)",
+      "geothermalKw": "Capacité Pompe à Chaleur",
+      "geothermalCop": "COP Pompe à Chaleur",
+      "hotWaterKw": "Capacité Réseau Eau Chaude",
+      "fogFlowPerLine": "Débit Eau Brouillard (par ligne)",
+      "fogEvaporationEfficiency": "Efficacité d'Évaporation Brouillard",
+      "units": {
+        "flowM3h": "m³/h",
+        "litersPerHour": "L/h",
+        "ach": "ACH",
+        "ratio": "—"
+      }
+    },
     "coolingOptions": {
       "none": "Aucun",
       "fan_and_pad": "Ventilateur & Pad",

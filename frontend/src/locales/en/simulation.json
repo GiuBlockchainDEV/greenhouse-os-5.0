@@ -92,6 +92,32 @@
       "pipeRowCount": "Pipe Rows",
       "fogLineCount": "Fog Lines"
     },
+    "ratedTitle": "Rated Capacities",
+    "ratedHint": "Manufacturer/design values used by the physics engine (flow, kW, COP, SHR).",
+    "rated": {
+      "leakageAch": "Envelope Leakage",
+      "exhaustFanFlow": "Exhaust Fan Flow (each)",
+      "roofExhaustFanFlow": "Roof Exhaust Fan Flow (each)",
+      "circulationFanFlow": "HAF Fan Flow (each)",
+      "circulationFanMotorW": "HAF Motor Power (each)",
+      "padEfficiency": "Pad Saturation Efficiency",
+      "acKwPerUnit": "AC Cooling (per unit)",
+      "acShr": "AC Sensible Heat Ratio",
+      "acCop": "AC COP",
+      "acSupplyAirflow": "AC Supply Airflow (total)",
+      "heaterKwPerUnit": "Heater Output (per unit)",
+      "geothermalKw": "Heat Pump Capacity",
+      "geothermalCop": "Heat Pump COP",
+      "hotWaterKw": "Hot-Water Network Capacity",
+      "fogFlowPerLine": "Fog Water Flow (per line)",
+      "fogEvaporationEfficiency": "Fog Evaporation Efficiency",
+      "units": {
+        "flowM3h": "m³/h",
+        "litersPerHour": "L/h",
+        "ach": "ACH",
+        "ratio": "—"
+      }
+    },
     "coolingOptions": {
       "none": "None",
       "fan_and_pad": "Fan & Pad",

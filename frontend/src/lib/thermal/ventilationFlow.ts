@@ -2,14 +2,16 @@
 
 import type { ClimateEquipment, ClimateScenario, GreenhouseDimensions } from "@/types/greenhouse";
 import {
-  DEFAULT_CIRCULATION_FACE_VELOCITY_MS,
   DEFAULT_DISCHARGE_COEFF,
-  DEFAULT_EXHAUST_FACE_VELOCITY_MS,
-  DEFAULT_LEAKAGE_ACH,
-  DEFAULT_ROOF_EXHAUST_FACE_VELOCITY_MS,
   DEFAULT_WIND_PRESSURE_COEFF,
   GRAVITY_M_S2,
 } from "@/lib/thermal/constants";
+import {
+  resolveCirculationFlowM3h,
+  resolveExhaustFlowM3h,
+  resolveLeakageAch,
+  resolveRoofExhaustFlowM3h,
+} from "@/lib/thermal/ratedCapacities";
 
 export interface VentilationFlowBreakdown {
   mechanicalM3h: number;
@@ -18,17 +20,6 @@ export interface VentilationFlowBreakdown {
   infiltrationM3h: number;
   totalM3h: number;
   ach: number;
-}
-
-function fanThroatFlowM3h(
-  count: number,
-  diameterM: number,
-  faceVelocityMs: number,
-  runtimeFraction = 1,
-): number {
-  if (count <= 0 || diameterM <= 0) return 0;
-  const area = count * Math.PI * (diameterM / 2) ** 2;
-  return area * faceVelocityMs * 3600 * runtimeFraction;
 }
 
 function usesMechanicalVentilation(equipment: ClimateEquipment): boolean {
@@ -69,18 +60,8 @@ export function computeVentilationFlows(
 
   if (usesMechanicalVentilation(equipment)) {
     mechanicalM3h =
-      fanThroatFlowM3h(
-        sizing.exhaustFanCount,
-        sizing.exhaustFanDiameterM,
-        DEFAULT_EXHAUST_FACE_VELOCITY_MS,
-        runtimeFraction,
-      ) +
-      fanThroatFlowM3h(
-        sizing.roofExhaustFanCount,
-        sizing.roofExhaustFanDiameterM,
-        DEFAULT_ROOF_EXHAUST_FACE_VELOCITY_MS,
-        runtimeFraction,
-      );
+      resolveExhaustFlowM3h(sizing, runtimeFraction) +
+      resolveRoofExhaustFlowM3h(sizing, runtimeFraction);
     mechanicalM3h *= screenPressureDropFactor;
   }
 
@@ -110,7 +91,7 @@ export function computeVentilationFlows(
         3600
       : 0;
 
-  const infiltrationM3h = DEFAULT_LEAKAGE_ACH * Math.max(volumeM3, 1);
+  const infiltrationM3h = resolveLeakageAch(sizing) * Math.max(volumeM3, 1);
   const naturalCombined = Math.sqrt(windM3h ** 2 + stackM3h ** 2);
   const totalM3h = mechanicalM3h + naturalCombined + infiltrationM3h;
 
@@ -128,13 +109,7 @@ export function circulationRecirculationM3h(
   equipment: ClimateEquipment,
   runtimeFraction = 1,
 ): number {
-  const sizing = equipment.sizing;
-  return fanThroatFlowM3h(
-    sizing.circulationFanCount,
-    sizing.circulationFanDiameterM,
-    DEFAULT_CIRCULATION_FACE_VELOCITY_MS,
-    runtimeFraction,
-  );
+  return resolveCirculationFlowM3h(equipment.sizing, runtimeFraction);
 }
 
 export function mixingEffectiveness(

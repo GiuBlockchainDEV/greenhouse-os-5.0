@@ -28,6 +28,8 @@
     "meters": "m",
     "squareMeters": "m²",
     "cubicMeters": "m³",
-    "degrees": "°"
+    "degrees": "°",
+    "kilowatts": "kW",
+    "watts": "W"
   }
 }

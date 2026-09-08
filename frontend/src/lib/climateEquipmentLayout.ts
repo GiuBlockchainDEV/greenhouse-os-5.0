@@ -3,6 +3,7 @@
 import { computeAcDuctNetwork, type AcDuctNetwork } from "@/lib/acDuctLayout";
 
 import type { BedZone } from "@/lib/cultivationLayout";
+import { RATED_CAPACITY_DEFAULTS } from "@/lib/thermal/ratedCapacities";
 import { bayCenterZ, roofRiseM } from "@/lib/structureUtils";
 import type {
   ArchType,
@@ -95,6 +96,7 @@ export const REFERENCE_CLIMATE_SIZING: ClimateEquipmentSizing = {
   heaterUnitCount: 2,
   pipeRowCount: 3,
   fogLineCount: 4,
+  ...RATED_CAPACITY_DEFAULTS,
 };
 
 /** Default installed equipment counts for a new greenhouse (empty install). */
@@ -116,6 +118,7 @@ export const DEFAULT_CLIMATE_SIZING: ClimateEquipmentSizing = {
   heaterUnitCount: 0,
   pipeRowCount: 0,
   fogLineCount: 0,
+  ...RATED_CAPACITY_DEFAULTS,
 };
 
 /** Seed visible equipment when a cooling mode is first selected (counts still at zero). */

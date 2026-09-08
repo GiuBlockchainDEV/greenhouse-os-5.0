@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import { wsUrl } from "@/lib/apiConfig";
+import { mapClimateSizingToWs } from "@/lib/climateSizingWire";
 import { expandBayArchTypes } from "@/lib/structureUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
@@ -71,25 +72,7 @@ function buildUpdatePayload(): WSUpdatePayload {
         cooling: state.climateEquipment.cooling,
         heating: state.climateEquipment.heating,
         ventilation: state.climateEquipment.ventilation,
-        sizing: {
-          exhaust_fan_count: state.climateEquipment.sizing.exhaustFanCount,
-          exhaust_fan_diameter_m: state.climateEquipment.sizing.exhaustFanDiameterM,
-          roof_exhaust_fan_count: state.climateEquipment.sizing.roofExhaustFanCount,
-          roof_exhaust_fan_diameter_m: state.climateEquipment.sizing.roofExhaustFanDiameterM,
-          circulation_fan_count: state.climateEquipment.sizing.circulationFanCount,
-          circulation_fan_diameter_m: state.climateEquipment.sizing.circulationFanDiameterM,
-          pad_wall_width_m: state.climateEquipment.sizing.padWallWidthM,
-          pad_wall_height_m: state.climateEquipment.sizing.padWallHeightM,
-          ac_unit_count: state.climateEquipment.sizing.acUnitCount,
-          ac_unit_width_m: state.climateEquipment.sizing.acUnitWidthM,
-          roof_vent_count: state.climateEquipment.sizing.roofVentCount,
-          roof_vent_width_m: state.climateEquipment.sizing.roofVentWidthM,
-          side_vent_count: state.climateEquipment.sizing.sideVentCount,
-          side_vent_height_m: state.climateEquipment.sizing.sideVentHeightM,
-          heater_unit_count: state.climateEquipment.sizing.heaterUnitCount,
-          pipe_row_count: state.climateEquipment.sizing.pipeRowCount,
-          fog_line_count: state.climateEquipment.sizing.fogLineCount,
-        },
+        sizing: mapClimateSizingToWs(state.climateEquipment.sizing),
       },
       climate: {
         external_temp_c: state.climateScenario.externalTempC,
