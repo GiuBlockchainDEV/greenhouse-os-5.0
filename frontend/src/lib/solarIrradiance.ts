@@ -68,7 +68,7 @@ export function buildSolarFieldContext(
   const horiz = Math.hypot(lx, lz);
   return {
     active: true,
-    amplitude: elevationFactor * intensity * qSolar * 0.11,
+    amplitude: elevationFactor * intensity * qSolar * 0.06,
     dirX: horiz > 1e-6 ? lx / horiz : 0,
     dirZ: horiz > 1e-6 ? lz / horiz : 0,
     floorBeam: Math.max(0, ly),

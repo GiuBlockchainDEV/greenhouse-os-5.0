@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Thermal coefficient audit (P0/P1)** — Corrected transpiration latent-heat units (~1000× under-estimate), removed frontend −3 °C external offset, gated heating on 22 °C setpoint, aligned ACH fan/vent/circulation coefficients with backend, bounded evaporative/AC cooling floors, ET₀-based preview transpiration, cultivation thermal-mass damping without sub-unity amplification, RH coupling 1.0 °C⁻¹, heatmap solar amplitude and local ΔT caps.
+
 - **Pad wall thermodynamics** — Fan-and-pad cooling now respects outdoor wet-bulb depression with diminishing returns on oversized pads; prevents negative or sub-wet-bulb temperatures at 40 °C outdoor conditions.
 
 ## [5.0.1] - 2026-09-08
