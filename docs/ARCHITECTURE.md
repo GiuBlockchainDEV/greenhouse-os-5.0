@@ -294,6 +294,19 @@ When cooling mode is `mechanical_ac`, each wall-mounted unit drives an internal 
 **3D mesh:** `frontend/src/components/3d/ClimateEquipmentMesh.tsx`  
 **Heatmap:** duct segments + diffuser Gaussians in `equipmentAwareHeatmap.ts`
 
+### Heatmap influence rules (preview)
+
+| System | Spatial pattern | Notes |
+|--------|-----------------|-------|
+| Solar | Directional beam on roof/walls/floor | Scales with azimuth, elevation, intensity |
+| Pad / evaporative | Cool humid plume at −X wall + airflow transit | Fan-and-pad stronger than evaporative-only |
+| Exhaust fans | Cool/dry near +X gable | Only when fans are installed |
+| HAF circulation | **Mixing** (dampens local ΔT/ΔRH) | Does not add cooling |
+| Roof/side vents | Cool near openings | Stronger at ridge for roof vents |
+| Mechanical AC | Duct network + diffusers | Floor 12 °C, not wet-bulb |
+| High-pressure fog | Full-length bands along fog lines | RH boost aloft |
+| Heating | Warm spots near heaters | Only when T_int < 22 °C setpoint |
+
 ---
 
 ## Multi-AI Gateway (Milestone 5)
