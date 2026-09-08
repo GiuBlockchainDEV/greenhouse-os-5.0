@@ -54,6 +54,11 @@ export function resolveHeatmapField(
     internalRh,
     qSolar,
     scenario,
+    {
+      mixingEffectiveness: preview.mixingEffectiveness,
+      supplyTempC: preview.supplyTempC,
+      supplyHumidityRatioKgKg: preview.supplyHumidityRatioKgKg,
+    },
   );
 
   const surfaces = generateVisibleSurfaceHeatmaps(ctx);

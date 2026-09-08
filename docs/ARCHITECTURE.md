@@ -220,7 +220,9 @@ Internal temperature solved at quasi-steady state from net energy gain and total
 | Cooling capacity factor | 1.15 | Applied to pad, fog, evaporative, and AC deltas |
 | Cultivation thermal mass | ≥ 1.0 divisor | Dampens deviation only; never amplifies |
 
-**Implementation:** `backend/app/simulation/thermal.py`, `frontend/src/lib/thermalEstimate.ts`
+**Implementation:** `backend/app/simulation/thermal_physics.py`, `backend/app/simulation/thermal.py`, `frontend/src/lib/thermal/solveMicroclimate.ts`, `frontend/src/lib/thermalEstimate.ts`
+
+**Equipment specification:** [`docs/THERMAL_EQUIPMENT_AUDIT.csv`](THERMAL_EQUIPMENT_AUDIT.csv) — Qatar-corrected flow-based ventilation, moisture balance, and energy-conserving spatial heatmap rules.
 
 ### WebSocket Pipeline
 

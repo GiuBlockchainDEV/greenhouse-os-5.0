@@ -549,6 +549,18 @@ export function computeClimateEquipmentLayout(params: {
     });
   }
 
+  if (equipment.heating === "hot_water_pipes") {
+    const loopZs = spreadAlongAxis(Math.max(sizing.pipeRowCount, 1), width, width * 0.15);
+    loopZs.forEach((offsetZ) => {
+      heaters.push({
+        x: 0,
+        y: 0.35,
+        z: offsetZ,
+        kind: "unit",
+      });
+    });
+  }
+
   if (equipment.heating === "geothermal") {
     const loopZs = spreadAlongAxis(sizing.pipeRowCount, width, width * 0.15);
     loopZs.forEach((offsetZ) => {
