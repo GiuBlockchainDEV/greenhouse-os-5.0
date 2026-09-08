@@ -278,6 +278,21 @@ High-performance foliage rendering using `THREE.InstancedMesh`:
 
 **Implementation:** `frontend/src/components/3d/CropGridMesh.tsx`
 
+### Mechanical AC Duct Network
+
+When cooling mode is `mechanical_ac`, each wall-mounted unit drives an internal supply network:
+
+| Element | Rule |
+|---------|------|
+| Trunk | From AC face inward to ~22–44 % of greenhouse width |
+| Spine | Along greenhouse length within the unit's coverage zone |
+| Diffusers | Every 4 m on the spine, blowing toward crop center |
+| Diameter | Scales with `ac_unit_width_m` (0.18–0.24 m) |
+
+**Layout:** `frontend/src/lib/acDuctLayout.ts`  
+**3D mesh:** `frontend/src/components/3d/ClimateEquipmentMesh.tsx`  
+**Heatmap:** duct segments + diffuser Gaussians in `equipmentAwareHeatmap.ts`
+
 ---
 
 ## Multi-AI Gateway (Milestone 5)

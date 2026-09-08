@@ -4,6 +4,10 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+### Added
+
+- **Mechanical AC supply ducts** — Each AC unit generates an insulated trunk, ceiling spine along its length zone, and diffusers every 4 m; visible in 3D and drives spatial cooling on the preview heatmap.
+
 ### Fixed
 
 - **Cooling capacity boost (+15 %)** — `COOLING_CAPACITY_FACTOR = 1.15` applied to fan-and-pad, evaporative, fog, and AC cooling; wet-bulb floor margin relaxed proportionally.

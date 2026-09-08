@@ -12,12 +12,15 @@ import {
   type RoofExhaustFanPlacement,
   type VentPlacement,
 } from "@/lib/climateEquipmentLayout";
+import type { AcDuctDiffuser, AcDuctSegment } from "@/lib/acDuctLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 const FRAME_COLOR = "#059669";
 const METAL_COLOR = "#64748b";
 const PAD_COLOR = "#0ea5e9";
 const AC_COLOR = "#94a3b8";
+const AC_DUCT_COLOR = "#cbd5e1";
+const AC_DIFFUSER_COLOR = "#64748b";
 const HEATER_COLOR = "#f97316";
 const FOG_COLOR = "#67e8f9";
 
@@ -131,6 +134,73 @@ function PadWall({ pad }: { pad: PadWallPlacement }) {
         <boxGeometry args={[0.16, 0.08, pad.widthM + 0.1]} />
         <meshStandardMaterial color={METAL_COLOR} metalness={0.6} roughness={0.35} />
       </mesh>
+    </group>
+  );
+}
+
+function AcDuctSegmentMesh({ segment }: { segment: AcDuctSegment }) {
+  const start = new THREE.Vector3(segment.start.x, segment.start.y, segment.start.z);
+  const end = new THREE.Vector3(segment.end.x, segment.end.y, segment.end.z);
+  const axis = end.clone().sub(start);
+  const length = axis.length();
+  if (length < 0.05) return null;
+
+  const center = start.clone().add(end).multiplyScalar(0.5);
+  const quaternion = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    axis.normalize(),
+  );
+
+  return (
+    <mesh position={center} quaternion={quaternion}>
+      <cylinderGeometry args={[segment.diameterM / 2, segment.diameterM / 2, length, 12]} />
+      <meshStandardMaterial color={AC_DUCT_COLOR} metalness={0.42} roughness={0.48} />
+    </mesh>
+  );
+}
+
+function AcDuctDiffuserMesh({ diffuser }: { diffuser: AcDuctDiffuser }) {
+  return (
+    <group position={[diffuser.x, diffuser.y, diffuser.z]} rotation={[0, diffuser.yaw, 0]}>
+      <mesh>
+        <boxGeometry args={[0.42, 0.06, 0.28]} />
+        <meshStandardMaterial color={AC_DIFFUSER_COLOR} metalness={0.55} roughness={0.32} />
+      </mesh>
+      {Array.from({ length: 4 }, (_, index) => (
+        <mesh
+          key={`louver-${index}`}
+          position={[-0.14 + index * 0.09, -0.04, 0.12]}
+          rotation={[0.42, 0, 0]}
+        >
+          <boxGeometry args={[0.06, 0.02, 0.14]} />
+          <meshStandardMaterial color="#334155" metalness={0.45} roughness={0.4} />
+        </mesh>
+      ))}
+      <mesh position={[0, -0.02, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.035, 0.1, 6]} />
+        <meshStandardMaterial color="#38bdf8" emissive="#0ea5e9" emissiveIntensity={0.25} />
+      </mesh>
+    </group>
+  );
+}
+
+function AcDuctNetworkMesh({
+  segments,
+  diffusers,
+}: {
+  segments: AcDuctSegment[];
+  diffusers: AcDuctDiffuser[];
+}) {
+  if (segments.length === 0 && diffusers.length === 0) return null;
+
+  return (
+    <group>
+      {segments.map((segment, index) => (
+        <AcDuctSegmentMesh key={`ac-duct-${index}`} segment={segment} />
+      ))}
+      {diffusers.map((diffuser, index) => (
+        <AcDuctDiffuserMesh key={`ac-diffuser-${index}`} diffuser={diffuser} />
+      ))}
     </group>
   );
 }
@@ -362,6 +432,10 @@ export function ClimateEquipmentMesh() {
       {layout.acUnits.map((unit, index) => (
         <AcUnit key={`ac-${index}`} unit={unit} />
       ))}
+      <AcDuctNetworkMesh
+        segments={layout.acDucts.segments}
+        diffusers={layout.acDucts.diffusers}
+      />
       {layout.vents.map((vent, index) => (
         <ClimateVent key={`vent-${index}`} vent={vent} />
       ))}
