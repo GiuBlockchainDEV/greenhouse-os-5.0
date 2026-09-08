@@ -3,15 +3,16 @@
 import math
 
 from app.simulation.climate_equipment import (
+    ac_capacity_factor,
     cooling_effect_with_sizing,
     exhaust_capacity_factor,
     fan_and_pad_cooling_c,
+    fog_capacity_factor,
     heating_flux_with_sizing,
     ventilation_ach_with_sizing,
 )
-from app.simulation.constants import COOLING_CAPACITY_FACTOR
+from app.simulation.constants import COOLING_CAPACITY_FACTOR, LATENT_HEAT_VAPORIZATION
 from app.simulation.psychrometrics import pad_cooling_temp_floor_c
-from app.simulation.constants import LATENT_HEAT_VAPORIZATION
 from app.simulation.cultivation import (
     CULTIVATION_ET_FACTOR,
     CULTIVATION_THERMAL_MASS,
@@ -215,6 +216,7 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         width=width,
         eave_height=eave_height,
         equipment=params.equipment,
+        heating_setpoint_c=params.heating_setpoint_c,
     )
 
     return ThermalResult(
@@ -245,6 +247,7 @@ def _generate_heatmap(
     width: float,
     eave_height: float,
     equipment,
+    heating_setpoint_c: float = 22.0,
 ) -> list[list[float]]:
     """Generate equipment-aware floor temperature grid."""
     matrix: list[list[float]] = []
@@ -255,18 +258,42 @@ def _generate_heatmap(
     sizing = equipment.sizing
     half_l = length / 2.0
     half_w = width / 2.0
+    cooling = equipment.cooling
+    heating_active = (
+        equipment.heating != "none" and heating_setpoint_c - base_temp > 0.5
+    )
 
+    uses_pad = cooling in {"fan_and_pad", "evaporative"}
     pad_cool = 0.0
-    if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
+    if uses_pad and sizing.pad_wall_width_m > 0:
         pad_cool, _ = fan_and_pad_cooling_c(t_external, rh_external, sizing)
         pad_cool = min(pad_cool, 6.0 * COOLING_CAPACITY_FACTOR)
+        if cooling == "evaporative":
+            pad_cool *= 0.65
 
-    fan_cool = exhaust_capacity_factor(sizing) * 1.0
+    fan_cool = 0.0
+    if cooling in {"fan_and_pad", "evaporative"} or equipment.ventilation in {
+        "forced_exhaust",
+        "combined",
+    }:
+        fan_cool = exhaust_capacity_factor(sizing) * 1.0
+
     vent_cool = (
         sizing.roof_vent_count * sizing.roof_vent_width_m * 0.08
         + sizing.side_vent_count * sizing.side_vent_height_m * 0.1
     )
+    ac_cool = (
+        ac_capacity_factor(sizing) * 2.4 * COOLING_CAPACITY_FACTOR
+        if cooling == "mechanical_ac"
+        else 0.0
+    )
+    fog_cool = (
+        fog_capacity_factor(sizing) * 1.15 * COOLING_CAPACITY_FACTOR
+        if cooling == "high_pressure_fog"
+        else 0.0
+    )
     mix = min(0.85, sizing.circulation_fan_count * 0.08)
+    heat_boost = 1.2 if heating_active else 0.0
 
     for row in range(rows):
         row_data: list[float] = []
@@ -274,14 +301,43 @@ def _generate_heatmap(
         x_norm = (x + half_l) / max(length, 0.1)
         for col in range(cols):
             z = -half_w + (col / max(cols - 1, 1)) * width
+            z_norm = abs(z) / max(half_w, 0.1)
             dist = math.sqrt((row - center_r) ** 2 + (col - center_c) ** 2)
             edge_factor = dist / max_dist
             temp = base_temp + solar_boost * (1.0 - edge_factor * 0.6)
             temp -= edge_factor * max(base_temp - t_external, 0) * 0.08
-            temp -= pad_cool * (1.0 - x_norm)
-            temp -= fan_cool * (x_norm**1.4) * 0.6
+
+            if uses_pad:
+                transit = min(1.0, x_norm / 0.95)
+                temp -= pad_cool * (1.0 - transit)
+                if cooling == "fan_and_pad":
+                    temp += pad_cool * 0.35 * (transit**1.35)
+                elif cooling == "evaporative":
+                    temp += pad_cool * 0.2 * (transit**1.25)
+
+            if fan_cool > 0:
+                temp -= fan_cool * (x_norm**1.4) * 0.6
             temp -= vent_cool * edge_factor * 0.35
+
+            if ac_cool > 0:
+                cross_wave = 0.55 + 0.45 * math.sin(x_norm * math.pi * 4)
+                temp -= ac_cool * (1.0 - z_norm * 0.45) * cross_wave
+
+            if fog_cool > 0:
+                band = math.exp(-((z / max(half_w, 0.1)) ** 2) / 0.35)
+                along = 1.0 - 0.12 * abs(x) / max(half_l, 0.1)
+                temp -= fog_cool * band * along
+
+            if heat_boost > 0:
+                temp += heat_boost * (1.0 - edge_factor) * 0.35
+
             temp = base_temp + (temp - base_temp) * (1.0 - mix * 0.45)
+
+            if cooling in {"fan_and_pad", "evaporative", "high_pressure_fog"}:
+                temp = max(pad_cooling_temp_floor_c(t_external, rh_external), temp)
+            elif cooling == "mechanical_ac":
+                temp = max(12.0, temp)
+
             row_data.append(round(temp, 2))
         matrix.append(row_data)
 

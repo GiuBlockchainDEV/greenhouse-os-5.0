@@ -66,7 +66,7 @@ const HEATING_W_M2: Record<string, number> = {
   geothermal: 90,
 };
 
-const MECHANICAL_AC_TEMP_FLOOR_C = 12;
+export const MECHANICAL_AC_TEMP_FLOOR_C = 12;
 
 function floorArea(length: number, width: number): number {
   return length * width;

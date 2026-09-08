@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Heatmap system audit** — Per-cooling-mode temperature floors, HAF mixing (not cooling), fog full-length bands, heating only below setpoint, reduced fan-and-pad double-counting; backend WS heatmap aligned for AC/fog/heating.
+
 - **Mechanical AC supply ducts** — Full-length wall headers, cross-ducts spanning greenhouse width every ~5.5 m, and ceiling diffusers; scales with `acUnitCount`.
 
 ### Fixed
