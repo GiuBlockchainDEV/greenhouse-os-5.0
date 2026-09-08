@@ -77,8 +77,9 @@
     "estimatedValue": "Stima",
     "workingRange": "Range di lavoro coltura",
     "floorRange": "Span pavimento",
+    "colorScale": "Range contrasto colori",
     "legend": {
-      "temperature": "Scala assoluta 0–50°C — indicatore = temperatura interna stimata",
+      "temperature": "Riferimento 0–50°C; fascia evidenziata = colori sulla mappa pavimento",
       "humidity": "Scala assoluta 0–100% — indicatore = UR interna stimata",
       "vpd": "Scala VPD (0–10 kPa)",
       "uniformity": "Indice uniformità interna (0–100%)"

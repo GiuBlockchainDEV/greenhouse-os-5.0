@@ -70,8 +70,9 @@
     "estimatedValue": "Estimation",
     "workingRange": "Plage de travail culture",
     "floorRange": "Étendue au sol",
+    "colorScale": "Plage de contraste des couleurs",
     "legend": {
-      "temperature": "Échelle absolue 0–50°C — repère = température interne estimée",
+      "temperature": "Référence 0–50°C ; bande mise en évidence = couleurs sur la carte du sol",
       "humidity": "Échelle absolue 0–100% — repère = HR interne estimée",
       "vpd": "Échelle VPD (0–10 kPa)",
       "uniformity": "Indice d'uniformité interne (0–100%)"

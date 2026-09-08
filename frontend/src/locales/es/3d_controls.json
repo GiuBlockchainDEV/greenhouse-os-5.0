@@ -70,8 +70,9 @@
     "estimatedValue": "Estimado",
     "workingRange": "Rango de trabajo del cultivo",
     "floorRange": "Rango en suelo",
+    "colorScale": "Rango de contraste de color",
     "legend": {
-      "temperature": "Escala absoluta 0–50°C — marcador = temperatura interna estimada",
+      "temperature": "Referencia 0–50°C; banda resaltada = colores en el mapa del suelo",
       "humidity": "Escala absoluta 0–100% — marcador = HR interna estimada",
       "vpd": "Escala VPD (0–10 kPa)",
       "uniformity": "Índice de uniformidad interna (0–100%)"
