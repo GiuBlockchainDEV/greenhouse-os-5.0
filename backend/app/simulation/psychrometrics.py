@@ -5,6 +5,7 @@ import math
 from app.simulation.constants import (
     LATENT_HEAT_VAPORIZATION,
     MOLECULAR_WEIGHT_RATIO,
+    PAD_WET_BULB_MARGIN_C,
     SPECIFIC_HEAT_AIR,
     STANDARD_ATM_PRESSURE_KPA,
 )
@@ -113,4 +114,4 @@ def approx_wet_bulb_c(dry_bulb_c: float, rh_pct: float) -> float:
 
 def pad_cooling_temp_floor_c(external_temp_c: float, external_rh_pct: float) -> float:
     """Minimum achievable internal temperature with evaporative pad cooling."""
-    return approx_wet_bulb_c(external_temp_c, external_rh_pct) - 1.5
+    return approx_wet_bulb_c(external_temp_c, external_rh_pct) - PAD_WET_BULB_MARGIN_C

@@ -34,3 +34,9 @@ SECONDS_PER_HOUR: Final[float] = 3600.0
 
 # Conversion: μmol to mol
 UMOL_TO_MOL: Final[float] = 1e-6
+
+# Global boost for installed cooling systems (pad, fog, AC, evaporative)
+COOLING_CAPACITY_FACTOR: Final[float] = 1.15
+
+# Wet-bulb margin for evaporative cooling floor (°C above T_wb)
+PAD_WET_BULB_MARGIN_C: Final[float] = 1.5 / COOLING_CAPACITY_FACTOR

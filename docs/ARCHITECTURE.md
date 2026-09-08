@@ -215,8 +215,9 @@ Internal temperature solved at quasi-steady state from net energy gain and total
 | ACH fan boost | $(A_{fan}/A_{floor})\times 8$ | Exhaust fan throat area |
 | ACH vent boost | $(A_{vent}/A_{floor})\times 2.5$ | Roof/side vent openings |
 | ACH circulation | $\min(N_{circ}, 24)\times 0.15$ | HAF mixing (no direct exhaust) |
-| Evaporative floor | $T_{wb} - 1.5\,°\mathrm{C}$ | Pad, fog, evaporative cooling |
+| Evaporative floor | $T_{wb} - 1.5/1.15\,°\mathrm{C}$ | Pad, fog, evaporative cooling (15 % capacity boost) |
 | AC floor | 12 °C | Mechanical cooling minimum |
+| Cooling capacity factor | 1.15 | Applied to pad, fog, evaporative, and AC deltas |
 | Cultivation thermal mass | ≥ 1.0 divisor | Dampens deviation only; never amplifies |
 
 **Implementation:** `backend/app/simulation/thermal.py`, `frontend/src/lib/thermalEstimate.ts`
