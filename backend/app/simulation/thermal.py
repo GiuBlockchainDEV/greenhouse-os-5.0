@@ -140,7 +140,8 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     lai_effective = effective_lai(params.crop.lai, system, tier_count)
     lai_factor = min(lai_effective / 3.0, 2.0)
     et_rate_mm_h = (params.et0_mm_day / 24.0) * kc * lai_factor * et_factor
-    q_transpiration = -(et_rate_mm_h / 3600.0) * 1000.0 * LATENT_HEAT_J_KG / 1e6
+    # mm/h ≡ kg/m²/h → divide by 3600 for kg/m²/s, multiply by λ for W/m²
+    q_transpiration = -(et_rate_mm_h / 3600.0) * LATENT_HEAT_J_KG
 
     ach = ventilation_ach_with_sizing(
         params.equipment.ventilation,
@@ -172,8 +173,10 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     )
     t_internal += cool_delta
 
-    if params.equipment.cooling == "fan_and_pad":
+    if params.equipment.cooling in {"fan_and_pad", "evaporative", "high_pressure_fog"}:
         t_internal = max(pad_cooling_temp_floor_c(t_external, rh_external), t_internal)
+    elif params.equipment.cooling == "mechanical_ac":
+        t_internal = max(12.0, t_internal)
 
     temp_deficit = params.heating_setpoint_c - t_internal
     q_heating = heating_flux_with_sizing(
@@ -184,7 +187,8 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
     if q_heating > 0:
         t_internal += q_heating / max(params.materials.u_value * 2.5, 1.0)
 
-    t_internal = (t_internal - t_external) / thermal_mass + t_external
+    # Higher cultivation thermal mass dampens deviation from exterior; never amplify swings
+    t_internal = t_external + (t_internal - t_external) / max(thermal_mass, 1.0)
 
     q_conduction = -params.materials.u_value * (envelope_area / floor_area) * (t_internal - t_external)
     q_ventilation = -RHO_AIR * CP_AIR * ach * volume / (3600.0 * floor_area) * (t_internal - t_external)
@@ -194,7 +198,7 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         95.0,
         max(
             30.0,
-            rh_external + (t_external - t_internal) * 1.8 + et_rate_mm_h * 0.5 + rh_cool_delta,
+            rh_external + (t_external - t_internal) * 1.0 + et_rate_mm_h * 0.5 + rh_cool_delta,
         ),
     )
     vpd = calculate_vpd_kpa(t_internal, relative_humidity_pct=internal_rh)
@@ -204,6 +208,7 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         cols=max(int(width / 2), 4),
         base_temp=t_internal,
         t_external=t_external,
+        rh_external=rh_external,
         q_solar=q_solar,
         length=length,
         width=width,
@@ -233,6 +238,7 @@ def _generate_heatmap(
     cols: int,
     base_temp: float,
     t_external: float,
+    rh_external: float,
     q_solar: float,
     length: float,
     width: float,
@@ -251,7 +257,7 @@ def _generate_heatmap(
 
     pad_cool = 0.0
     if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
-        pad_cool, _ = fan_and_pad_cooling_c(t_external, 60.0, sizing)
+        pad_cool, _ = fan_and_pad_cooling_c(t_external, rh_external, sizing)
         pad_cool = min(pad_cool, 6.0)
 
     fan_cool = exhaust_capacity_factor(sizing) * 1.0

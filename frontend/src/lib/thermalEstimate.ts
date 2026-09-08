@@ -9,6 +9,15 @@ import type {
   GreenhouseDimensions,
   ShadingScreen,
 } from "@/types/greenhouse";
+import {
+  cropCoefficient,
+  CULTIVATION_THERMAL_MASS,
+  DEFAULT_ET0_MM_DAY,
+  effectiveLai,
+  LATENT_HEAT_J_KG,
+  normalizeCultivationSystem,
+  CULTIVATION_ET_FACTOR,
+} from "@/lib/cultivationFactors";
 import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { solarElevationFactor, solarIntensityFactor } from "@/lib/solarIrradiance";
 import {
@@ -17,9 +26,11 @@ import {
   fogCapacityFactor,
   heaterCapacityFactor,
   padCapacityFactor,
-  ventCapacityFactor,
 } from "@/lib/climateEquipmentCapacity";
 import { padCoolingTempFloorC } from "@/lib/psychrometrics";
+
+/** Matches backend ThermalInput.heating_setpoint_c default. */
+export const HEATING_SETPOINT_C = 22;
 
 const COOLING_DELTA: Record<string, number> = {
   none: 0,
@@ -53,6 +64,8 @@ const HEATING_W_M2: Record<string, number> = {
   air_heater: 150,
   geothermal: 90,
 };
+
+const MECHANICAL_AC_TEMP_FLOOR_C = 12;
 
 function floorArea(length: number, width: number): number {
   return length * width;
@@ -97,8 +110,37 @@ function envelopeConductancePerFloor(
   ridgeHeight: number,
   uValue: number,
 ): number {
-  const floorArea = Math.max(length * width, 1);
-  return (uValue * envelopeArea(length, width, eaveHeight, ridgeHeight)) / floorArea;
+  const area = Math.max(length * width, 1);
+  return (uValue * envelopeArea(length, width, eaveHeight, ridgeHeight)) / area;
+}
+
+function transpirationFluxWm2(et0MmDay: number, crop: CropConfig): number {
+  const system = normalizeCultivationSystem(crop.system);
+  const etFactor = CULTIVATION_ET_FACTOR[system] ?? 1.0;
+  const kc = cropCoefficient(crop);
+  const laiEffective = effectiveLai(crop.lai, system, crop.layout.tierCount);
+  const laiFactor = Math.min(laiEffective / 3, 2);
+  const etRateMmH = (et0MmDay / 24) * kc * laiFactor * etFactor;
+  return -(etRateMmH / 3600) * LATENT_HEAT_J_KG;
+}
+
+function applyCoolingTempFloor(
+  internalTemp: number,
+  externalTemp: number,
+  externalRhPct: number,
+  cooling: string,
+): number {
+  if (
+    cooling === "fan_and_pad" ||
+    cooling === "evaporative" ||
+    cooling === "high_pressure_fog"
+  ) {
+    return Math.max(padCoolingTempFloorC(externalTemp, externalRhPct), internalTemp);
+  }
+  if (cooling === "mechanical_ac") {
+    return Math.max(MECHANICAL_AC_TEMP_FLOOR_C, internalTemp);
+  }
+  return internalTemp;
 }
 
 export function ventilationAchWithSizing(
@@ -120,9 +162,8 @@ export function ventilationAchWithSizing(
     sizing.roofVentCount * sizing.roofVentWidthM * 1.2 +
     sizing.sideVentCount * sizing.sideVentHeightM * 1.8;
 
-  const forcedBoost = (fanArea / area) * 14 + (ventArea / area) * 4 * ventCapacityFactor(sizing);
-  const circulationBoost =
-    sizing.circulationFanCount * 0.22 * (300 / area);
+  const forcedBoost = (fanArea / area) * 8 + (ventArea / area) * 2.5;
+  const circulationBoost = Math.min(sizing.circulationFanCount, 24) * 0.15;
 
   return base + windBonus + buoyancy + forcedBoost + circulationBoost;
 }
@@ -134,6 +175,7 @@ export function estimatePreviewMicroclimate(
   equipment: ClimateEquipment,
   dimensions: GreenhouseDimensions,
   crop: CropConfig,
+  et0MmDay = DEFAULT_ET0_MM_DAY,
 ): {
   internalTemp: number;
   externalTemp: number;
@@ -142,7 +184,7 @@ export function estimatePreviewMicroclimate(
   vpdKpa: number;
 } {
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
-  const externalTemp = scenario.externalTempC - 3;
+  const externalTemp = scenario.externalTempC;
   const solarTransmittance = effectiveSolarTransmittance(covering, shadingScreen);
   const qSolar =
     solarTransmittance *
@@ -164,8 +206,7 @@ export function estimatePreviewMicroclimate(
     (1.2 * 1005 * ach * volume) / (3600 * Math.max(length * width, 1));
   const totalCoeff = conductance + ventCoeff;
 
-  const laiFactor = Math.min(crop.lai / 3, 2);
-  const qTranspiration = -(crop.lai > 0 ? laiFactor * 45 : 20);
+  const qTranspiration = transpirationFluxWm2(et0MmDay, crop);
 
   let internalTemp =
     externalTemp + (qSolar + qTranspiration) / Math.max(totalCoeff, 0.5);
@@ -201,23 +242,33 @@ export function estimatePreviewMicroclimate(
     }
   }
 
+  internalTemp = applyCoolingTempFloor(
+    internalTemp,
+    externalTemp,
+    scenario.externalRhPct,
+    equipment.cooling,
+  );
+
   const heatingBase = HEATING_W_M2[equipment.heating] ?? 0;
-  if (heatingBase > 0) {
+  const tempDeficit = HEATING_SETPOINT_C - internalTemp;
+  if (heatingBase > 0 && tempDeficit > 0) {
+    const heatingFlux =
+      heatingBase * Math.min(tempDeficit / 5, 1.5) * heaterCapacityFactor(sizing);
     internalTemp +=
-      (heatingBase * heaterCapacityFactor(sizing) * 0.55) /
-      Math.max(covering.uValue * 2.5, 1);
+      heatingFlux / Math.max(covering.uValue * 2.5, 1);
   }
 
-  if (equipment.cooling === "fan_and_pad") {
-    internalTemp = Math.max(
-      padCoolingTempFloorC(externalTemp, scenario.externalRhPct),
-      internalTemp,
-    );
-  }
+  const system = normalizeCultivationSystem(crop.system);
+  const thermalMass = CULTIVATION_THERMAL_MASS[system] ?? 1.0;
+  internalTemp =
+    externalTemp + (internalTemp - externalTemp) / Math.max(thermalMass, 1.0);
 
   const internalRh = Math.min(
     95,
-    Math.max(30, scenario.externalRhPct + rhCool + (externalTemp - internalTemp) * 1.8),
+    Math.max(
+      30,
+      scenario.externalRhPct + rhCool + (externalTemp - internalTemp) * 1.0,
+    ),
   );
 
   const es = 0.6108 * Math.exp((17.27 * internalTemp) / (internalTemp + 237.3));

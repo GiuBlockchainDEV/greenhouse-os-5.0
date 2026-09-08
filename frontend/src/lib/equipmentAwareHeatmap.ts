@@ -105,7 +105,7 @@ const GRID_MAX = 24;
 const REF_GREENHOUSE_LENGTH_M = 30;
 const REF_GREENHOUSE_WIDTH_M = 10;
 const REF_GREENHOUSE_EAVE_M = 3;
-const MAX_LOCAL_TEMP_DELTA_C = 12;
+const MAX_LOCAL_TEMP_DELTA_C = 7;
 const MAX_LOCAL_RH_DELTA_PCT = 28;
 
 function gaussian1d(dist: number, sigma: number): number {

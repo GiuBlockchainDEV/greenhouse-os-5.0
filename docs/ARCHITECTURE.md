@@ -203,7 +203,23 @@ $$
 
 Internal temperature solved at quasi-steady state from net energy gain and total conductance.
 
-**Implementation:** `backend/app/simulation/thermal.py`
+**Key coefficients (aligned frontend ↔ backend):**
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Air density ρ | 1.2 kg/m³ | Ventilation sensible heat |
+| Air $c_p$ | 1005 J/(kg·K) | Ventilation sensible heat |
+| Latent heat λ | 2.45 MJ/kg (2.45×10⁶ J/kg) | Transpiration: $Q_{trans} = -(\mathrm{ET}_{mm/h}/3600)\cdot\lambda$ |
+| Solar absorption | 0.72 × τ | Fraction of transmitted global radiation heating air |
+| RH coupling | 1.0 %/°C | Internal RH shift per °C below external dry-bulb |
+| ACH fan boost | $(A_{fan}/A_{floor})\times 8$ | Exhaust fan throat area |
+| ACH vent boost | $(A_{vent}/A_{floor})\times 2.5$ | Roof/side vent openings |
+| ACH circulation | $\min(N_{circ}, 24)\times 0.15$ | HAF mixing (no direct exhaust) |
+| Evaporative floor | $T_{wb} - 1.5\,°\mathrm{C}$ | Pad, fog, evaporative cooling |
+| AC floor | 12 °C | Mechanical cooling minimum |
+| Cultivation thermal mass | ≥ 1.0 divisor | Dampens deviation only; never amplifies |
+
+**Implementation:** `backend/app/simulation/thermal.py`, `frontend/src/lib/thermalEstimate.ts`
 
 ### WebSocket Pipeline
 
