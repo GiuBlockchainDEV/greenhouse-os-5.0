@@ -67,9 +67,14 @@
     "liveDataHint": "Carte live du moteur de simulation (géométrie, culture, équipements, météo).",
     "previewHintDetailed": "Estimation d'aperçu : ~{{temp}}°C intérieur, ~{{rh}}% HR — selon météo, couverture et équipements.",
     "equipmentHint": "La carte inclut pad, ventilateurs, ouvrants, AC, chauffage et circulation du panneau gauche.",
+    "estimatedValue": "Estimation",
+    "workingRange": "Plage de travail culture",
+    "floorRange": "Étendue au sol",
     "legend": {
-      "temperature": "Plage de température au sol",
-      "vpd": "Plage de VPD au sol"
+      "temperature": "Échelle absolue 0–50°C — repère = température interne estimée",
+      "humidity": "Échelle absolue 0–100% — repère = HR interne estimée",
+      "vpd": "Échelle VPD (0–10 kPa)",
+      "uniformity": "Indice d'uniformité interne (0–100%)"
     }
   }
 }

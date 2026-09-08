@@ -74,9 +74,12 @@
     "liveDataHint": "La mappa segue i parametri impostati; con simulazione connessa riceve gli stessi dati meteo.",
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
     "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
+    "estimatedValue": "Stima",
+    "workingRange": "Range di lavoro coltura",
+    "floorRange": "Span pavimento",
     "legend": {
-      "temperature": "Colori: range attuale sul pavimento (riferimento 0–50°C)",
-      "humidity": "Scala umidità (0–100%)",
+      "temperature": "Scala assoluta 0–50°C — indicatore = temperatura interna stimata",
+      "humidity": "Scala assoluta 0–100% — indicatore = UR interna stimata",
       "vpd": "Scala VPD (0–10 kPa)",
       "uniformity": "Indice uniformità interna (0–100%)"
     }

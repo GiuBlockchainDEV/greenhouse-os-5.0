@@ -1,3 +1,4 @@
+import type { CropType } from "@/types/greenhouse";
 import type { WSSimulationResults } from "@/types/simulation";
 
 export type SimulationData = WSSimulationResults["data"];
@@ -168,9 +169,84 @@ export interface HeatmapScale {
   unit: string;
 }
 
+export const GREENHOUSE_TEMP_MIN_C = 0;
+export const GREENHOUSE_TEMP_MAX_C = 50;
+
+export interface WorkingTempRange {
+  min: number;
+  max: number;
+}
+
+export interface HeatmapFieldSummary {
+  estimated: number;
+  fieldMin: number;
+  fieldMax: number;
+  fieldMean: number;
+}
+
+const CROP_WORKING_TEMP_C: Record<CropType, WorkingTempRange> = {
+  tomato: { min: 20, max: 28 },
+  cucumber: { min: 22, max: 30 },
+  pepper: { min: 20, max: 28 },
+  lettuce: { min: 16, max: 22 },
+  strawberry: { min: 18, max: 26 },
+  cannabis: { min: 22, max: 28 },
+};
+
+export function cropWorkingTempRange(cropType: CropType): WorkingTempRange {
+  return CROP_WORKING_TEMP_C[cropType] ?? { min: 20, max: 28 };
+}
+
+export function computeHeatmapFieldSummary(
+  surface: HeatmapSurfaceValues,
+  mode: HeatmapValueMode,
+  preview: HeatmapClimatePreview,
+): HeatmapFieldSummary {
+  const rows = surface.temperature.length;
+  const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
+  const values: number[] = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      values.push(matrixValueAt(surface, mode, preview.internalRh, row, col));
+    }
+  }
+
+  if (values.length === 0) {
+    const estimated =
+      mode === "humidity"
+        ? preview.internalRh
+        : mode === "vpd"
+          ? vpdKpaAt(preview.internalTemp, preview.internalRh)
+          : mode === "uniformity"
+            ? 100
+            : preview.internalTemp;
+    return {
+      estimated,
+      fieldMin: estimated,
+      fieldMax: estimated,
+      fieldMean: estimated,
+    };
+  }
+
+  const fieldMin = Math.min(...values);
+  const fieldMax = Math.max(...values);
+  const fieldMean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const estimated =
+    mode === "humidity"
+      ? preview.internalRh
+      : mode === "vpd"
+        ? preview.vpdKpa
+        : mode === "uniformity"
+          ? fieldMean
+          : preview.internalTemp;
+
+  return { estimated, fieldMin, fieldMax, fieldMean };
+}
+
 /** Fixed absolute color scales for heatmap visualization. */
 export const HEATMAP_FIXED_SCALE: Record<HeatmapValueMode, HeatmapScale> = {
-  temperature: { min: 0, max: 50, unit: "°C" },
+  temperature: { min: GREENHOUSE_TEMP_MIN_C, max: GREENHOUSE_TEMP_MAX_C, unit: "°C" },
   humidity: { min: 0, max: 100, unit: "%" },
   vpd: { min: 0, max: 10, unit: "kPa" },
   uniformity: { min: 0, max: 100, unit: "%" },
@@ -213,26 +289,23 @@ function surfaceValueBounds(
   return { min, max };
 }
 
-/** Color range from actual field spread, clamped to absolute scale (0–50°C etc.). */
+/** Color range: fixed absolute scale so 0–50°C (and RH/VPD bands) stay readable. */
 export function computeHeatmapVisualRange(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   preview: HeatmapClimatePreview,
 ): HeatmapScale {
   const absolute = HEATMAP_FIXED_SCALE[mode];
+
+  if (mode === "temperature" || mode === "humidity" || mode === "uniformity") {
+    return absolute;
+  }
+
   const minSpan = MIN_VISUAL_SPAN[mode];
   const { min: dataMin, max: dataMax } = surfaceValueBounds(surface, mode, preview);
 
   let min = dataMin;
   let max = dataMax;
-
-  if (mode === "temperature") {
-    min = Math.min(min, preview.internalTemp - minSpan / 2);
-    max = Math.max(max, preview.internalTemp + minSpan / 2);
-  } else if (mode === "humidity") {
-    min = Math.min(min, preview.internalRh - minSpan / 2);
-    max = Math.max(max, preview.internalRh + minSpan / 2);
-  }
 
   if (max - min < minSpan) {
     const mid = (min + max) / 2;
