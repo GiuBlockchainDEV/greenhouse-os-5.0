@@ -328,12 +328,45 @@ function influenceAt(
     }
   }
 
+  for (const segment of ctx.layout.acDucts.segments) {
+    const unit = ctx.layout.acUnits[segment.acUnitIndex];
+    if (!unit) continue;
+    const scale = acCapacityFactor(unit.widthM) * coeffs.acCapacity;
+    const dx = segment.end.x - segment.start.x;
+    const dz = segment.end.z - segment.start.z;
+    const segLen = Math.hypot(dx, dz);
+    const steps = Math.max(2, Math.ceil(segLen / 2));
+    const sigma = segment.diameterM * 2.2;
+    for (let step = 0; step <= steps; step++) {
+      const t = step / steps;
+      const sx = segment.start.x + dx * t;
+      const sz = segment.start.z + dz * t;
+      const g = gaussian1d(x - sx, sigma) * gaussian1d(z - sz, sigma);
+      tempDelta -= 0.85 * scale * g;
+      rhDelta -= 2.5 * scale * g;
+    }
+  }
+
+  for (const diffuser of ctx.layout.acDucts.diffusers) {
+    const unit = ctx.layout.acUnits[diffuser.acUnitIndex];
+    const scale = unit
+      ? acCapacityFactor(unit.widthM) * coeffs.acCapacity
+      : coeffs.acCapacity;
+    const sigma = diffuser.reachM;
+    const g = gaussian1d(x - diffuser.x, sigma) * gaussian1d(z - diffuser.z, sigma);
+    tempDelta -= 2.6 * scale * g;
+    rhDelta -= 11 * scale * g;
+    if (y >= diffuser.y - 0.4 && y <= diffuser.y + 1.2) {
+      tempDelta -= 0.8 * scale * g;
+    }
+  }
+
   for (const ac of ctx.layout.acUnits) {
-    const scale = acCapacityFactor(ac.widthM) * coeffs.acCapacity;
-    const sigma = ac.widthM * 0.9;
+    const scale = acCapacityFactor(ac.widthM) * coeffs.acCapacity * 0.2;
+    const sigma = ac.widthM * 0.55;
     const g = gaussian1d(x - ac.x, sigma) * gaussian1d(z - ac.z, sigma);
-    tempDelta -= 2.8 * scale * g;
-    rhDelta -= 12 * scale * g;
+    tempDelta -= 1.2 * scale * g;
+    rhDelta -= 4 * scale * g;
   }
 
   if (coeffs.heaterShare > 0) {

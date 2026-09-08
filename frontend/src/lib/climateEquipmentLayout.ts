@@ -1,5 +1,7 @@
 /** Positions and dimensions for 3D climate equipment placement. */
 
+import { computeAcDuctNetwork, type AcDuctNetwork } from "@/lib/acDuctLayout";
+
 import type { BedZone } from "@/lib/cultivationLayout";
 import { bayCenterZ, roofRiseM } from "@/lib/structureUtils";
 import type {
@@ -68,6 +70,8 @@ export interface ClimateEquipmentLayout {
   circulationFans: CirculationFanPlacement[];
   padWalls: PadWallPlacement[];
   acUnits: AcUnitPlacement[];
+  /** Insulated supply ducts and ceiling diffusers for mechanical AC. */
+  acDucts: AcDuctNetwork;
   vents: VentPlacement[];
   heaters: HeaterPlacement[];
   fogLines: FogLinePlacement[];
@@ -443,6 +447,11 @@ export function computeClimateEquipmentLayout(params: {
     });
   }
 
+  const acDucts =
+    equipment.cooling === "mechanical_ac"
+      ? computeAcDuctNetwork(acUnits, length, width, eaveHeight)
+      : { segments: [], diffusers: [] };
+
   if (equipment.cooling === "high_pressure_fog") {
     const fogZs = spreadAlongAxis(sizing.fogLineCount, width, width * 0.1);
     fogZs.forEach((offsetZ) => {
@@ -558,6 +567,7 @@ export function computeClimateEquipmentLayout(params: {
     circulationFans,
     padWalls,
     acUnits,
+    acDucts,
     vents,
     heaters,
     fogLines,
