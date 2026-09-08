@@ -25,6 +25,7 @@ function buildHeatmapTexture(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   preview: HeatmapClimatePreview,
+  surfaceKind: string,
 ): { texture: THREE.DataTexture; min: number; max: number } {
   const rows = surface.temperature.length;
   const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
@@ -36,11 +37,21 @@ function buildHeatmapTexture(
     return { texture: fallback, min: displayRange.min, max: displayRange.max };
   }
 
+  const flipRow = surfaceKind === "wall_west" || surfaceKind === "wall_south";
+  const flipCol = surfaceKind === "wall_south";
+
   const values = new Float32Array(rows * cols);
   for (let row = 0; row < rows; row++) {
+    const texRow = flipRow ? rows - 1 - row : row;
     for (let col = 0; col < cols; col++) {
-      // DataTexture stores texels as y * width + x (x = row / length, y = col / width).
-      values[col * rows + row] = matrixValueAt(surface, mode, preview.internalRh, row, col);
+      const texCol = flipCol ? cols - 1 - col : col;
+      values[texCol * rows + texRow] = matrixValueAt(
+        surface,
+        mode,
+        preview.internalRh,
+        row,
+        col,
+      );
     }
   }
 
@@ -55,7 +66,7 @@ function buildHeatmapTexture(
 }
 
 interface HeatmapSurfaceProps {
-  surfaceKey: string;
+  surfaceKind: string;
   surface: HeatmapSurfaceValues;
   mode: HeatmapValueMode;
   preview: HeatmapClimatePreview;
@@ -66,7 +77,7 @@ interface HeatmapSurfaceProps {
 }
 
 function HeatmapSurface({
-  surfaceKey,
+  surfaceKind,
   surface,
   mode,
   preview,
@@ -75,9 +86,10 @@ function HeatmapSurface({
   rotation,
   planeSize,
 }: HeatmapSurfaceProps) {
+  const surfaceKey = surfaceKind;
   const shaderData = useMemo(
-    () => buildHeatmapTexture(surface, mode, preview),
-    [surface, mode, preview, surfaceKey],
+    () => buildHeatmapTexture(surface, mode, preview, surfaceKind),
+    [surface, mode, preview, surfaceKind],
   );
 
   useEffect(() => {
@@ -214,7 +226,7 @@ export function HeatmapPlane() {
         return (
           <HeatmapSurface
             key={`${surfaceKind}-${revision}-${valueMode}`}
-            surfaceKey={`${surfaceKind}-${revision}-${valueMode}`}
+            surfaceKind={surfaceKind}
             surface={field.surfaces[surfaceKind]}
             mode={valueMode}
             preview={field.preview}

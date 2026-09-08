@@ -98,10 +98,12 @@ export function solarTempDeltaFromContext(
   const fromNorth = (solar.halfW - z) / Math.max(solar.width, 0.1);
 
   let sunFacing = 0;
-  if (solar.dirX > 0.12) sunFacing = Math.max(sunFacing, fromWest);
-  if (solar.dirX < -0.12) sunFacing = Math.max(sunFacing, fromEast);
-  if (solar.dirZ > 0.12) sunFacing = Math.max(sunFacing, fromSouth);
-  if (solar.dirZ < -0.12) sunFacing = Math.max(sunFacing, fromNorth);
+  // dirX > 0: light travels toward +X (from west) → west interior receives more (high fromEast).
+  if (solar.dirX > 0.12) sunFacing = Math.max(sunFacing, fromEast);
+  if (solar.dirX < -0.12) sunFacing = Math.max(sunFacing, fromWest);
+  // dirZ > 0: light travels toward +Z (from north) → north interior receives more (high fromNorth).
+  if (solar.dirZ > 0.12) sunFacing = Math.max(sunFacing, fromNorth);
+  if (solar.dirZ < -0.12) sunFacing = Math.max(sunFacing, fromSouth);
 
   const heightFactor = 0.65 + 0.35 * (1 - y / Math.max(solar.eaveHeight, 1));
   const spatial =

@@ -129,8 +129,13 @@ export function computeSpatialPerturbation(
   const solarDelta = solarTempDeltaFromContext(solar, x, y, z) - solarMean * 0.15;
 
   const outdoorInfl = outdoorInfluenceAt(ctx, x, z);
+  const padTransit =
+    ctx.equipment.cooling === "fan_and_pad" ||
+    ctx.equipment.cooling === "evaporative"
+      ? padTransitInfluence(ctx, x)
+      : 0;
   const outdoorTempDelta =
-    outdoorInfl * (ctx.externalTemp - ctx.baseTemp) * 0.45;
+    outdoorInfl * (1 - padTransit * 0.85) * (ctx.externalTemp - ctx.baseTemp) * 0.45;
   const wOut = humidityRatioKgKg(ctx.externalTemp, ctx.scenario.externalRhPct);
   const outdoorRhDelta =
     outdoorInfl *
@@ -144,13 +149,17 @@ export function computeSpatialPerturbation(
     ctx.equipment.cooling === "fan_and_pad" ||
     ctx.equipment.cooling === "evaporative"
   ) {
-    const transit = padTransitInfluence(ctx, x);
+    const transit = padTransit;
     const supplyTemp = ctx.supplyTempC ?? ctx.externalTemp;
     const supplyDelta = (supplyTemp - ctx.baseTemp) * transit;
     tempDelta += supplyDelta;
+    const warmExcess = Math.max(ctx.baseTemp - supplyTemp, 0);
+    const downwind = 1 - transit;
+    tempDelta += downwind ** 1.3 * warmExcess * 0.6;
     if (ctx.supplyHumidityRatioKgKg !== null) {
       const supplyRh = rhPctFromHumidityRatio(supplyTemp, ctx.supplyHumidityRatioKgKg);
       rhDelta += (supplyRh - ctx.internalRh) * transit * 0.65;
+      rhDelta -= downwind ** 1.15 * Math.max(supplyRh - ctx.internalRh, 0) * 0.35;
     }
   }
 
