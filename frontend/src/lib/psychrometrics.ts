@@ -1,5 +1,7 @@
 /** Psychrometric helpers for preview microclimate and equipment-aware heatmaps. */
 
+import { PAD_WET_BULB_MARGIN_C } from "@/lib/coolingConstants";
+
 /** Magnus–Tetens saturation vapor pressure (kPa). */
 export function saturationVaporPressureKpa(temperatureC: number): number {
   return 0.6108 * Math.exp((17.27 * temperatureC) / (temperatureC + 237.3));
@@ -23,5 +25,5 @@ export function approxWetBulbC(dryBulbC: number, rhPct: number): number {
 
 /** Minimum achievable internal air temperature with evaporative pad cooling (°C). */
 export function padCoolingTempFloorC(externalTempC: number, externalRhPct: number): number {
-  return approxWetBulbC(externalTempC, externalRhPct) - 1.5;
+  return approxWetBulbC(externalTempC, externalRhPct) - PAD_WET_BULB_MARGIN_C;
 }

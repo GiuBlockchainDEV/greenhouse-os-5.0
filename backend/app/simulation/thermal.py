@@ -9,6 +9,7 @@ from app.simulation.climate_equipment import (
     heating_flux_with_sizing,
     ventilation_ach_with_sizing,
 )
+from app.simulation.constants import COOLING_CAPACITY_FACTOR
 from app.simulation.psychrometrics import pad_cooling_temp_floor_c
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
 from app.simulation.cultivation import (
@@ -258,7 +259,7 @@ def _generate_heatmap(
     pad_cool = 0.0
     if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
         pad_cool, _ = fan_and_pad_cooling_c(t_external, rh_external, sizing)
-        pad_cool = min(pad_cool, 6.0)
+        pad_cool = min(pad_cool, 6.0 * COOLING_CAPACITY_FACTOR)
 
     fan_cool = exhaust_capacity_factor(sizing) * 1.0
     vent_cool = (

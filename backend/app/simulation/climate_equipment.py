@@ -3,6 +3,7 @@
 import math
 
 from app.simulation.psychrometrics import approx_wet_bulb_c
+from app.simulation.constants import COOLING_CAPACITY_FACTOR
 from app.simulation.schemas import ClimateEquipmentSizingInput
 
 PAD_CAPACITY_MAX = 2.5
@@ -103,7 +104,7 @@ def fan_and_pad_cooling_c(
     system_factor = (0.42 + pad_capacity * 0.29) * (
         0.58 + min(exhaust_capacity, 2.0) * 0.42
     )
-    temp_drop = depression * PAD_EVAPORATIVE_EFFICIENCY * min(1.1, system_factor)
+    temp_drop = depression * PAD_EVAPORATIVE_EFFICIENCY * min(1.1, system_factor) * COOLING_CAPACITY_FACTOR
     rh_boost = min(
         28.0,
         10.0 + (temp_drop / max(depression, 0.5)) * 18.0,
@@ -159,6 +160,8 @@ def cooling_effect_with_sizing(
     elif cooling_system == "high_pressure_fog":
         delta *= 0.45 + fog_capacity_factor(sizing) * 0.85
         rh += (fog_capacity_factor(sizing) - 1.0) * 8.0
+    if cooling_system not in {"none", "fan_and_pad"}:
+        delta *= COOLING_CAPACITY_FACTOR
     return delta, rh
 
 

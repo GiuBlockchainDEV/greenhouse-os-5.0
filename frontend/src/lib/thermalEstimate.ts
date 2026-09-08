@@ -27,6 +27,7 @@ import {
   heaterCapacityFactor,
   padCapacityFactor,
 } from "@/lib/climateEquipmentCapacity";
+import { COOLING_CAPACITY_FACTOR } from "@/lib/coolingConstants";
 import { padCoolingTempFloorC } from "@/lib/psychrometrics";
 
 /** Matches backend ThermalInput.heating_setpoint_c default. */
@@ -233,6 +234,7 @@ export function estimatePreviewMicroclimate(
     if (equipment.cooling === "high_pressure_fog") {
       coolDelta *= 0.45 + fogCapacityFactor(sizing) * 0.85;
     }
+    coolDelta *= COOLING_CAPACITY_FACTOR;
     internalTemp += coolDelta;
 
     if (equipment.cooling === "mechanical_ac") {

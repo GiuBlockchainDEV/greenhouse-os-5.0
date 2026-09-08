@@ -1,4 +1,5 @@
 import { REFERENCE_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
+import { COOLING_CAPACITY_FACTOR } from "@/lib/coolingConstants";
 import { approxWetBulbC } from "@/lib/psychrometrics";
 import type { ClimateEquipmentSizing } from "@/types/greenhouse";
 
@@ -84,7 +85,10 @@ export function computeFanAndPadCoolingC(
     (0.42 + padCapacity * 0.29) *
     (0.58 + Math.min(exhaustCapacity, 2) * 0.42);
   const tempDropC =
-    depression * PAD_EVAPORATIVE_EFFICIENCY * Math.min(1.1, systemFactor);
+    depression *
+    PAD_EVAPORATIVE_EFFICIENCY *
+    Math.min(1.1, systemFactor) *
+    COOLING_CAPACITY_FACTOR;
   const rhBoostPct =
     Math.min(28, 10 + (tempDropC / Math.max(depression, 0.5)) * 18) -
     Math.max(0, (exhaustCapacity - 1) * 3);
