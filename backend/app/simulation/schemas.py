@@ -131,7 +131,7 @@ class ClimateEquipmentSizingInput(BaseModel):
     roof_exhaust_fan_diameter_m: float = Field(default=1.0, ge=0.7, le=1.6)
     circulation_fan_count: int = Field(default=0, ge=0, le=24)
     circulation_fan_diameter_m: float = Field(default=0.55, ge=0.4, le=1.0)
-    pad_wall_width_m: float = Field(default=8.0, ge=2.0, le=20.0)
+    pad_wall_width_m: float = Field(default=8.0, ge=2.0, le=250.0)
     pad_wall_height_m: float = Field(default=2.0, ge=1.2, le=3.5)
     ac_unit_count: int = Field(default=0, ge=0, le=8)
     ac_unit_width_m: float = Field(default=1.8, ge=1.0, le=3.0)

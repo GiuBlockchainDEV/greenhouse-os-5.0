@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { normalizeHafFanCount, hafFansPerBayPerRow } from "@/lib/climateEquipmentLayout";
+import { maxPadWallSpanM, normalizeHafFanCount, hafFansPerBayPerRow } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   CoolingSystem,
@@ -130,6 +130,7 @@ export function CultivationClimateControls() {
   const { t: tCrops } = useTranslation("crops");
   const { t: tSim } = useTranslation("simulation");
 
+  const dimensions = useGreenhouseStore((state) => state.dimensions);
   const crop = useGreenhouseStore((state) => state.crop);
   const structure = useGreenhouseStore((state) => state.structure);
   const metrics = useGreenhouseStore((state) => state.metrics);
@@ -143,6 +144,7 @@ export function CultivationClimateControls() {
   const sizing = climateEquipment.sizing;
   const [circulationCountAdjusted, setCirculationCountAdjusted] = useState(false);
   const hafFansPerRow = sizing.circulationFanCount / 2;
+  const maxPadWallWidth = maxPadWallSpanM(dimensions.width);
   const fansPerBayPerRow = hafFansPerBayPerRow(
     sizing.circulationFanCount,
     structure.bayCount,
@@ -360,7 +362,7 @@ export function CultivationClimateControls() {
                   value={sizing.padWallWidthM}
                   unit={tCommon("units.meters")}
                   min={2}
-                  max={20}
+                  max={maxPadWallWidth}
                   step={0.5}
                   onChange={(value) => setClimateEquipmentSizing({ padWallWidthM: value })}
                 />

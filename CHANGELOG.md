@@ -13,6 +13,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - **HAF circulation fan layout** — Even fan count enforcement, per-bay balanced rows with 3 m end offset, full-length X slot grid with round-robin bay assignment for maximum floor coverage.
+- **Pad wall span** — Pad wall may cover up to 95% of greenhouse width; slider max scales with structure dimensions.
 
 ## [5.0.0] - 2026-08-03
 

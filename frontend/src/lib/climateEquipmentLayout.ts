@@ -192,6 +192,13 @@ function gableFanCenterY(
 /** Minimum clearance from short gable walls along greenhouse length (m). */
 export const HAF_WALL_OFFSET_M = 3;
 
+/** Pad wall may span up to 95% of the greenhouse width (gable face). */
+export const PAD_WALL_MAX_SPAN_FRACTION = 0.95;
+
+export function maxPadWallSpanM(greenhouseWidth: number): number {
+  return Math.max(2, greenhouseWidth * PAD_WALL_MAX_SPAN_FRACTION);
+}
+
 export interface HafFanCountNormalization {
   requested: number;
   total: number;
@@ -414,7 +421,7 @@ export function computeClimateEquipmentLayout(params: {
       x: -halfLength + 0.06,
       y: sizing.padWallHeightM / 2 + 0.2,
       zCenter: 0,
-      widthM: Math.min(sizing.padWallWidthM, width * 0.85),
+      widthM: Math.min(sizing.padWallWidthM, maxPadWallSpanM(width)),
       heightM: Math.min(sizing.padWallHeightM, eaveHeight * 0.85),
     });
   }

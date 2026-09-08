@@ -112,7 +112,7 @@ export interface ClimateEquipmentSizing {
   circulationFanCount: number;
   /** Circulation fan impeller diameter in meters. */
   circulationFanDiameterM: number;
-  /** Pad wall span along the gable width in meters. */
+  /** Pad wall span along the gable face (up to 95% of greenhouse width). */
   padWallWidthM: number;
   /** Pad wall height in meters. */
   padWallHeightM: number;
