@@ -12,7 +12,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- **HAF circulation fan layout** — Even fan count enforcement, 3 m end offset, two balanced rows (outbound at W/4, return at 3W/4), and dynamic step redistribution along greenhouse length.
+- **HAF circulation fan layout** — Even fan count enforcement, per-bay balanced rows with 3 m end offset, dynamic step along length, and auto-normalization when bay count changes.
 
 ## [5.0.0] - 2026-08-03
 

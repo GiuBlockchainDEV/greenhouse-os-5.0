@@ -297,7 +297,26 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         const structure = { ...get().structure, ...update };
         const dimensions = syncDimensionsFromStructure(structure, get().dimensions);
         const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {});
-        set({ structure, dimensions, crop, metrics }, false, "setStructure");
+        const climateEquipment = get().climateEquipment;
+        const normalizedCount = normalizeHafFanCount(
+          climateEquipment.sizing.circulationFanCount,
+          structure.bayCount,
+        ).total;
+        const nextEquipment =
+          normalizedCount === climateEquipment.sizing.circulationFanCount
+            ? climateEquipment
+            : {
+                ...climateEquipment,
+                sizing: {
+                  ...climateEquipment.sizing,
+                  circulationFanCount: normalizedCount,
+                },
+              };
+        set(
+          { structure, dimensions, crop, metrics, climateEquipment: nextEquipment },
+          false,
+          "setStructure",
+        );
       },
 
       setDimensions: (update) => {
@@ -363,6 +382,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         if (partial.circulationFanCount !== undefined) {
           partial.circulationFanCount = normalizeHafFanCount(
             partial.circulationFanCount,
+            get().structure.bayCount,
           ).total;
         }
         set(

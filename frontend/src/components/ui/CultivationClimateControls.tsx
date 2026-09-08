@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { normalizeHafFanCount } from "@/lib/climateEquipmentLayout";
+import { normalizeHafFanCount, hafFansPerBayPerRow } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   CoolingSystem,
@@ -143,6 +143,10 @@ export function CultivationClimateControls() {
   const sizing = climateEquipment.sizing;
   const [circulationCountAdjusted, setCirculationCountAdjusted] = useState(false);
   const hafFansPerRow = sizing.circulationFanCount / 2;
+  const fansPerBayPerRow = hafFansPerBayPerRow(
+    sizing.circulationFanCount,
+    structure.bayCount,
+  );
 
   const showFans =
     climateEquipment.cooling === "fan_and_pad" ||
@@ -482,23 +486,30 @@ export function CultivationClimateControls() {
             value={sizing.circulationFanCount}
             unit=""
             min={0}
-            max={24}
+            max={Math.max(24, structure.bayCount * 8)}
             step={2}
             onChange={(value) => {
-              const normalized = normalizeHafFanCount(value);
+              const normalized = normalizeHafFanCount(value, structure.bayCount);
               setCirculationCountAdjusted(normalized.adjusted);
               setClimateEquipmentSizing({ circulationFanCount: normalized.total });
             }}
           />
           {circulationCountAdjusted && (
             <p className="text-[10px] text-amber-700">
-              {tSim("equipment.sizing.circulationEvenCountWarning")}
+              {tSim("equipment.sizing.circulationCountWarning", {
+                bayCount: structure.bayCount,
+              })}
             </p>
           )}
           <ReadOnlyMetricRow
             label={tSim("equipment.sizing.circulationHint")}
-            value={hafFansPerRow}
+            value={fansPerBayPerRow}
             unit={tSim("equipment.sizing.circulationHintUnit")}
+          />
+          <ReadOnlyMetricRow
+            label={tSim("equipment.sizing.circulationRowHint")}
+            value={hafFansPerRow}
+            unit={tSim("equipment.sizing.circulationRowHintUnit")}
           />
           <SliderRow
             label={tSim("equipment.sizing.circulationFanDiameter")}

@@ -198,35 +198,93 @@ export interface HafFanCountNormalization {
   adjusted: boolean;
 }
 
-/** HAF loops require an even fan count so forward and return rows stay balanced. */
-export function normalizeHafFanCount(requested: number): HafFanCountNormalization {
+/**
+ * HAF loops require:
+ * - an even total fan count;
+ * - the same number of fans per row in every bay (N_fila divisible by bayCount);
+ * - at least one fan per row per bay (minimum 2 × bayCount).
+ */
+export function normalizeHafFanCount(
+  requested: number,
+  bayCount = 1,
+): HafFanCountNormalization {
+  const bays = Math.max(1, Math.floor(bayCount));
   if (requested <= 0) {
     return { requested, total: 0, adjusted: false };
   }
-  if (requested % 2 === 0) {
-    return { requested, total: requested, adjusted: false };
+
+  let total = requested;
+  if (total % 2 !== 0) {
+    total += 1;
   }
-  return { requested, total: requested + 1, adjusted: true };
+
+  const minTotal = 2 * bays;
+  if (total < minTotal) {
+    total = minTotal;
+  }
+
+  let fansPerRow = total / 2;
+  const bayRemainder = fansPerRow % bays;
+  if (bayRemainder !== 0) {
+    fansPerRow += bays - bayRemainder;
+    total = fansPerRow * 2;
+  }
+
+  return { requested, total, adjusted: total !== requested };
+}
+
+export function hafFansPerBayPerRow(totalCount: number, bayCount = 1): number {
+  const bays = Math.max(1, Math.floor(bayCount));
+  const { total } = normalizeHafFanCount(totalCount, bays);
+  if (total <= 0) return 0;
+  return total / 2 / bays;
+}
+
+function computeHafRowXUserPositions(
+  fansPerBayPerRow: number,
+  length: number,
+  wallOffsetM: number,
+): { row1: number[]; row2: number[] } {
+  const effectiveOffset = Math.min(wallOffsetM, Math.max((length - 0.5) / 2, 0));
+  const usefulSpace = Math.max(length - 2 * effectiveOffset, 0.5);
+
+  if (fansPerBayPerRow <= 0) {
+    return { row1: [], row2: [] };
+  }
+
+  if (fansPerBayPerRow === 1) {
+    const center = effectiveOffset + usefulSpace / 2;
+    return { row1: [center], row2: [center] };
+  }
+
+  const step = usefulSpace / (fansPerBayPerRow - 1);
+  const row1 = Array.from(
+    { length: fansPerBayPerRow },
+    (_, index) => effectiveOffset + index * step,
+  );
+  const row2 = Array.from(
+    { length: fansPerBayPerRow },
+    (_, index) => length - effectiveOffset - index * step,
+  );
+  return { row1, row2 };
 }
 
 function userXToSceneX(xUser: number, length: number): number {
   return xUser - length / 2;
 }
 
-function userYToSceneZ(yUser: number, width: number): number {
-  return yUser - width / 2;
-}
-
 /**
- * Balanced HAF circulation layout:
- * - Row 1 at Y = W/4, blowing +X (outbound)
- * - Row 2 at Y = 3W/4, blowing −X (return)
+ * Balanced HAF circulation layout per bay:
+ * - Row 1 at Z = bayCenter − bayWidth/4, blowing +X (outbound)
+ * - Row 2 at Z = bayCenter + bayWidth/4, blowing −X (return)
  * - Fans spaced uniformly along length with a fixed 3 m end offset
  */
 export function distributeHafCirculationFans(params: {
   totalCount: number;
   length: number;
   width: number;
+  bayCount: number;
+  bayWidthM: number;
   eaveHeight: number;
   ridgeHeight: number;
   diameterM: number;
@@ -236,58 +294,51 @@ export function distributeHafCirculationFans(params: {
     totalCount,
     length,
     width,
+    bayCount,
+    bayWidthM,
     eaveHeight,
     ridgeHeight,
     diameterM,
     wallOffsetM = HAF_WALL_OFFSET_M,
   } = params;
 
-  const { total } = normalizeHafFanCount(totalCount);
+  const bays = Math.max(1, bayCount);
+  const { total } = normalizeHafFanCount(totalCount, bays);
   if (total <= 0) return [];
 
-  const fansPerRow = total / 2;
-  const effectiveOffset = Math.min(wallOffsetM, Math.max((length - 0.5) / 2, 0));
-  const usefulSpace = Math.max(length - 2 * effectiveOffset, 0.5);
+  const fansPerBayPerRow = total / 2 / bays;
+  const { row1: row1XUser, row2: row2XUser } = computeHafRowXUserPositions(
+    fansPerBayPerRow,
+    length,
+    wallOffsetM,
+  );
   const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
-  const row1Z = userYToSceneZ(width / 4, width);
-  const row2Z = userYToSceneZ((3 * width) / 4, width);
-
-  const row1XUser: number[] = [];
-  let step = 0;
-
-  if (fansPerRow === 1) {
-    row1XUser.push(effectiveOffset + usefulSpace / 2);
-  } else {
-    step = usefulSpace / (fansPerRow - 1);
-    for (let i = 0; i < fansPerRow; i++) {
-      row1XUser.push(effectiveOffset + i * step);
-    }
-  }
-
   const fans: CirculationFanPlacement[] = [];
 
-  for (const xUser of row1XUser) {
-    fans.push({
-      x: userXToSceneX(xUser, length),
-      y: hangY,
-      z: row1Z,
-      diameterM,
-      yaw: 0,
-    });
-  }
+  for (let bayIndex = 0; bayIndex < bays; bayIndex++) {
+    const bayCenter = bayCenterZ(bayIndex, bayWidthM, width);
+    const row1Z = bayCenter - bayWidthM / 4;
+    const row2Z = bayCenter + bayWidthM / 4;
 
-  for (let i = 0; i < fansPerRow; i++) {
-    const xUser =
-      fansPerRow === 1
-        ? effectiveOffset + usefulSpace / 2
-        : length - effectiveOffset - i * step;
-    fans.push({
-      x: userXToSceneX(xUser, length),
-      y: hangY,
-      z: row2Z,
-      diameterM,
-      yaw: Math.PI,
-    });
+    for (const xUser of row1XUser) {
+      fans.push({
+        x: userXToSceneX(xUser, length),
+        y: hangY,
+        z: row1Z,
+        diameterM,
+        yaw: 0,
+      });
+    }
+
+    for (const xUser of row2XUser) {
+      fans.push({
+        x: userXToSceneX(xUser, length),
+        y: hangY,
+        z: row2Z,
+        diameterM,
+        yaw: Math.PI,
+      });
+    }
   }
 
   return fans;
@@ -349,6 +400,8 @@ export function computeClimateEquipmentLayout(params: {
         totalCount: sizing.circulationFanCount,
         length,
         width,
+        bayCount,
+        bayWidthM,
         eaveHeight,
         ridgeHeight,
         diameterM: sizing.circulationFanDiameterM,
