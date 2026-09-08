@@ -4,6 +4,10 @@ All notable architectural changes to GreenhouseOS 5.0 are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+### Fixed
+
+- **Pad wall thermodynamics** — Fan-and-pad cooling now respects outdoor wet-bulb depression with diminishing returns on oversized pads; prevents negative or sub-wet-bulb temperatures at 40 °C outdoor conditions.
+
 ## [5.0.1] - 2026-09-08
 
 ### Fixed

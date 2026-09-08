@@ -2,7 +2,11 @@
 
 import math
 
+from app.simulation.psychrometrics import approx_wet_bulb_c
 from app.simulation.schemas import ClimateEquipmentSizingInput
+
+PAD_CAPACITY_MAX = 2.5
+PAD_EVAPORATIVE_EFFICIENCY = 0.72
 
 COOLING_DELTA_C: dict[str, float] = {
     "none": 0.0,
@@ -82,7 +86,29 @@ def exhaust_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
 def pad_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
     actual = sizing.pad_wall_width_m * sizing.pad_wall_height_m
     baseline = DEFAULT_PAD_WIDTH_M * DEFAULT_PAD_HEIGHT_M
-    return actual / max(baseline, 0.1)
+    area_ratio = actual / max(baseline, 0.1)
+    return min(PAD_CAPACITY_MAX, math.sqrt(area_ratio))
+
+
+def fan_and_pad_cooling_c(
+    external_temp_c: float,
+    external_rh_pct: float,
+    sizing: ClimateEquipmentSizingInput,
+) -> tuple[float, float]:
+    """Physics-bounded fan-and-pad cooling (temp drop °C, RH boost %)."""
+    pad_capacity = pad_capacity_factor(sizing)
+    exhaust_capacity = exhaust_capacity_factor(sizing)
+    wet_bulb = approx_wet_bulb_c(external_temp_c, external_rh_pct)
+    depression = max(0.0, external_temp_c - wet_bulb)
+    system_factor = (0.42 + pad_capacity * 0.29) * (
+        0.58 + min(exhaust_capacity, 2.0) * 0.42
+    )
+    temp_drop = depression * PAD_EVAPORATIVE_EFFICIENCY * min(1.1, system_factor)
+    rh_boost = min(
+        28.0,
+        10.0 + (temp_drop / max(depression, 0.5)) * 18.0,
+    ) - max(0.0, (exhaust_capacity - 1.0) * 3.0)
+    return temp_drop, rh_boost
 
 
 def ac_capacity_factor(sizing: ClimateEquipmentSizingInput) -> float:
@@ -113,16 +139,19 @@ def cooling_effect_with_sizing(
     length: float,
     width: float,
     eave_height: float,
+    external_temp_c: float = 25.0,
+    external_rh_pct: float = 60.0,
 ) -> tuple[float, float]:
     """Scale cooling effect by installed pad/AC capacity."""
     delta, rh = cooling_effect(cooling_system)
     if cooling_system == "fan_and_pad":
-        pad_capacity = pad_capacity_factor(sizing)
-        exhaust_capacity = exhaust_capacity_factor(sizing)
-        delta *= (0.35 + pad_capacity * 0.65) * (0.55 + exhaust_capacity * 0.65)
-        rh += (pad_capacity - 1.0) * 6.0
-        rh -= (exhaust_capacity - 1.0) * 5.0
-    elif cooling_system == "evaporative":
+        temp_drop, rh_boost = fan_and_pad_cooling_c(
+            external_temp_c,
+            external_rh_pct,
+            sizing,
+        )
+        return -temp_drop, rh_boost
+    if cooling_system == "evaporative":
         delta *= 0.45 + pad_capacity_factor(sizing) * 0.75
     elif cooling_system == "mechanical_ac":
         delta *= 0.45 + ac_capacity_factor(sizing) * 0.85

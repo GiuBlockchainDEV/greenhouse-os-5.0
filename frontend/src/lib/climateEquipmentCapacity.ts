@@ -1,5 +1,9 @@
 import { REFERENCE_CLIMATE_SIZING } from "@/lib/climateEquipmentLayout";
+import { approxWetBulbC } from "@/lib/psychrometrics";
 import type { ClimateEquipmentSizing } from "@/types/greenhouse";
+
+const PAD_CAPACITY_MAX = 2.5;
+const PAD_EVAPORATIVE_EFFICIENCY = 0.72;
 
 function fanFlowUnits(diameterM: number, count: number, refDiameter: number): number {
   if (count <= 0 || diameterM <= 0) return 0;
@@ -54,11 +58,37 @@ export function circulationCapacityFactor(sizing: ClimateEquipmentSizing): numbe
   return normalizedRatio(actual, baseline);
 }
 
+/** 1.0 = reference pad area; diminishing returns for oversized pads. */
 export function padCapacityFactor(sizing: ClimateEquipmentSizing): number {
   const ref = REFERENCE_CLIMATE_SIZING;
-  const actual = sizing.padWallWidthM * sizing.padWallHeightM;
-  const baseline = ref.padWallWidthM * ref.padWallHeightM;
-  return normalizedRatio(actual, baseline);
+  const areaRatio =
+    (sizing.padWallWidthM * sizing.padWallHeightM) /
+    Math.max(ref.padWallWidthM * ref.padWallHeightM, 0.1);
+  return Math.min(PAD_CAPACITY_MAX, Math.sqrt(areaRatio));
+}
+
+/**
+ * Physics-bounded fan-and-pad cooling from outdoor wet-bulb depression.
+ * Prevents unrealistic sub-zero or below-wet-bulb temperatures at high outdoor RH.
+ */
+export function computeFanAndPadCoolingC(
+  externalTempC: number,
+  externalRhPct: number,
+  sizing: ClimateEquipmentSizing,
+): { tempDropC: number; rhBoostPct: number } {
+  const padCapacity = padCapacityFactor(sizing);
+  const exhaustCapacity = exhaustCapacityFactor(sizing);
+  const wetBulb = approxWetBulbC(externalTempC, externalRhPct);
+  const depression = Math.max(0, externalTempC - wetBulb);
+  const systemFactor =
+    (0.42 + padCapacity * 0.29) *
+    (0.58 + Math.min(exhaustCapacity, 2) * 0.42);
+  const tempDropC =
+    depression * PAD_EVAPORATIVE_EFFICIENCY * Math.min(1.1, systemFactor);
+  const rhBoostPct =
+    Math.min(28, 10 + (tempDropC / Math.max(depression, 0.5)) * 18) -
+    Math.max(0, (exhaustCapacity - 1) * 3);
+  return { tempDropC, rhBoostPct };
 }
 
 export function ventCapacityFactor(sizing: ClimateEquipmentSizing): number {

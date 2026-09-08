@@ -5,10 +5,11 @@ import math
 from app.simulation.climate_equipment import (
     cooling_effect_with_sizing,
     exhaust_capacity_factor,
+    fan_and_pad_cooling_c,
     heating_flux_with_sizing,
-    pad_capacity_factor,
     ventilation_ach_with_sizing,
 )
+from app.simulation.psychrometrics import pad_cooling_temp_floor_c
 from app.simulation.constants import LATENT_HEAT_VAPORIZATION
 from app.simulation.cultivation import (
     CULTIVATION_ET_FACTOR,
@@ -166,8 +167,13 @@ def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
         length,
         width,
         eave_height,
+        t_external,
+        rh_external,
     )
     t_internal += cool_delta
+
+    if params.equipment.cooling == "fan_and_pad":
+        t_internal = max(pad_cooling_temp_floor_c(t_external, rh_external), t_internal)
 
     temp_deficit = params.heating_setpoint_c - t_internal
     q_heating = heating_flux_with_sizing(
@@ -245,9 +251,8 @@ def _generate_heatmap(
 
     pad_cool = 0.0
     if equipment.cooling == "fan_and_pad" and sizing.pad_wall_width_m > 0:
-        pad_capacity = pad_capacity_factor(sizing)
-        exhaust_capacity = exhaust_capacity_factor(sizing)
-        pad_cool = 2.5 * pad_capacity * (0.55 + exhaust_capacity * 0.65)
+        pad_cool, _ = fan_and_pad_cooling_c(t_external, 60.0, sizing)
+        pad_cool = min(pad_cool, 6.0)
 
     fan_cool = exhaust_capacity_factor(sizing) * 1.0
     vent_cool = (

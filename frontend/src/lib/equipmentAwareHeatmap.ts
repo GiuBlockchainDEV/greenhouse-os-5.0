@@ -8,12 +8,14 @@ import {
 import {
   acCapacityFactor as acCapacityFromSizing,
   circulationCapacityFactor,
+  computeFanAndPadCoolingC,
   exhaustCapacityFactor,
   fogCapacityFactor,
   heaterCapacityFactor,
   padCapacityFactor as padCapacityFromSizing,
   ventCapacityFactor,
 } from "@/lib/climateEquipmentCapacity";
+import { padCoolingTempFloorC } from "@/lib/psychrometrics";
 import {
   buildSolarFieldContext,
   solarTempDeltaFromContext,
@@ -103,8 +105,8 @@ const GRID_MAX = 24;
 const REF_GREENHOUSE_LENGTH_M = 30;
 const REF_GREENHOUSE_WIDTH_M = 10;
 const REF_GREENHOUSE_EAVE_M = 3;
-const MAX_LOCAL_TEMP_DELTA_C = 18;
-const MAX_LOCAL_RH_DELTA_PCT = 35;
+const MAX_LOCAL_TEMP_DELTA_C = 12;
+const MAX_LOCAL_RH_DELTA_PCT = 28;
 
 function gaussian1d(dist: number, sigma: number): number {
   if (sigma <= 0) return 0;
@@ -118,7 +120,8 @@ function gridSize(span: number): number {
 function padAreaFactor(widthM: number, heightM: number): number {
   const refArea =
     REFERENCE_CLIMATE_SIZING.padWallWidthM * REFERENCE_CLIMATE_SIZING.padWallHeightM;
-  return (widthM * heightM) / Math.max(refArea, 0.1);
+  const ratio = (widthM * heightM) / Math.max(refArea, 0.1);
+  return Math.min(2.5, Math.sqrt(ratio));
 }
 
 function acCapacityFactor(widthM: number): number {
@@ -180,7 +183,15 @@ function buildHeatmapCoeffs(
   const acCapacity = acCapacityFromSizing(sizing);
   const exhaustFlow = exhaustFlowSum(ctx.layout);
   const fanAndPad = ctx.equipment.cooling === "fan_and_pad";
-  const padSystem = fanAndPad ? padFactor * (0.55 + exhaustCapacity * 0.65) : padFactor;
+  const fanPadCooling = fanAndPad
+    ? computeFanAndPadCoolingC(ctx.externalTemp, ctx.scenario.externalRhPct, sizing)
+    : null;
+  const padTransitCool = fanPadCooling
+    ? Math.min(4.5, fanPadCooling.tempDropC * 0.55)
+    : 0;
+  const padTransitRh = fanPadCooling
+    ? Math.min(16, fanPadCooling.rhBoostPct * 0.45)
+    : 0;
   const lengthScale = clampDimensionScale(ctx.length / REF_GREENHOUSE_LENGTH_M);
   const widthScale = clampDimensionScale(ctx.width / REF_GREENHOUSE_WIDTH_M, 0.65, 1.9);
   const heightScale = clampDimensionScale(ctx.eaveHeight / REF_GREENHOUSE_EAVE_M, 0.7, 1.7);
@@ -206,12 +217,10 @@ function buildHeatmapCoeffs(
     acCapacity,
     padFactor,
     fanAndPad,
-    fanAndPadTempWest: fanAndPad ? 7 * padSystem * Math.sqrt(widthScale) : 0,
-    fanAndPadTempEastWarm: fanAndPad
-      ? 5.5 * padSystem * (0.75 + exhaustCapacity * 0.35) * lengthScale
-      : 0,
-    fanAndPadRhWest: fanAndPad ? 18 * padSystem * Math.sqrt(widthScale) : 0,
-    fanAndPadRhEastDry: fanAndPad ? 14 * exhaustCapacity * padFactor * lengthScale : 0,
+    fanAndPadTempWest: fanAndPad ? padTransitCool : 0,
+    fanAndPadTempEastWarm: fanAndPad ? padTransitCool * 0.35 * lengthScale : 0,
+    fanAndPadRhWest: fanAndPad ? padTransitRh : 0,
+    fanAndPadRhEastDry: fanAndPad ? padTransitRh * 0.35 * lengthScale : 0,
     heaterShare:
       ctx.layout.heaters.length > 0
         ? heaterCapacityFactor(sizing) / ctx.layout.heaters.length
@@ -276,11 +285,11 @@ function influenceAt(
 
   for (const pad of ctx.layout.padWalls) {
     const plume = padPlumeStrength(ctx, x, y, z, pad) * padAreaFactor(pad.widthM, pad.heightM);
-    tempDelta -= 12 * plume;
-    rhDelta += 28 * plume;
+    tempDelta -= 3.5 * plume;
+    rhDelta += 9 * plume;
     if (y <= pad.heightM + 0.35) {
-      tempDelta -= 4 * plume;
-      rhDelta += 12 * plume;
+      tempDelta -= 1.2 * plume;
+      rhDelta += 4 * plume;
     }
   }
 
@@ -415,7 +424,10 @@ function fillHorizontalGrid(
     for (let col = 0; col < cols; col++) {
       const z = -halfW + (col / colDenom) * ctx.width;
       const { tempDelta, rhDelta } = influenceAt(ctx, x, y, z);
-      tempRow.push(Math.round((ctx.baseTemp + tempDelta) * 100) / 100);
+      const minTemp = padCoolingTempFloorC(ctx.externalTemp, ctx.scenario.externalRhPct);
+      tempRow.push(
+        Math.round(Math.max(minTemp, ctx.baseTemp + tempDelta) * 100) / 100,
+      );
       rhRow.push(Math.round((ctx.internalRh + rhDelta) * 100) / 100);
     }
     temperature.push(tempRow);
@@ -543,8 +555,8 @@ export function generateSurfaceHeatmap(
 
       if (surface === "wall_west" && pad && y <= pad.heightM + 0.2) {
         const g = gaussian1d(z - pad.zCenter, pad.widthM * 0.4);
-        temp -= 3.5 * g * padFactor;
-        rh += 12 * g * padFactor;
+        temp -= 2 * g * padFactor;
+        rh += 8 * g * padFactor;
       }
       if (surface === "wall_east") {
         const heightNorm = y / Math.max(ctx.eaveHeight, 1);
@@ -552,7 +564,8 @@ export function generateSurfaceHeatmap(
         rh -= 1 * heightNorm;
       }
 
-      tempRow.push(Math.round(temp * 100) / 100);
+      const minTemp = padCoolingTempFloorC(ctx.externalTemp, ctx.scenario.externalRhPct);
+      tempRow.push(Math.round(Math.max(minTemp, temp) * 100) / 100);
       rhRow.push(Math.round(rh * 100) / 100);
     }
     temperature.push(tempRow);

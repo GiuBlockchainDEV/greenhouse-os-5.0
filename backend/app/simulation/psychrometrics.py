@@ -96,3 +96,21 @@ def psychrometric_constant(
     return (
         SPECIFIC_HEAT_AIR * atmospheric_pressure_kpa
     ) / (MOLECULAR_WEIGHT_RATIO * LATENT_HEAT_VAPORIZATION)
+
+
+def approx_wet_bulb_c(dry_bulb_c: float, rh_pct: float) -> float:
+    """Wet-bulb temperature (°C) via Stull (2011)."""
+    rh = max(1.0, min(100.0, rh_pct))
+    t = dry_bulb_c
+    return (
+        t * math.atan(0.151977 * math.sqrt(rh + 8.313659))
+        + math.atan(t + rh)
+        - math.atan(rh - 1.676331)
+        + 0.00391838 * (rh ** 1.5) * math.atan(0.023101 * rh)
+        - 4.686035
+    )
+
+
+def pad_cooling_temp_floor_c(external_temp_c: float, external_rh_pct: float) -> float:
+    """Minimum achievable internal temperature with evaporative pad cooling."""
+    return approx_wet_bulb_c(external_temp_c, external_rh_pct) - 1.5

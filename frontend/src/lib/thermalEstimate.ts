@@ -13,12 +13,13 @@ import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { solarElevationFactor, solarIntensityFactor } from "@/lib/solarIrradiance";
 import {
   acCapacityFactor,
-  exhaustCapacityFactor,
+  computeFanAndPadCoolingC,
   fogCapacityFactor,
   heaterCapacityFactor,
   padCapacityFactor,
   ventCapacityFactor,
 } from "@/lib/climateEquipmentCapacity";
+import { padCoolingTempFloorC } from "@/lib/psychrometrics";
 
 const COOLING_DELTA: Record<string, number> = {
   none: 0,
@@ -170,22 +171,35 @@ export function estimatePreviewMicroclimate(
     externalTemp + (qSolar + qTranspiration) / Math.max(totalCoeff, 0.5);
 
   const sizing = equipment.sizing;
-  const exhaustCapacity = exhaustCapacityFactor(sizing);
   let coolDelta = COOLING_DELTA[equipment.cooling] ?? 0;
+  let rhCool = COOLING_RH[equipment.cooling] ?? 0;
+
   if (equipment.cooling === "fan_and_pad") {
-    const padCapacity = padCapacityFactor(sizing);
-    coolDelta *= (0.35 + padCapacity * 0.65) * (0.55 + exhaustCapacity * 0.65);
+    const padCooling = computeFanAndPadCoolingC(
+      externalTemp,
+      scenario.externalRhPct,
+      sizing,
+    );
+    internalTemp -= padCooling.tempDropC;
+    rhCool = padCooling.rhBoostPct;
+  } else {
+    if (equipment.cooling === "evaporative") {
+      coolDelta *= 0.45 + padCapacityFactor(sizing) * 0.75;
+    }
+    if (equipment.cooling === "mechanical_ac") {
+      coolDelta *= 0.45 + acCapacityFactor(sizing) * 0.85;
+    }
+    if (equipment.cooling === "high_pressure_fog") {
+      coolDelta *= 0.45 + fogCapacityFactor(sizing) * 0.85;
+    }
+    internalTemp += coolDelta;
+
+    if (equipment.cooling === "mechanical_ac") {
+      rhCool -= (acCapacityFactor(sizing) - 1) * 4;
+    } else if (equipment.cooling === "high_pressure_fog") {
+      rhCool += (fogCapacityFactor(sizing) - 1) * 8;
+    }
   }
-  if (equipment.cooling === "evaporative") {
-    coolDelta *= 0.45 + padCapacityFactor(sizing) * 0.75;
-  }
-  if (equipment.cooling === "mechanical_ac") {
-    coolDelta *= 0.45 + acCapacityFactor(sizing) * 0.85;
-  }
-  if (equipment.cooling === "high_pressure_fog") {
-    coolDelta *= 0.45 + fogCapacityFactor(sizing) * 0.85;
-  }
-  internalTemp += coolDelta;
 
   const heatingBase = HEATING_W_M2[equipment.heating] ?? 0;
   if (heatingBase > 0) {
@@ -194,15 +208,13 @@ export function estimatePreviewMicroclimate(
       Math.max(covering.uValue * 2.5, 1);
   }
 
-  let rhCool = COOLING_RH[equipment.cooling] ?? 0;
   if (equipment.cooling === "fan_and_pad") {
-    rhCool += (padCapacityFactor(sizing) - 1) * 6;
-    rhCool -= (exhaustCapacity - 1) * 5;
-  } else if (equipment.cooling === "mechanical_ac") {
-    rhCool -= (acCapacityFactor(sizing) - 1) * 4;
-  } else if (equipment.cooling === "high_pressure_fog") {
-    rhCool += (fogCapacityFactor(sizing) - 1) * 8;
+    internalTemp = Math.max(
+      padCoolingTempFloorC(externalTemp, scenario.externalRhPct),
+      internalTemp,
+    );
   }
+
   const internalRh = Math.min(
     95,
     Math.max(30, scenario.externalRhPct + rhCool + (externalTemp - internalTemp) * 1.8),
