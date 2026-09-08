@@ -67,9 +67,14 @@
     "liveDataHint": "Mapa en vivo del motor de simulación (geometría, cultivo, equipos, clima).",
     "previewHintDetailed": "Estimación previa: ~{{temp}}°C interior, ~{{rh}}% HR — según clima, cubierta y equipos.",
     "equipmentHint": "El mapa incluye pad, ventiladores, ventanas, AC, calefactores y circulación del panel izquierdo.",
+    "estimatedValue": "Estimado",
+    "workingRange": "Rango de trabajo del cultivo",
+    "floorRange": "Rango en suelo",
     "legend": {
-      "temperature": "Rango de temperatura en suelo",
-      "vpd": "Rango de VPD en suelo"
+      "temperature": "Escala absoluta 0–50°C — marcador = temperatura interna estimada",
+      "humidity": "Escala absoluta 0–100% — marcador = HR interna estimada",
+      "vpd": "Escala VPD (0–10 kPa)",
+      "uniformity": "Índice de uniformidad interna (0–100%)"
     }
   }
 }

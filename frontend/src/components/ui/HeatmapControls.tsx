@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { computeHeatmapVisualRange } from "@/lib/heatmapData";
+import {
+  computeHeatmapFieldSummary,
+  computeHeatmapVisualRange,
+  cropWorkingTempRange,
+} from "@/lib/heatmapData";
+import { HeatmapScaleLegend } from "@/components/ui/HeatmapScaleLegend";
 import { solarAzimuthLabel } from "@/lib/solarIrradiance";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -69,11 +74,6 @@ function ToolbarButton({ label, active, onClick }: ToolbarButtonProps) {
   );
 }
 
-function formatStatValue(mode: HeatmapMode, value: number): string {
-  if (mode === "vpd") return value.toFixed(2);
-  if (mode === "uniformity" || mode === "humidity") return value.toFixed(0);
-  return value.toFixed(1);
-}
 
 export function HeatmapControls() {
   const { t } = useTranslation("3d_controls");
@@ -108,7 +108,7 @@ export function HeatmapControls() {
 
   const valueMode =
     heatmapMode === "off" ? "temperature" : heatmapMode;
-  const stats = useMemo(
+  const visualRange = useMemo(
     () =>
       heatmapMode === "off"
         ? null
@@ -118,6 +118,23 @@ export function HeatmapControls() {
             heatmapSource.preview,
           ),
     [heatmapMode, valueMode, heatmapSource],
+  );
+
+  const fieldSummary = useMemo(
+    () =>
+      heatmapMode === "off"
+        ? null
+        : computeHeatmapFieldSummary(
+            heatmapSource.surfaces.floor,
+            valueMode,
+            heatmapSource.preview,
+          ),
+    [heatmapMode, valueMode, heatmapSource],
+  );
+
+  const workingRange = useMemo(
+    () => cropWorkingTempRange(crop.type),
+    [crop.type],
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";
@@ -151,7 +168,7 @@ export function HeatmapControls() {
                 value={climateScenario.externalTempC}
                 unit="°C"
                 min={5}
-                max={42}
+                max={50}
                 step={0.5}
                 onChange={(value) => setClimateScenario({ externalTempC: value })}
               />
@@ -214,17 +231,25 @@ export function HeatmapControls() {
             </div>
           </div>
 
-          {stats && (
+          {visualRange && fieldSummary && (
             <div className="rounded-lg bg-surface-muted px-2.5 py-2">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-label">
                 {t(`heatmap.legend.${valueMode}`)}
               </p>
-              <p className="mt-1 font-mono text-xs font-semibold text-gray-800">
-                {formatStatValue(heatmapMode, stats.min)}
-                {" – "}
-                {formatStatValue(heatmapMode, stats.max)} {stats.unit}
-              </p>
-              <p className="mt-1 text-[10px] text-label">
+              <div className="mt-2">
+                <HeatmapScaleLegend
+                  mode={valueMode}
+                  visualMin={visualRange.min}
+                  visualMax={visualRange.max}
+                  unit={visualRange.unit}
+                  summary={fieldSummary}
+                  workingRange={workingRange}
+                  estimatedLabel={t("heatmap.estimatedValue")}
+                  workingRangeLabel={t("heatmap.workingRange")}
+                  floorRangeLabel={t("heatmap.floorRange")}
+                />
+              </div>
+              <p className="mt-2 text-[10px] text-label">
                 {t("heatmap.equipmentHint")}
               </p>
               <p className="mt-1 text-[10px] text-label">
