@@ -222,6 +222,16 @@ Internal temperature solved at quasi-steady state from net energy gain and total
 
 **Implementation:** `backend/app/simulation/thermal.py`, `frontend/src/lib/thermalEstimate.ts`
 
+### Equipment audit (thermal vs heatmap)
+
+Full per-element matrix for review: [`docs/THERMAL_EQUIPMENT_AUDIT.csv`](THERMAL_EQUIPMENT_AUDIT.csv) (semicolon-separated).
+
+| Layer | Scope | Key files |
+|-------|--------|-----------|
+| Global microclimate | Single-zone `internalTemp` / `internalRh` | `thermalEstimate.ts`, `thermal.py` |
+| Spatial heatmap | Local ΔT/ΔRH on floor + walls, added to preview `baseTemp` | `equipmentAwareHeatmap.ts`, `climateEquipmentLayout.ts` |
+| 3D overlay source | Always frontend preview (WebSocket `heatmap_matrix` is not rendered) | `previewMicroclimate.ts` |
+
 ### WebSocket Pipeline
 
 ```text
@@ -259,7 +269,7 @@ OrbitControls disabled during gizmo drag to prevent camera conflict.
 
 ### GLSL Heatmap Shader
 
-Custom `ShaderMaterial` renders simulation `heatmap_matrix` as a floor overlay:
+Custom `ShaderMaterial` renders equipment-aware surface fields (floor + walls) from `resolveHeatmapField()`:
 
 - **Temperature mode** — Blue → green → yellow → red gradient
 - **VPD mode** — Optimal green → stress orange → severe red (computed per cell from temp + RH)

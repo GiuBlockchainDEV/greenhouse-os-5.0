@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Thermal equipment audit CSV** — `docs/THERMAL_EQUIPMENT_AUDIT.csv` lists every climate element with global thermal effect, heatmap spatial contribution, FE/BE alignment, and review flags.
+
 - **Heatmap 0–50°C absolute scale** — Fixed color mapping 0–50°C with crop working-range band and estimated-value marker on the legend; external temp slider extended to 50°C.
 
 - **Heatmap system audit** — Per-cooling-mode temperature floors, HAF mixing (not cooling), fog full-length bands, heating only below setpoint, reduced fan-and-pad double-counting; backend WS heatmap aligned for AC/fog/heating.
