@@ -10,6 +10,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **GAIA Vercel env resolution** — `/api/gaia` now reads `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, and `GOOGLE_API_KEY` at runtime with dynamic `process.env` access.
 
+### Added
+
+- **HAF circulation fan layout** — Even fan count enforcement, 3 m end offset, two balanced rows (outbound at W/4, return at 3W/4), and dynamic step redistribution along greenhouse length.
+
 ## [5.0.0] - 2026-08-03
 
 ### Added — Milestone 6 (Launch)

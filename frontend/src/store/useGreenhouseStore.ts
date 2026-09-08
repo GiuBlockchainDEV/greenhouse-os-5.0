@@ -4,7 +4,11 @@ import { devtools } from "zustand/middleware";
 import { roofRiseM } from "@/lib/structureUtils";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import { defaultSystemForCrop } from "@/lib/cultivationConstants";
-import { DEFAULT_CLIMATE_SIZING, applyCoolingSystemDefaults } from "@/lib/climateEquipmentLayout";
+import {
+  DEFAULT_CLIMATE_SIZING,
+  applyCoolingSystemDefaults,
+  normalizeHafFanCount,
+} from "@/lib/climateEquipmentLayout";
 import type {
   ClimateEquipment,
   ClimateEquipmentSizing,
@@ -354,17 +358,24 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         );
       },
 
-      setClimateEquipmentSizing: (sizing) =>
+      setClimateEquipmentSizing: (sizing) => {
+        const partial = { ...sizing };
+        if (partial.circulationFanCount !== undefined) {
+          partial.circulationFanCount = normalizeHafFanCount(
+            partial.circulationFanCount,
+          ).total;
+        }
         set(
           {
             climateEquipment: {
               ...get().climateEquipment,
-              sizing: { ...get().climateEquipment.sizing, ...sizing },
+              sizing: { ...get().climateEquipment.sizing, ...partial },
             },
           },
           false,
           "setClimateEquipmentSizing",
-        ),
+        );
+      },
 
       setClimateScenario: (scenario) =>
         set(

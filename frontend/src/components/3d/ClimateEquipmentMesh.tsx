@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import {
   computeClimateEquipmentLayout,
   type AcUnitPlacement,
@@ -335,30 +334,16 @@ export function ClimateEquipmentMesh() {
   const dimensions = useGreenhouseStore((s) => s.dimensions);
   const structure = useGreenhouseStore((s) => s.structure);
   const equipment = useGreenhouseStore((s) => s.climateEquipment);
-  const crop = useGreenhouseStore((s) => s.crop);
 
-  const layout = useMemo(() => {
-    const cultivation = computeCultivationLayout({
-      length: dimensions.length,
-      totalWidth: dimensions.width,
-      bayCount: structure.bayCount,
-      bayWidthM: structure.bayWidthM,
-      eaveHeight: dimensions.eaveHeight,
-      cropType: crop.type,
-      system: crop.system,
-      layout: crop.layout,
-      lai: crop.lai,
-      growthStage: crop.growthStage,
-    });
-
-    return computeClimateEquipmentLayout({
-      dimensions,
-      structure,
-      equipment,
-      cultivationBeds: cultivation.beds,
-      bedLineCount: cultivation.bedLineCount,
-    });
-  }, [dimensions, structure, equipment, crop]);
+  const layout = useMemo(
+    () =>
+      computeClimateEquipmentLayout({
+        dimensions,
+        structure,
+        equipment,
+      }),
+    [dimensions, structure, equipment],
+  );
 
   return (
     <group>

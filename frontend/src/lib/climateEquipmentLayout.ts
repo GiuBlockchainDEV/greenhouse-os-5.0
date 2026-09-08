@@ -160,15 +160,6 @@ function spreadAlongAxis(
   return Array.from({ length: count }, (_, index) => start + index * step);
 }
 
-/** Place items at equal intervals between edges (segment centers, not endpoints). */
-function evenlySpacedInRange(count: number, min: number, max: number): number[] {
-  if (count <= 0) return [];
-  if (count === 1) return [(min + max) / 2];
-  const span = max - min;
-  const step = span / (count + 1);
-  return Array.from({ length: count }, (_, index) => min + step * (index + 1));
-}
-
 function needsPadWall(cooling: ClimateEquipment["cooling"]): boolean {
   return cooling === "fan_and_pad" || cooling === "evaporative";
 }
@@ -198,77 +189,108 @@ function gableFanCenterY(
   return Math.max(wallFanY + 0.4, eaveHeight + rise * 0.35);
 }
 
-function distributeCirculationFansOnBeds(
-  totalCount: number,
-  beds: BedZone[],
-  bedLineCount: number,
-  eaveHeight: number,
-  ridgeHeight: number,
-  diameterM: number,
-): CirculationFanPlacement[] {
-  if (totalCount <= 0 || beds.length === 0 || bedLineCount <= 0) return [];
+/** Minimum clearance from short gable walls along greenhouse length (m). */
+export const HAF_WALL_OFFSET_M = 3;
 
-  const lineCount = bedLineCount;
-  const perLine = Math.floor(totalCount / lineCount);
-  let lineRemainder = totalCount % lineCount;
+export interface HafFanCountNormalization {
+  requested: number;
+  total: number;
+  adjusted: boolean;
+}
+
+/** HAF loops require an even fan count so forward and return rows stay balanced. */
+export function normalizeHafFanCount(requested: number): HafFanCountNormalization {
+  if (requested <= 0) {
+    return { requested, total: 0, adjusted: false };
+  }
+  if (requested % 2 === 0) {
+    return { requested, total: requested, adjusted: false };
+  }
+  return { requested, total: requested + 1, adjusted: true };
+}
+
+function userXToSceneX(xUser: number, length: number): number {
+  return xUser - length / 2;
+}
+
+function userYToSceneZ(yUser: number, width: number): number {
+  return yUser - width / 2;
+}
+
+/**
+ * Balanced HAF circulation layout:
+ * - Row 1 at Y = W/4, blowing +X (outbound)
+ * - Row 2 at Y = 3W/4, blowing −X (return)
+ * - Fans spaced uniformly along length with a fixed 3 m end offset
+ */
+export function distributeHafCirculationFans(params: {
+  totalCount: number;
+  length: number;
+  width: number;
+  eaveHeight: number;
+  ridgeHeight: number;
+  diameterM: number;
+  wallOffsetM?: number;
+}): CirculationFanPlacement[] {
+  const {
+    totalCount,
+    length,
+    width,
+    eaveHeight,
+    ridgeHeight,
+    diameterM,
+    wallOffsetM = HAF_WALL_OFFSET_M,
+  } = params;
+
+  const { total } = normalizeHafFanCount(totalCount);
+  if (total <= 0) return [];
+
+  const fansPerRow = total / 2;
+  const effectiveOffset = Math.min(wallOffsetM, Math.max((length - 0.5) / 2, 0));
+  const usefulSpace = Math.max(length - 2 * effectiveOffset, 0.5);
   const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
+  const row1Z = userYToSceneZ(width / 4, width);
+  const row2Z = userYToSceneZ((3 * width) / 4, width);
+
+  const row1XUser: number[] = [];
+  let step = 0;
+
+  if (fansPerRow === 1) {
+    row1XUser.push(effectiveOffset + usefulSpace / 2);
+  } else {
+    step = usefulSpace / (fansPerRow - 1);
+    for (let i = 0; i < fansPerRow; i++) {
+      row1XUser.push(effectiveOffset + i * step);
+    }
+  }
+
   const fans: CirculationFanPlacement[] = [];
 
-  for (let lineIdx = 0; lineIdx < lineCount; lineIdx++) {
-    const lineFanCount = perLine + (lineRemainder > 0 ? 1 : 0);
-    if (lineRemainder > 0) lineRemainder--;
+  for (const xUser of row1XUser) {
+    fans.push({
+      x: userXToSceneX(xUser, length),
+      y: hangY,
+      z: row1Z,
+      diameterM,
+      yaw: 0,
+    });
+  }
 
-    if (lineFanCount <= 0) continue;
-
-    const lineBeds = beds.filter((bed) => bed.bedIndex === lineIdx);
-    const firstBed = lineBeds[0];
-    if (!firstBed) continue;
-
-    const xPositions = evenlySpacedInRange(lineFanCount, firstBed.xMin, firstBed.xMax);
-
-    xPositions.forEach((x, fanIdx) => {
-      const bed = lineBeds[fanIdx % lineBeds.length];
-      if (!bed) return;
-      const centerZ = (bed.zMin + bed.zMax) / 2;
-      fans.push({
-        x,
-        y: hangY,
-        z: centerZ,
-        diameterM,
-        yaw: lineIdx % 2 === 0 ? Math.PI : 0,
-      });
+  for (let i = 0; i < fansPerRow; i++) {
+    const xUser =
+      fansPerRow === 1
+        ? effectiveOffset + usefulSpace / 2
+        : length - effectiveOffset - i * step;
+    fans.push({
+      x: userXToSceneX(xUser, length),
+      y: hangY,
+      z: row2Z,
+      diameterM,
+      yaw: Math.PI,
     });
   }
 
   return fans;
-}
-
-function distributeCirculationFansInHouse(
-  totalCount: number,
-  length: number,
-  width: number,
-  eaveHeight: number,
-  ridgeHeight: number,
-  diameterM: number,
-): CirculationFanPlacement[] {
-  if (totalCount <= 0) return [];
-
-  const hangY = Math.max(1.8, Math.min(eaveHeight - 0.65, ridgeHeight - 1.1));
-  const halfLength = length / 2;
-  const xPositions = evenlySpacedInRange(
-    totalCount,
-    -halfLength * 0.72,
-    halfLength * 0.72,
-  );
-  const zOffsets = spreadAlongAxis(totalCount, width, width * 0.18);
-
-  return xPositions.map((x, index) => ({
-    x,
-    y: hangY,
-    z: zOffsets[index] ?? 0,
-    diameterM,
-    yaw: index % 2 === 0 ? Math.PI : 0,
-  }));
 }
 
 export function computeClimateEquipmentLayout(params: {
@@ -278,7 +300,7 @@ export function computeClimateEquipmentLayout(params: {
   cultivationBeds?: BedZone[];
   bedLineCount?: number;
 }): ClimateEquipmentLayout {
-  const { dimensions, structure, equipment, cultivationBeds = [], bedLineCount = 0 } = params;
+  const { dimensions, structure, equipment } = params;
   const { length, width, eaveHeight, ridgeHeight } = dimensions;
   const { bayCount, bayWidthM, archType } = structure;
   const sizing = equipment.sizing;
@@ -322,29 +344,16 @@ export function computeClimateEquipmentLayout(params: {
   }
 
   if (sizing.circulationFanCount > 0) {
-    if (cultivationBeds.length > 0) {
-      circulationFans.push(
-        ...distributeCirculationFansOnBeds(
-          sizing.circulationFanCount,
-          cultivationBeds,
-          bedLineCount,
-          eaveHeight,
-          ridgeHeight,
-          sizing.circulationFanDiameterM,
-        ),
-      );
-    } else {
-      circulationFans.push(
-        ...distributeCirculationFansInHouse(
-          sizing.circulationFanCount,
-          length,
-          width,
-          eaveHeight,
-          ridgeHeight,
-          sizing.circulationFanDiameterM,
-        ),
-      );
-    }
+    circulationFans.push(
+      ...distributeHafCirculationFans({
+        totalCount: sizing.circulationFanCount,
+        length,
+        width,
+        eaveHeight,
+        ridgeHeight,
+        diameterM: sizing.circulationFanDiameterM,
+      }),
+    );
   }
 
   if (needsPadWall(equipment.cooling)) {

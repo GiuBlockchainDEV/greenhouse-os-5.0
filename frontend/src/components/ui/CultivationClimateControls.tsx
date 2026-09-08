@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { normalizeHafFanCount } from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   CoolingSystem,
@@ -139,6 +141,8 @@ export function CultivationClimateControls() {
     (state) => state.setClimateEquipmentSizing,
   );
   const sizing = climateEquipment.sizing;
+  const [circulationCountAdjusted, setCirculationCountAdjusted] = useState(false);
+  const hafFansPerRow = sizing.circulationFanCount / 2;
 
   const showFans =
     climateEquipment.cooling === "fan_and_pad" ||
@@ -478,17 +482,22 @@ export function CultivationClimateControls() {
             value={sizing.circulationFanCount}
             unit=""
             min={0}
-            max={Math.max(24, metrics.bedLineCount * structure.bayCount * 4)}
-            step={1}
-            onChange={(value) => setClimateEquipmentSizing({ circulationFanCount: value })}
+            max={24}
+            step={2}
+            onChange={(value) => {
+              const normalized = normalizeHafFanCount(value);
+              setCirculationCountAdjusted(normalized.adjusted);
+              setClimateEquipmentSizing({ circulationFanCount: normalized.total });
+            }}
           />
+          {circulationCountAdjusted && (
+            <p className="text-[10px] text-amber-700">
+              {tSim("equipment.sizing.circulationEvenCountWarning")}
+            </p>
+          )}
           <ReadOnlyMetricRow
             label={tSim("equipment.sizing.circulationHint")}
-            value={
-              metrics.bedLineCount > 0
-                ? Math.floor(sizing.circulationFanCount / metrics.bedLineCount)
-                : 0
-            }
+            value={hafFansPerRow}
             unit={tSim("equipment.sizing.circulationHintUnit")}
           />
           <SliderRow
