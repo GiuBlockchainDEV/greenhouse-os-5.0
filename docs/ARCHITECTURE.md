@@ -284,9 +284,10 @@ When cooling mode is `mechanical_ac`, each wall-mounted unit drives an internal 
 
 | Element | Rule |
 |---------|------|
-| Trunk | From AC face inward to ~22–44 % of greenhouse width |
-| Spine | Along greenhouse length within the unit's coverage zone |
-| Diffusers | Every 4 m on the spine, blowing toward crop center |
+| Trunk | Short tap from each AC unit to its wall header |
+| Headers | Full greenhouse length along north and/or south wall |
+| Cross ducts | Every ~5.5 m, span full width (or wall → center) |
+| Diffusers | Every 4 m on headers and along cross ducts |
 | Diameter | Scales with `ac_unit_width_m` (0.18–0.24 m) |
 
 **Layout:** `frontend/src/lib/acDuctLayout.ts`  
