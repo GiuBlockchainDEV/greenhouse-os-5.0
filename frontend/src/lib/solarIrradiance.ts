@@ -80,13 +80,53 @@ export function buildSolarFieldContext(
   };
 }
 
+export type SolarSurfaceKind =
+  | "floor"
+  | "roof"
+  | "wall_west"
+  | "wall_east"
+  | "wall_north"
+  | "wall_south";
+
+function heightFactorForSurface(
+  solar: SolarFieldContext,
+  y: number,
+  surface?: SolarSurfaceKind,
+): number {
+  const normalizedY = y / Math.max(solar.eaveHeight, 1);
+  if (surface?.startsWith("wall_")) {
+    return 0.55 + 0.45 * (1 - normalizedY);
+  }
+  return 0.65 + 0.35 * (1 - normalizedY);
+}
+
 export function solarTempDeltaFromContext(
   solar: SolarFieldContext,
   x: number,
   y: number,
   z: number,
+  surface?: SolarSurfaceKind,
 ): number {
   if (!solar.active) return 0;
+
+  const heightFactor = heightFactorForSurface(solar, y, surface);
+
+  if (surface === "wall_west") {
+    const facing = Math.max(0, solar.dirX);
+    return solar.amplitude * (facing * 0.9 + solar.floorBeam * 0.08) * heightFactor;
+  }
+  if (surface === "wall_east") {
+    const facing = Math.max(0, -solar.dirX);
+    return solar.amplitude * (facing * 0.9 + solar.floorBeam * 0.08) * heightFactor;
+  }
+  if (surface === "wall_north") {
+    const facing = Math.max(0, solar.dirZ);
+    return solar.amplitude * (facing * 0.9 + solar.floorBeam * 0.08) * heightFactor;
+  }
+  if (surface === "wall_south") {
+    const facing = Math.max(0, -solar.dirZ);
+    return solar.amplitude * (facing * 0.9 + solar.floorBeam * 0.08) * heightFactor;
+  }
 
   const alongSun =
     (x * solar.dirX + z * solar.dirZ) / Math.max(Math.max(solar.halfL, solar.halfW), 1);
@@ -98,14 +138,11 @@ export function solarTempDeltaFromContext(
   const fromNorth = (solar.halfW - z) / Math.max(solar.width, 0.1);
 
   let sunFacing = 0;
-  // dirX > 0: light travels toward +X (from west) → west interior receives more (high fromEast).
   if (solar.dirX > 0.12) sunFacing = Math.max(sunFacing, fromEast);
   if (solar.dirX < -0.12) sunFacing = Math.max(sunFacing, fromWest);
-  // dirZ > 0: light travels toward +Z (from north) → north interior receives more (high fromNorth).
   if (solar.dirZ > 0.12) sunFacing = Math.max(sunFacing, fromNorth);
   if (solar.dirZ < -0.12) sunFacing = Math.max(sunFacing, fromSouth);
 
-  const heightFactor = 0.65 + 0.35 * (1 - y / Math.max(solar.eaveHeight, 1));
   const spatial =
     solar.floorBeam * 0.45 + sunwardBias * 0.55 + sunFacing * 0.65;
 

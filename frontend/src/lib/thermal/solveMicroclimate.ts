@@ -15,6 +15,7 @@ import type {
 import {
   acCapacityFactor,
   computeFanAndPadCoolingC,
+  exhaustCapacityFactor,
   fogCapacityFactor,
   heaterCapacityFactor,
   padCapacityFactor,
@@ -217,8 +218,11 @@ export function ventilationAchWithSizing(
     sizing.roofVentCount * sizing.roofVentWidthM * 1.2 +
     sizing.sideVentCount * sizing.sideVentHeightM * 1.8;
 
-  const forcedBoost = (fanArea / area) * 8 + (ventArea / area) * 2.5;
-  const circulationBoost = Math.min(sizing.circulationFanCount, 24) * 0.15;
+  const forcedBoost =
+    (fanArea / area) * 10 +
+    sizing.exhaustFanCount * 0.06 +
+    (ventArea / area) * 2.5;
+  const circulationBoost = Math.min(sizing.circulationFanCount, 48) * 0.15;
 
   return base + windBonus + buoyancy + forcedBoost + circulationBoost;
 }
@@ -301,9 +305,13 @@ export function solveMicroclimate(
       scenario.externalRhPct,
       sizing,
     );
-    internalTemp -= padCooling.tempDropC;
-    rhCool = padCooling.rhBoostPct;
-    qEquipmentSensible = -(padCooling.tempDropC * totalCoeff);
+    const padAreaFactor = padCapacityFactor(sizing);
+    const fanAreaFactor = exhaustCapacityFactor(sizing);
+    const systemScale = 0.75 + padAreaFactor * 0.15 + Math.min(fanAreaFactor, 2.5) * 0.1;
+    const effectiveDrop = padCooling.tempDropC * systemScale;
+    internalTemp -= effectiveDrop;
+    rhCool = padCooling.rhBoostPct * (0.85 + padAreaFactor * 0.15);
+    qEquipmentSensible = -(effectiveDrop * totalCoeff);
   } else {
     if (equipment.cooling === "evaporative") {
       coolDelta *= 0.45 + padCapacityFactor(sizing) * 0.75;

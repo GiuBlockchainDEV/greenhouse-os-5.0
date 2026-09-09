@@ -10,7 +10,8 @@ import {
   type HeatmapSurfaceValues,
   type HeatmapValueMode,
 } from "@/lib/heatmapData";
-import { VISIBLE_HEATMAP_SURFACE_KINDS } from "@/lib/equipmentAwareHeatmap";
+import { VISIBLE_HEATMAP_SURFACE_KINDS, type HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
+import { heatmapTextureRemap } from "@/lib/heatmapSurfaceUv";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -25,7 +26,7 @@ function buildHeatmapTexture(
   surface: HeatmapSurfaceValues,
   mode: HeatmapValueMode,
   preview: HeatmapClimatePreview,
-  surfaceKind: string,
+  surfaceKind: HeatmapSurfaceKind,
 ): { texture: THREE.DataTexture; min: number; max: number } {
   const rows = surface.temperature.length;
   const cols = rows > 0 ? (surface.temperature[0]?.length ?? 0) : 0;
@@ -37,8 +38,7 @@ function buildHeatmapTexture(
     return { texture: fallback, min: displayRange.min, max: displayRange.max };
   }
 
-  const flipRow = surfaceKind === "wall_west" || surfaceKind === "wall_south";
-  const flipCol = surfaceKind === "wall_south";
+  const { flipRow, flipCol } = heatmapTextureRemap(surfaceKind);
 
   const values = new Float32Array(rows * cols);
   for (let row = 0; row < rows; row++) {
@@ -66,7 +66,7 @@ function buildHeatmapTexture(
 }
 
 interface HeatmapSurfaceProps {
-  surfaceKind: string;
+  surfaceKind: HeatmapSurfaceKind;
   surface: HeatmapSurfaceValues;
   mode: HeatmapValueMode;
   preview: HeatmapClimatePreview;

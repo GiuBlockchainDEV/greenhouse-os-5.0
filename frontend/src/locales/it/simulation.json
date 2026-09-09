@@ -70,7 +70,7 @@
     "ventilation": "Ventilazione",
     "sizing": {
       "exhaustFanCount": "Ventole Estrazione",
-      "exhaustFanCountHint": "Minimo 0 — distribuite sulla larghezza ({{width}} m). Massimo {{max}} ventole (~2,5 m di passo).",
+      "exhaustFanCountHint": "Minimo 0 — fino al 95% della facciata ({{width}} m). Massimo {{max}} ventole; il passo dipende dal diametro.",
       "exhaustFanDiameter": "Diametro Ventola",
       "roofExhaustFanCount": "Ventole Tetto (max 1 per campata)",
       "roofExhaustFanDiameter": "Diametro Ventola Tetto",

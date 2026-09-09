@@ -61,7 +61,7 @@
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Ventilateurs d'Extraction",
-      "exhaustFanCountHint": "Minimum 0 — répartis sur la largeur ({{width}} m). Jusqu'à {{max}} ventilateurs (~2,5 m d'espacement).",
+      "exhaustFanCountHint": "Minimum 0 — jusqu'à 95 % de la largeur de façade ({{width}} m). Max {{max}} ventilateurs; espacement selon diamètre.",
       "exhaustFanDiameter": "Diamètre Ventilateur",
       "roofExhaustFanCount": "Ventilateurs de Toit",
       "roofExhaustFanDiameter": "Diamètre Ventilateur Toit",

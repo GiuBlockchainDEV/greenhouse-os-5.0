@@ -70,7 +70,7 @@
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Exhaust Fans",
-      "exhaustFanCountHint": "Minimum 0 — distributed across width ({{width}} m). Up to {{max}} fans (~2.5 m spacing).",
+      "exhaustFanCountHint": "Minimum 0 — up to 95% of facade width ({{width}} m). Max {{max}} fans; spacing scales with diameter.",
       "exhaustFanDiameter": "Fan Diameter",
       "roofExhaustFanCount": "Roof Exhaust Fans",
       "roofExhaustFanDiameter": "Roof Fan Diameter",

@@ -151,7 +151,10 @@ export function CultivationClimateControls() {
   const [circulationCountAdjusted, setCirculationCountAdjusted] = useState(false);
   const hafFansPerRow = sizing.circulationFanCount / 2;
   const maxPadWallWidth = maxPadWallSpanM(dimensions.width);
-  const exhaustFanMax = maxExhaustFanCount(metrics.totalWidthM);
+  const exhaustFanMax = maxExhaustFanCount(
+    metrics.totalWidthM,
+    sizing.exhaustFanDiameterM,
+  );
   const roofVentMax = maxRoofVentCount(structure.bayCount, dimensions.length);
   const fansPerBayPerRow = hafFansPerBayPerRow(
     sizing.circulationFanCount,

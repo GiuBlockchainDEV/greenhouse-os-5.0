@@ -112,6 +112,7 @@ function fillHorizontalGrid(
   rows: number,
   cols: number,
   y: number,
+  surface: HeatmapSurfaceKind = "floor",
 ): HeatmapSurfaceValues {
   const { halfL, halfW } = ctx.coeffs;
   const rowDenom = Math.max(rows - 1, 1);
@@ -125,7 +126,7 @@ function fillHorizontalGrid(
     const x = -halfL + (row / rowDenom) * ctx.length;
     for (let col = 0; col < cols; col++) {
       const z = -halfW + (col / colDenom) * ctx.width;
-      const { tempDelta, rhDelta } = computeSpatialPerturbation(ctx, x, y, z);
+      const { tempDelta, rhDelta } = computeSpatialPerturbation(ctx, x, y, z, surface);
       tempRow.push(Math.round((ctx.baseTemp + tempDelta) * 100) / 100);
       rhRow.push(Math.round((ctx.internalRh + rhDelta) * 100) / 100);
     }
@@ -217,7 +218,7 @@ export function generateSurfaceHeatmap(
   const { halfL, halfW } = ctx.coeffs;
 
   if (surface === "floor") {
-    return fillHorizontalGrid(ctx, gridSize(ctx.length), gridSize(ctx.width), 0.2);
+    return fillHorizontalGrid(ctx, gridSize(ctx.length), gridSize(ctx.width), 0.2, "floor");
   }
 
   if (surface === "roof") {
@@ -226,6 +227,7 @@ export function generateSurfaceHeatmap(
       gridSize(ctx.length),
       gridSize(ctx.width),
       ctx.ridgeHeight - 0.15,
+      "roof",
     );
   }
 
@@ -260,7 +262,7 @@ export function generateSurfaceHeatmap(
         z = halfW - 0.05;
       }
 
-      const { tempDelta, rhDelta } = computeSpatialPerturbation(ctx, x, y, z);
+      const { tempDelta, rhDelta } = computeSpatialPerturbation(ctx, x, y, z, surface);
       tempRow.push(Math.round((ctx.baseTemp + tempDelta) * 100) / 100);
       rhRow.push(Math.round((ctx.internalRh + rhDelta) * 100) / 100);
     }

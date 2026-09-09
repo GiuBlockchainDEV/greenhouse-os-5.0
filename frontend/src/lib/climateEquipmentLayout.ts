@@ -199,27 +199,32 @@ function gableFanCenterY(
 /** Minimum clearance from short gable walls along greenhouse length (m). */
 export const HAF_WALL_OFFSET_M = 3;
 
-/** Pad wall may span up to 95% of the greenhouse width (gable face). */
+/** Pad wall and exhaust fan row may span up to 95% of the gable / exhaust facade width. */
 export const PAD_WALL_MAX_SPAN_FRACTION = 0.95;
+export const EXHAUST_FAN_FACADE_FRACTION = PAD_WALL_MAX_SPAN_FRACTION;
+export const EXHAUST_FAN_COUNT_CAP = 100;
+const EXHAUST_FAN_MIN_SPACING_M = 0.35;
 
 export function maxPadWallSpanM(greenhouseWidth: number): number {
   return Math.max(2, greenhouseWidth * PAD_WALL_MAX_SPAN_FRACTION);
 }
 
-const EXHAUST_FAN_MIN_SPACING_M = 2.5;
-const EXHAUST_FAN_COUNT_CAP = 96;
+/** Side margin when distributing equipment along the 95% facade span. */
+export function facadeMarginM(spanM: number, coverageFraction = EXHAUST_FAN_FACADE_FRACTION): number {
+  return Math.max(0, spanM * (1 - coverageFraction) / 2);
+}
 
-/** Exhaust fans mount along greenhouse width — scale max count with usable wall span (min count = 0). */
-export function maxExhaustFanCount(greenhouseWidthM: number): number {
-  const margin = greenhouseWidthM * 0.12;
-  const usable = Math.max(greenhouseWidthM - margin * 2, 0);
-  if (usable < EXHAUST_FAN_MIN_SPACING_M) {
+/** Exhaust fans mount along 95% of the exhaust facade width (min count = 0, max 100). */
+export function maxExhaustFanCount(
+  greenhouseWidthM: number,
+  fanDiameterM = 1.2,
+): number {
+  const usable = maxPadWallSpanM(greenhouseWidthM);
+  const minSpacing = Math.max(EXHAUST_FAN_MIN_SPACING_M, fanDiameterM * 0.55);
+  if (usable < minSpacing) {
     return 0;
   }
-  return Math.min(
-    EXHAUST_FAN_COUNT_CAP,
-    Math.ceil(usable / EXHAUST_FAN_MIN_SPACING_M),
-  );
+  return Math.min(EXHAUST_FAN_COUNT_CAP, Math.ceil(usable / minSpacing));
 }
 
 /** Ridge vent modules scale with length and structural bays (min count = 0). */
@@ -404,7 +409,11 @@ export function computeClimateEquipmentLayout(params: {
   const fogLines: FogLinePlacement[] = [];
 
   if (needsExhaustFans(equipment.cooling, equipment.ventilation)) {
-    const fanZs = spreadAlongAxis(sizing.exhaustFanCount, width, width * 0.12);
+    const fanZs = spreadAlongAxis(
+      sizing.exhaustFanCount,
+      width,
+      facadeMarginM(width, EXHAUST_FAN_FACADE_FRACTION),
+    );
     fanZs.forEach((offsetZ) => {
       exhaustFans.push({
         x: halfLength - 0.12,
