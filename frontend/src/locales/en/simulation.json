@@ -70,6 +70,7 @@
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Exhaust Fans",
+      "exhaustFanCountHint": "Distributed across greenhouse width ({{width}} m). Up to {{max}} fans (~2.5 m spacing).",
       "exhaustFanDiameter": "Fan Diameter",
       "roofExhaustFanCount": "Roof Exhaust Fans",
       "roofExhaustFanDiameter": "Roof Fan Diameter",

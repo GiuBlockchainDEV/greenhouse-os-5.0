@@ -61,6 +61,7 @@
     "ventilation": "Ventilation",
     "sizing": {
       "exhaustFanCount": "Ventilateurs d'Extraction",
+      "exhaustFanCountHint": "Répartis sur la largeur de la serre ({{width}} m). Jusqu'à {{max}} ventilateurs (~2,5 m d'espacement).",
       "exhaustFanDiameter": "Diamètre Ventilateur",
       "roofExhaustFanCount": "Ventilateurs de Toit",
       "roofExhaustFanDiameter": "Diamètre Ventilateur Toit",

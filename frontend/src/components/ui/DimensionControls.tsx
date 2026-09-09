@@ -143,6 +143,9 @@ export function DimensionControls() {
             {metrics.totalWidthM} {tCommon("units.meters")}
           </p>
         </div>
+        <p className="text-[10px] leading-relaxed text-label">
+          {tControls("structure.bayHint")}
+        </p>
         <label className="flex flex-col gap-1">
           <span className="text-xs text-label">{tControls("structure.archType")}</span>
           <select
@@ -164,6 +167,9 @@ export function DimensionControls() {
 
       <section className="ui-divider flex flex-col gap-3 pt-4">
         <h4 className="ui-section-title">{tControls("dimensions.title")}</h4>
+        <p className="text-[10px] leading-relaxed text-label">
+          {tControls("dimensions.lengthHint")}
+        </p>
         <SliderRow
           label={tControls("dimensions.length")}
           value={dimensions.length}

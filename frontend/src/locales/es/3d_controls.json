@@ -3,7 +3,8 @@
     "title": "Longitud del Invernadero",
     "heightTitle": "Altura del Invernadero",
     "heightHint": "Alero y cumbrera afectan el volumen, la ventilación y la heatmap en paredes.",
-    "length": "Longitud",
+    "length": "Longitud (eje largo)",
+    "lengthHint": "La longitud sigue el eje largo del invernadero (pad → extractores). No es el ancho del módulo: el ancho total viene de los módulos en paralelo.",
     "width": "Ancho",
     "ridgeHeight": "Altura de Cumbrera",
     "eaveHeight": "Altura de Alero"
@@ -11,7 +12,8 @@
   "structure": {
     "title": "Estructura del Invernadero",
     "bayCount": "Número de Módulos (Campatas)",
-    "bayWidth": "Ancho del Módulo",
+    "bayWidth": "Ancho del Módulo (campata)",
+    "bayHint": "Campata = módulo de cubierta colocado en paralelo al ancho. Ancho total = número de campatas × ancho del módulo (ej. 6 × 8 m = 48 m).",
     "totalWidth": "Ancho Total",
     "bayRoofsTitle": "Techo por Módulo",
     "bayLabel": "Techo módulo {{n}}",
@@ -69,7 +71,7 @@
     "equipmentHint": "El mapa incluye pad, ventiladores, ventanas, AC, calefactores y circulación del panel izquierdo.",
     "estimatedValue": "Estimado",
     "workingRange": "Rango de trabajo del cultivo",
-    "floorRange": "Rango en suelo",
+    "floorRange": "Rango de temperatura en suelo",
     "colorScale": "Rango de contraste de color",
     "legend": {
       "temperature": "Referencia 0–50°C; banda resaltada = colores en el mapa del suelo",

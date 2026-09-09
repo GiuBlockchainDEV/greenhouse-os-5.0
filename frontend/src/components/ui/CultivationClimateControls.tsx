@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { maxPadWallSpanM, normalizeHafFanCount, hafFansPerBayPerRow } from "@/lib/climateEquipmentLayout";
+import {
+  hafFansPerBayPerRow,
+  maxExhaustFanCount,
+  maxPadWallSpanM,
+  maxRoofVentCount,
+  normalizeHafFanCount,
+} from "@/lib/climateEquipmentLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   CoolingSystem,
@@ -145,6 +151,8 @@ export function CultivationClimateControls() {
   const [circulationCountAdjusted, setCirculationCountAdjusted] = useState(false);
   const hafFansPerRow = sizing.circulationFanCount / 2;
   const maxPadWallWidth = maxPadWallSpanM(dimensions.width);
+  const exhaustFanMax = maxExhaustFanCount(metrics.totalWidthM);
+  const roofVentMax = maxRoofVentCount(structure.bayCount, dimensions.length);
   const fansPerBayPerRow = hafFansPerBayPerRow(
     sizing.circulationFanCount,
     structure.bayCount,
@@ -329,13 +337,19 @@ export function CultivationClimateControls() {
               <>
                 <SliderRow
                   label={tSim("equipment.sizing.exhaustFanCount")}
-                  value={sizing.exhaustFanCount}
+                  value={Math.min(sizing.exhaustFanCount, exhaustFanMax)}
                   unit=""
                   min={0}
-                  max={12}
+                  max={exhaustFanMax}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ exhaustFanCount: value })}
                 />
+                <p className="text-[10px] leading-relaxed text-label">
+                  {tSim("equipment.sizing.exhaustFanCountHint", {
+                    max: exhaustFanMax,
+                    width: metrics.totalWidthM,
+                  })}
+                </p>
                 <SliderRow
                   label={tSim("equipment.sizing.exhaustFanDiameter")}
                   value={sizing.exhaustFanDiameterM}
@@ -424,10 +438,10 @@ export function CultivationClimateControls() {
               <>
                 <SliderRow
                   label={tSim("equipment.sizing.roofVentCount")}
-                  value={sizing.roofVentCount}
+                  value={Math.min(sizing.roofVentCount, roofVentMax)}
                   unit=""
                   min={0}
-                  max={12}
+                  max={roofVentMax}
                   step={1}
                   onChange={(value) => setClimateEquipmentSizing({ roofVentCount: value })}
                 />

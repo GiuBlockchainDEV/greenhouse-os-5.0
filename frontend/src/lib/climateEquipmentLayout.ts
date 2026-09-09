@@ -206,6 +206,25 @@ export function maxPadWallSpanM(greenhouseWidth: number): number {
   return Math.max(2, greenhouseWidth * PAD_WALL_MAX_SPAN_FRACTION);
 }
 
+const EXHAUST_FAN_MIN_SPACING_M = 2.5;
+const EXHAUST_FAN_COUNT_CAP = 96;
+
+/** Exhaust fans mount along greenhouse width — scale max count with usable wall span. */
+export function maxExhaustFanCount(greenhouseWidthM: number): number {
+  const margin = greenhouseWidthM * 0.12;
+  const usable = Math.max(greenhouseWidthM - margin * 2, EXHAUST_FAN_MIN_SPACING_M);
+  return Math.min(
+    EXHAUST_FAN_COUNT_CAP,
+    Math.max(24, Math.ceil(usable / EXHAUST_FAN_MIN_SPACING_M)),
+  );
+}
+
+/** Ridge vent modules scale with length and structural bays. */
+export function maxRoofVentCount(bayCount: number, greenhouseLengthM: number): number {
+  const bays = Math.max(1, bayCount);
+  return Math.min(48, Math.max(bays * 2, Math.ceil(greenhouseLengthM / 8)));
+}
+
 export interface HafFanCountNormalization {
   requested: number;
   total: number;

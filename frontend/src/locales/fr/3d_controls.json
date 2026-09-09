@@ -3,7 +3,8 @@
     "title": "Longueur de la Serre",
     "heightTitle": "Hauteur de la Serre",
     "heightHint": "Gouttière et faîtage influencent le volume, la ventilation et la heatmap sur les parois.",
-    "length": "Longueur",
+    "length": "Longueur (axe long)",
+    "lengthHint": "La longueur suit l'axe long de la serre (mur pad → extracteurs). Ce n'est pas la largeur de travée — la largeur totale vient des travées côte à côte.",
     "width": "Largeur",
     "ridgeHeight": "Hauteur de Faîtage",
     "eaveHeight": "Hauteur de Gouttière"
@@ -11,7 +12,8 @@
   "structure": {
     "title": "Structure de la Serre",
     "bayCount": "Nombre de Travées",
-    "bayWidth": "Largeur de Travée",
+    "bayWidth": "Largeur de Travée (module)",
+    "bayHint": "Travée = module de toiture placé côte à côte sur la largeur. Largeur totale = nombre de travées × largeur de travée (ex. 6 × 8 m = 48 m).",
     "totalWidth": "Largeur Totale",
     "bayRoofsTitle": "Toit par Travée",
     "bayLabel": "Toit travée {{n}}",
@@ -69,7 +71,7 @@
     "equipmentHint": "La carte inclut pad, ventilateurs, ouvrants, AC, chauffage et circulation du panneau gauche.",
     "estimatedValue": "Estimation",
     "workingRange": "Plage de travail culture",
-    "floorRange": "Étendue au sol",
+    "floorRange": "Plage de température au sol",
     "colorScale": "Plage de contraste des couleurs",
     "legend": {
       "temperature": "Référence 0–50°C ; bande mise en évidence = couleurs sur la carte du sol",

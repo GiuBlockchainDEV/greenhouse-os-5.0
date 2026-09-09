@@ -3,7 +3,8 @@
     "title": "Lunghezza Serra",
     "heightTitle": "Altezza Serra",
     "heightHint": "Gronda e colmo influenzano volume, ventilazione e heatmap sulle pareti.",
-    "length": "Lunghezza",
+    "length": "Lunghezza (asse lungo)",
+    "lengthHint": "La lunghezza è l'asse lungo della serra (direzione pad → estrattori). Non confonderla con la campata: la larghezza totale è data dalle campate affiancate.",
     "width": "Larghezza",
     "ridgeHeight": "Altezza Colmo",
     "eaveHeight": "Altezza Gronda"
@@ -11,7 +12,8 @@
   "structure": {
     "title": "Struttura Serra",
     "bayCount": "Numero di Campate",
-    "bayWidth": "Larghezza Campata",
+    "bayWidth": "Larghezza Campata (modulo)",
+    "bayHint": "Campata = modulo di tetto affiancato perpendicolarmente alla lunghezza. Larghezza totale = numero campate × larghezza campata (es. 6 campate × 8 m = 48 m).",
     "totalWidth": "Larghezza Totale",
     "bayRoofsTitle": "Tetto per Campata",
     "bayLabel": "Tetto campata {{n}}",
@@ -76,7 +78,7 @@
     "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
     "estimatedValue": "Stima",
     "workingRange": "Range di lavoro coltura",
-    "floorRange": "Span pavimento",
+    "floorRange": "Intervallo temperatura pavimento",
     "colorScale": "Range contrasto colori",
     "legend": {
       "temperature": "Riferimento 0–50°C; fascia evidenziata = colori sulla mappa pavimento",

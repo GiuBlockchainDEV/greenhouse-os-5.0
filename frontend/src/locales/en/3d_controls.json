@@ -3,7 +3,8 @@
     "title": "Greenhouse Length",
     "heightTitle": "Greenhouse Height",
     "heightHint": "Eave and ridge height affect volume, ventilation, and heatmap wall surfaces.",
-    "length": "Length",
+    "length": "Length (long axis)",
+    "lengthHint": "Length runs along the greenhouse long axis (pad wall → exhaust fans). It is not the bay width — total width comes from side-by-side bays.",
     "width": "Width",
     "ridgeHeight": "Ridge Height",
     "eaveHeight": "Eave Height"
@@ -11,7 +12,8 @@
   "structure": {
     "title": "Greenhouse Structure",
     "bayCount": "Number of Bays (Campate)",
-    "bayWidth": "Bay Width",
+    "bayWidth": "Bay Width (module)",
+    "bayHint": "A bay is one roof module placed side-by-side across the width. Total width = number of bays × bay width (e.g. 6 bays × 8 m = 48 m).",
     "totalWidth": "Total Width",
     "bayRoofsTitle": "Roof per Bay",
     "bayLabel": "Bay {{n}} roof",
@@ -76,7 +78,7 @@
     "equipmentHint": "Impact scales with pad area, fan/AC diameter, and unit count from the left panel.",
     "estimatedValue": "Estimated",
     "workingRange": "Crop working range",
-    "floorRange": "Floor span",
+    "floorRange": "Floor temperature range",
     "colorScale": "Color contrast range",
     "legend": {
       "temperature": "Reference 0–50°C; highlighted band = colors used on floor map",

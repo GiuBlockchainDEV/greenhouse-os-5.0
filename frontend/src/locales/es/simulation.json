@@ -61,6 +61,7 @@
     "ventilation": "Ventilación",
     "sizing": {
       "exhaustFanCount": "Ventiladores de Extracción",
+      "exhaustFanCountHint": "Distribuidos en el ancho del invernadero ({{width}} m). Hasta {{max}} ventiladores (~2,5 m de paso).",
       "exhaustFanDiameter": "Diámetro del Ventilador",
       "roofExhaustFanCount": "Ventiladores de Techo",
       "roofExhaustFanDiameter": "Diámetro Ventilador Techo",

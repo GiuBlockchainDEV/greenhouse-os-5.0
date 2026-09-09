@@ -70,6 +70,7 @@
     "ventilation": "Ventilazione",
     "sizing": {
       "exhaustFanCount": "Ventole Estrazione",
+      "exhaustFanCountHint": "Distribuite sulla larghezza della serra ({{width}} m). Massimo {{max}} ventole (~2,5 m di passo).",
       "exhaustFanDiameter": "Diametro Ventola",
       "roofExhaustFanCount": "Ventole Tetto (max 1 per campata)",
       "roofExhaustFanDiameter": "Diametro Ventola Tetto",
