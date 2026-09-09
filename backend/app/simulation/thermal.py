@@ -2,54 +2,236 @@
 
 import math
 
+from app.simulation.climate_equipment import (
+    ac_capacity_factor,
+    cooling_effect_with_sizing,
+    exhaust_capacity_factor,
+    fan_and_pad_cooling_c,
+    fog_capacity_factor,
+    heating_flux_with_sizing,
+    ventilation_ach_with_sizing,
+)
+from app.simulation.constants import COOLING_CAPACITY_FACTOR, LATENT_HEAT_VAPORIZATION
+from app.simulation.psychrometrics import pad_cooling_temp_floor_c
+from app.simulation.cultivation import (
+    CULTIVATION_ET_FACTOR,
+    CULTIVATION_THERMAL_MASS,
+    effective_lai,
+    normalize_cultivation_system,
+)
+from app.simulation.geometry import compute_envelope
 from app.simulation.schemas import ThermalBalance, ThermalInput, ThermalResult
-from app.simulation.thermal_physics import HEATING_SETPOINT_C, solve_microclimate
 from app.simulation.vpd import calculate_vpd_kpa
+
+RHO_AIR = 1.2
+CP_AIR = 1005.0
+LATENT_HEAT_J_KG = LATENT_HEAT_VAPORIZATION * 1e6
+
+
+def _roof_area(length: float, width: float, eave_height: float, ridge_height: float) -> float:
+    roof_rise = max(ridge_height - eave_height, 0.01)
+    slope_length = math.sqrt((width / 2) ** 2 + roof_rise**2)
+    return 2 * slope_length * length
+
+
+def _envelope_area(length: float, width: float, eave_height: float, ridge_height: float) -> float:
+    wall_area = 2 * length * eave_height + 2 * width * eave_height
+    return wall_area + _roof_area(length, width, eave_height, ridge_height)
+
+
+def _floor_area(length: float, width: float) -> float:
+    return length * width
+
+
+def _volume(length: float, width: float, eave_height: float, ridge_height: float) -> float:
+    floor = _floor_area(length, width)
+    roof_rise = max(ridge_height - eave_height, 0)
+    return floor * eave_height + floor * roof_rise / 2
+
+
+def _crop_coefficient(crop_type: str, growth_stage: str) -> float:
+    base_kc: dict[str, float] = {
+        "tomato": 1.05,
+        "cucumber": 0.95,
+        "pepper": 0.90,
+        "lettuce": 0.80,
+        "strawberry": 0.85,
+        "cannabis": 1.10,
+    }
+    stage_factor: dict[str, float] = {
+        "seedling": 0.6,
+        "early_vegetative": 0.8,
+        "mid_season": 1.0,
+        "late_vegetative": 1.05,
+        "generative": 1.1,
+        "harvest": 0.9,
+    }
+    return base_kc.get(crop_type, 1.0) * stage_factor.get(growth_stage, 1.0)
+
+
+def _solar_irradiance_w_m2(solar_radiation_mj_m2_day: float, daylight_hours: float) -> float:
+    if daylight_hours <= 0:
+        return 0.0
+    return (solar_radiation_mj_m2_day * 1e6) / (daylight_hours * 3600.0)
+
+
+def _solve_internal_temperature(
+    t_external: float,
+    q_solar_w_m2: float,
+    u_value: float,
+    envelope_area: float,
+    floor_area: float,
+    ach: float,
+    volume: float,
+    q_transpiration_w_m2: float,
+) -> float:
+    """Solve quasi-steady-state internal air temperature (°C)."""
+    conductance = u_value * envelope_area / floor_area
+    vent_coeff = RHO_AIR * CP_AIR * ach * volume / (3600.0 * floor_area)
+    total_coeff = conductance + vent_coeff
+
+    if total_coeff <= 0:
+        return t_external
+
+    net_gain = q_solar_w_m2 + q_transpiration_w_m2
+    return t_external + net_gain / total_coeff
 
 
 def compute_thermal_balance(params: ThermalInput) -> ThermalResult:
-    """Compute greenhouse energy balance fluxes and internal microclimate."""
+    """
+    Compute greenhouse energy balance fluxes and internal microclimate.
+
+    Energy balance (W/m² floor reference):
+        Q_net = Q_solar + Q_transpiration + Q_ventilation + Q_conduction ≈ 0
+
+    Args:
+        params: Geometry, materials, crop, and external climate inputs.
+
+    Returns:
+        Thermal balance fluxes, internal microclimate, and heatmap grid.
+    """
     length = params.geometry.length
     width = params.geometry.width
-    state = solve_microclimate(params)
+    eave_height = params.geometry.eave_height
+    ridge_height = params.geometry.ridge_height
 
-    q_net_delta = (
-        state.q_solar_w_m2
-        + state.q_transpiration_w_m2
-        + state.q_ventilation_w_m2
-        + state.q_conduction_w_m2
-        + state.q_equipment_w_m2
+    floor_area, envelope_area, volume = compute_envelope(
+        length,
+        width,
+        eave_height,
+        ridge_height,
+        arch_type=params.geometry.arch_type,
+        bay_count=params.geometry.bay_count,
+        bay_width=params.geometry.bay_width_m,
+        bay_arch_types=params.geometry.bay_arch_types,
     )
+
+    t_external = params.external_temp_c
+    rh_external = params.external_rh_pct
+    daylight = max(params.daylight_hours, 1.0)
+
+    irradiance = _solar_irradiance_w_m2(params.solar_radiation_mj_m2_day, daylight)
+    q_solar = irradiance * params.materials.transmittance * 0.72
+
+    system = normalize_cultivation_system(params.crop.system)
+    tier_count = params.crop.layout.tier_count
+    et_factor = CULTIVATION_ET_FACTOR.get(system, 1.0)
+    thermal_mass = CULTIVATION_THERMAL_MASS.get(system, 1.0)
+
+    kc = _crop_coefficient(params.crop.type, params.crop.growth_stage)
+    lai_effective = effective_lai(params.crop.lai, system, tier_count)
+    lai_factor = min(lai_effective / 3.0, 2.0)
+    et_rate_mm_h = (params.et0_mm_day / 24.0) * kc * lai_factor * et_factor
+    # mm/h ≡ kg/m²/h → divide by 3600 for kg/m²/s, multiply by λ for W/m²
+    q_transpiration = -(et_rate_mm_h / 3600.0) * LATENT_HEAT_J_KG
+
+    ach = ventilation_ach_with_sizing(
+        params.equipment.ventilation,
+        params.wind_speed_m_s,
+        params.equipment.sizing,
+        length,
+        width,
+    )
+
+    t_internal = _solve_internal_temperature(
+        t_external,
+        q_solar,
+        params.materials.u_value,
+        envelope_area,
+        floor_area,
+        ach,
+        volume,
+        q_transpiration,
+    )
+
+    cool_delta, rh_cool_delta = cooling_effect_with_sizing(
+        params.equipment.cooling,
+        params.equipment.sizing,
+        length,
+        width,
+        eave_height,
+        t_external,
+        rh_external,
+    )
+    t_internal += cool_delta
+
+    if params.equipment.cooling in {"fan_and_pad", "evaporative", "high_pressure_fog"}:
+        t_internal = max(pad_cooling_temp_floor_c(t_external, rh_external), t_internal)
+    elif params.equipment.cooling == "mechanical_ac":
+        t_internal = max(12.0, t_internal)
+
+    temp_deficit = params.heating_setpoint_c - t_internal
+    q_heating = heating_flux_with_sizing(
+        params.equipment.heating,
+        temp_deficit,
+        params.equipment.sizing,
+    )
+    if q_heating > 0:
+        t_internal += q_heating / max(params.materials.u_value * 2.5, 1.0)
+
+    # Higher cultivation thermal mass dampens deviation from exterior; never amplify swings
+    t_internal = t_external + (t_internal - t_external) / max(thermal_mass, 1.0)
+
+    q_conduction = -params.materials.u_value * (envelope_area / floor_area) * (t_internal - t_external)
+    q_ventilation = -RHO_AIR * CP_AIR * ach * volume / (3600.0 * floor_area) * (t_internal - t_external)
+    q_net_delta = q_solar + q_transpiration + q_ventilation + q_conduction + q_heating
+
+    internal_rh = min(
+        95.0,
+        max(
+            30.0,
+            rh_external + (t_external - t_internal) * 1.0 + et_rate_mm_h * 0.5 + rh_cool_delta,
+        ),
+    )
+    vpd = calculate_vpd_kpa(t_internal, relative_humidity_pct=internal_rh)
 
     heatmap = _generate_heatmap(
         rows=max(int(length / 2), 4),
         cols=max(int(width / 2), 4),
-        base_temp=state.internal_temp_c,
-        t_external=params.external_temp_c,
-        rh_external=params.external_rh_pct,
-        q_solar=state.q_solar_w_m2,
+        base_temp=t_internal,
+        t_external=t_external,
+        rh_external=rh_external,
+        q_solar=q_solar,
         length=length,
         width=width,
-        eave_height=params.geometry.eave_height,
+        eave_height=eave_height,
         equipment=params.equipment,
-        supply_temp_c=state.supply_temp_c,
-        mixing=state.mixing_effectiveness,
         heating_setpoint_c=params.heating_setpoint_c,
     )
 
     return ThermalResult(
         thermal_balance=ThermalBalance(
-            q_solar=state.q_solar_w_m2,
-            q_transpiration=state.q_transpiration_w_m2,
-            q_ventilation=state.q_ventilation_w_m2,
-            q_conduction=state.q_conduction_w_m2,
+            q_solar=round(q_solar, 1),
+            q_transpiration=round(q_transpiration, 1),
+            q_ventilation=round(q_ventilation, 1),
+            q_conduction=round(q_conduction, 1),
             q_net_delta=round(q_net_delta, 1),
         ),
-        internal_temp_c=state.internal_temp_c,
-        external_temp_c=round(params.external_temp_c, 1),
-        internal_rh_pct=state.internal_rh_pct,
-        vpd_kpa=round(calculate_vpd_kpa(state.internal_temp_c, relative_humidity_pct=state.internal_rh_pct), 3),
-        ventilation_ach=state.ventilation_ach,
+        internal_temp_c=round(t_internal, 1),
+        external_temp_c=round(t_external, 1),
+        internal_rh_pct=round(internal_rh, 1),
+        vpd_kpa=round(vpd, 3),
+        ventilation_ach=round(ach, 2),
         heatmap_matrix=heatmap,
     )
 
@@ -65,17 +247,53 @@ def _generate_heatmap(
     width: float,
     eave_height: float,
     equipment,
-    supply_temp_c: float | None,
-    mixing: float,
-    heating_setpoint_c: float = HEATING_SETPOINT_C,
+    heating_setpoint_c: float = 22.0,
 ) -> list[list[float]]:
-    """Generate flow-aware floor temperature grid with energy-conserving re-centering."""
+    """Generate equipment-aware floor temperature grid."""
     matrix: list[list[float]] = []
+    center_r = (rows - 1) / 2.0
+    center_c = (cols - 1) / 2.0
+    max_dist = math.sqrt(center_r**2 + center_c**2) or 1.0
+    solar_boost = q_solar * 0.015
+    sizing = equipment.sizing
     half_l = length / 2.0
     half_w = width / 2.0
-    heating_active = equipment.heating != "none" and heating_setpoint_c - base_temp > 0.5
-    solar_amplitude = q_solar * 0.012
-    temp_values: list[float] = []
+    cooling = equipment.cooling
+    heating_active = (
+        equipment.heating != "none" and heating_setpoint_c - base_temp > 0.5
+    )
+
+    uses_pad = cooling in {"fan_and_pad", "evaporative"}
+    pad_cool = 0.0
+    if uses_pad and sizing.pad_wall_width_m > 0:
+        pad_cool, _ = fan_and_pad_cooling_c(t_external, rh_external, sizing)
+        pad_cool = min(pad_cool, 6.0 * COOLING_CAPACITY_FACTOR)
+        if cooling == "evaporative":
+            pad_cool *= 0.65
+
+    fan_cool = 0.0
+    if cooling in {"fan_and_pad", "evaporative"} or equipment.ventilation in {
+        "forced_exhaust",
+        "combined",
+    }:
+        fan_cool = exhaust_capacity_factor(sizing) * 1.0
+
+    vent_cool = (
+        sizing.roof_vent_count * sizing.roof_vent_width_m * 0.08
+        + sizing.side_vent_count * sizing.side_vent_height_m * 0.1
+    )
+    ac_cool = (
+        ac_capacity_factor(sizing) * 2.4 * COOLING_CAPACITY_FACTOR
+        if cooling == "mechanical_ac"
+        else 0.0
+    )
+    fog_cool = (
+        fog_capacity_factor(sizing) * 1.15 * COOLING_CAPACITY_FACTOR
+        if cooling == "high_pressure_fog"
+        else 0.0
+    )
+    mix = min(0.85, sizing.circulation_fan_count * 0.08)
+    heat_boost = 1.2 if heating_active else 0.0
 
     for row in range(rows):
         row_data: list[float] = []
@@ -84,30 +302,43 @@ def _generate_heatmap(
         for col in range(cols):
             z = -half_w + (col / max(cols - 1, 1)) * width
             z_norm = abs(z) / max(half_w, 0.1)
-            edge = math.sqrt((x_norm - 0.5) ** 2 + (z_norm - 0.5) ** 2)
+            dist = math.sqrt((row - center_r) ** 2 + (col - center_c) ** 2)
+            edge_factor = dist / max_dist
+            temp = base_temp + solar_boost * (1.0 - edge_factor * 0.6)
+            temp -= edge_factor * max(base_temp - t_external, 0) * 0.08
 
-            temp = base_temp + solar_amplitude * (0.5 - edge)
-            temp += edge * (t_external - base_temp) * 0.35
+            if uses_pad:
+                transit = min(1.0, x_norm / 0.95)
+                temp -= pad_cool * (1.0 - transit)
+                if cooling == "fan_and_pad":
+                    temp += pad_cool * 0.35 * (transit**1.35)
+                elif cooling == "evaporative":
+                    temp += pad_cool * 0.2 * (transit**1.25)
 
-            if equipment.cooling in {"fan_and_pad", "evaporative"} and supply_temp_c is not None:
-                transit = 1.0 - min(1.0, x_norm / 0.95)
-                temp += (supply_temp_c - base_temp) * transit
+            if fan_cool > 0:
+                temp -= fan_cool * (x_norm**1.4) * 0.6
+            temp -= vent_cool * edge_factor * 0.35
 
-            if equipment.cooling == "mechanical_ac" and supply_temp_c is not None:
-                cross_wave = 0.55 + 0.45 * math.sin(x_norm * math.pi * 4.0)
-                temp += (supply_temp_c - base_temp) * (1.0 - z_norm * 0.45) * cross_wave * 0.65
+            if ac_cool > 0:
+                cross_wave = 0.55 + 0.45 * math.sin(x_norm * math.pi * 4)
+                temp -= ac_cool * (1.0 - z_norm * 0.45) * cross_wave
 
-            if heating_active and supply_temp_c is not None:
-                temp += (supply_temp_c - base_temp) * (1.0 - edge) * 0.25
+            if fog_cool > 0:
+                band = math.exp(-((z / max(half_w, 0.1)) ** 2) / 0.35)
+                along = 1.0 - 0.12 * abs(x) / max(half_l, 0.1)
+                temp -= fog_cool * band * along
 
-            temp = base_temp + (temp - base_temp) * (1.0 - mixing * 0.35)
-            row_data.append(temp)
-            temp_values.append(temp)
+            if heat_boost > 0:
+                temp += heat_boost * (1.0 - edge_factor) * 0.35
+
+            temp = base_temp + (temp - base_temp) * (1.0 - mix * 0.45)
+
+            if cooling in {"fan_and_pad", "evaporative", "high_pressure_fog"}:
+                temp = max(pad_cooling_temp_floor_c(t_external, rh_external), temp)
+            elif cooling == "mechanical_ac":
+                temp = max(12.0, temp)
+
+            row_data.append(round(temp, 2))
         matrix.append(row_data)
 
-    mean_temp = sum(temp_values) / max(len(temp_values), 1)
-    shift = base_temp - mean_temp
-    return [
-        [round(value + shift, 2) for value in row]
-        for row in matrix
-    ]
+    return matrix

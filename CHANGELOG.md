@@ -12,6 +12,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Global microclimate regression** — Restored calibrated steady-state balance (260 W/m² solar proxy, equipment cooling deltas, cultivation thermal mass) while keeping rated-capacity flows and pad outlet states for the spatial heatmap. Fixes internal temps running hotter than outdoors with fan-and-pad and NaN values in passive modes.
+
 - **Heatmap left/right inversion** — Corrected solar facing direction, pad-to-exhaust airflow warming on the exhaust side, pad-masked perimeter exchange, and west/south wall texture UV alignment.
 
 - **Heatmap 0–50°C absolute scale** — Fixed color mapping 0–50°C with crop working-range band and estimated-value marker on the legend; external temp slider extended to 50°C.

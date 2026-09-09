@@ -1,5 +1,5 @@
 /**
- * Equipment-aware microclimate preview (Qatar-corrected physics engine).
+ * Equipment-aware microclimate preview (calibrated global balance + rated flows for heatmap).
  */
 import type {
   ClimateEquipment,
@@ -9,42 +9,14 @@ import type {
   GreenhouseDimensions,
   ShadingScreen,
 } from "@/types/greenhouse";
-import { solveMicroclimate, HEATING_SETPOINT_C } from "@/lib/thermal/solveMicroclimate";
+import {
+  solveMicroclimate,
+  HEATING_SETPOINT_C,
+  MECHANICAL_AC_TEMP_FLOOR_C,
+  ventilationAchWithSizing,
+} from "@/lib/thermal/solveMicroclimate";
 
-export { HEATING_SETPOINT_C };
-export const MECHANICAL_AC_TEMP_FLOOR_C = 12;
-
-export function ventilationAchWithSizing(
-  equipment: ClimateEquipment,
-  scenario: ClimateScenario,
-  length: number,
-  width: number,
-  eaveHeight = 3,
-  ridgeHeight = 4.5,
-): number {
-  return solveMicroclimate({
-    scenario,
-    covering: { type: "glass", transmittance: 0.85, uValue: 5.8 },
-    shadingScreen: { installed: false, deploymentPct: 0 },
-    equipment,
-    dimensions: { length, width, eaveHeight, ridgeHeight },
-    crop: {
-      type: "tomato",
-      system: "nft",
-      lai: 3,
-      growthStage: "mid_season",
-      layout: {
-        tierCount: 1,
-        gutterLengthM: length,
-        plantsPerTier: 100,
-        plantDensity: 1,
-        bedLineCount: 2,
-        pathwayWidthM: 1.2,
-        sideClearanceM: 0.6,
-      },
-    },
-  }).ventilationAch;
-}
+export { HEATING_SETPOINT_C, MECHANICAL_AC_TEMP_FLOOR_C, ventilationAchWithSizing };
 
 export function estimatePreviewMicroclimate(
   scenario: ClimateScenario,
