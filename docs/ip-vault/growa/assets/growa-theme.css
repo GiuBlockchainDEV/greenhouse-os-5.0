@@ -1,0 +1,375 @@
+/* Growa IP Protection Document — Premium Corporate Design System */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@page content {
+  margin: 22mm 20mm 24mm 20mm;
+  background: #F6F6F2;
+
+  @bottom-center {
+    content: counter(page);
+    font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    color: #8A8A85;
+  }
+}
+
+@page cover {
+  margin: 0;
+  background: #191815;
+}
+
+:root {
+  --growa-off-white: #F6F6F2;
+  --growa-near-black: #191815;
+  --growa-green: #35A853;
+  --growa-card: #FFFFFF;
+  --growa-border: #E2E2DC;
+  --growa-text: #191815;
+  --growa-muted: #6B6B66;
+  --growa-green-soft: #E8F5EC;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.6;
+  color: var(--growa-text);
+  background: var(--growa-off-white);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Cover (dark page) ── */
+
+.cover-page {
+  page: cover;
+  page-break-after: always;
+  background: var(--growa-near-black);
+  color: #FFFFFF;
+  min-height: 297mm;
+  padding: 48mm 32mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cover-brand {
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-stretch: condensed;
+  font-size: 42pt;
+  letter-spacing: -0.02em;
+  color: var(--growa-green);
+  margin: 0;
+}
+
+.cover-accent-bar {
+  width: 48px;
+  height: 4px;
+  background: var(--growa-green);
+  margin: 16px 0 32px 0;
+}
+
+.cover-title {
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-stretch: condensed;
+  font-size: 22pt;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0 0 8px 0;
+}
+
+.cover-subtitle {
+  font-size: 12pt;
+  color: #A8A8A3;
+  margin: 0 0 48px 0;
+}
+
+.cover-meta {
+  border-top: 1px solid #333330;
+  padding-top: 24px;
+  font-size: 9pt;
+  color: #8A8A85;
+}
+
+.cover-meta table {
+  border: none;
+  background: transparent;
+}
+
+.cover-meta td {
+  border: none;
+  padding: 4px 24px 4px 0;
+  background: transparent;
+  color: #A8A8A3;
+}
+
+.cover-meta td:first-child {
+  color: #6B6B66;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+}
+
+.cover-footer {
+  font-size: 8pt;
+  color: #4A4A47;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Content pages ── */
+
+.content-page {
+  page: content;
+  page-break-before: always;
+}
+
+.note-section {
+  page-break-before: always;
+}
+
+.note-section:first-of-type {
+  page-break-before: auto;
+}
+
+/* ── Typography ── */
+
+h1, h2, h3, h4 {
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-stretch: condensed;
+  font-weight: 700;
+  color: var(--growa-near-black);
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 22pt;
+  margin: 0 0 6px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--growa-green);
+}
+
+h2 {
+  font-size: 14pt;
+  margin: 28px 0 12px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--growa-green);
+}
+
+h3 {
+  font-size: 11pt;
+  margin: 20px 0 8px 0;
+  color: var(--growa-green);
+}
+
+h4 {
+  font-size: 10pt;
+  margin: 16px 0 6px 0;
+}
+
+p {
+  margin: 0 0 10px 0;
+}
+
+/* ── Cards ── */
+
+.card {
+  background: var(--growa-card);
+  border: 1px solid var(--growa-border);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  page-break-inside: avoid;
+}
+
+.card-grid {
+  display: block;
+  margin: 16px 0;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--growa-near-black);
+  font-size: 10.5pt;
+}
+
+.card p {
+  font-size: 9.5pt;
+  color: var(--growa-muted);
+  margin-bottom: 0;
+}
+
+/* ── Blockquote / callout ── */
+
+blockquote {
+  background: var(--growa-green-soft);
+  border-left: 3px solid var(--growa-green);
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 9.5pt;
+  color: var(--growa-muted);
+}
+
+blockquote p {
+  margin: 0;
+}
+
+/* ── Tables ── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 9pt;
+  background: var(--growa-card);
+  border: 1px solid var(--growa-border);
+  border-radius: 6px;
+  overflow: hidden;
+  page-break-inside: avoid;
+}
+
+th {
+  background: var(--growa-near-black);
+  color: #FFFFFF;
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-stretch: condensed;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 8.5pt;
+  letter-spacing: 0.02em;
+}
+
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--growa-border);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:nth-child(even) td {
+  background: #FAFAF8;
+}
+
+/* ── Code blocks (black-box style) ── */
+
+pre {
+  background: var(--growa-near-black);
+  color: #D4D4CF;
+  border: 1px solid #333330;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "DejaVu Sans Mono", "Consolas", monospace;
+  font-size: 8pt;
+  line-height: 1.5;
+  overflow-x: auto;
+  page-break-inside: avoid;
+  margin: 14px 0;
+}
+
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+
+code {
+  font-family: "DejaVu Sans Mono", "Consolas", monospace;
+  font-size: 8.5pt;
+  background: #EEEEE9;
+  color: var(--growa-near-black);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--growa-border);
+}
+
+/* Syntax-like coloring for abstract interfaces */
+pre .comment { color: #6B8A6E; }
+pre .keyword { color: var(--growa-green); }
+pre .type { color: #8AB4D4; }
+
+/* ── Lists ── */
+
+ul, ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+li {
+  margin: 4px 0;
+  font-size: 9.5pt;
+}
+
+/* ── Links / wikilinks ── */
+
+a, .wikilink {
+  color: var(--growa-green);
+  text-decoration: none;
+}
+
+/* ── Horizontal rule ── */
+
+hr {
+  border: none;
+  border-top: 1px solid var(--growa-border);
+  margin: 24px 0;
+}
+
+/* ── Note footer ── */
+
+.note-footer {
+  margin-top: 32px;
+  padding-top: 12px;
+  border-top: 1px solid var(--growa-border);
+  font-size: 8.5pt;
+  color: var(--growa-muted);
+  font-style: italic;
+}
+
+/* ── Section label ── */
+
+.section-label {
+  display: inline-block;
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-stretch: condensed;
+  font-size: 7.5pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--growa-green);
+  margin-bottom: 4px;
+}
+
+/* ── Black box badge ── */
+
+.black-box-badge {
+  display: inline-block;
+  background: var(--growa-near-black);
+  color: var(--growa-green);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 7pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
