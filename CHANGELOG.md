@@ -12,6 +12,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Equipment fan count limits** — Exhaust fan slider now scales with greenhouse width (up to 96 units, ~2.5 m spacing) instead of a hard cap at 12. Ridge vent max scales with length and bays. Added bay vs length help text in structure controls.
+
 - **Global microclimate regression** — Restored calibrated steady-state balance (260 W/m² solar proxy, equipment cooling deltas, cultivation thermal mass) while keeping rated-capacity flows and pad outlet states for the spatial heatmap. Fixes internal temps running hotter than outdoors with fan-and-pad and NaN values in passive modes.
 
 - **Heatmap left/right inversion** — Corrected solar facing direction, pad-to-exhaust airflow warming on the exhaust side, pad-masked perimeter exchange, and west/south wall texture UV alignment.
