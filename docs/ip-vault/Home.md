@@ -8,6 +8,18 @@
 
 ---
 
+## Growa Premium Edition
+
+A **black-box, corporate-grade** IP protection document with Growa branding is available at `docs/ip-vault/growa/`. Generate the premium PDF with:
+
+```bash
+python3 scripts/generate_growa_ip_pdf.py
+```
+
+Output: `docs/ip-vault/growa/Growa-IP-Protection.pdf`
+
+---
+
 ## Navigation Map
 
 This vault follows an [[Obsidian]]-style linked-note structure. Each note is self-contained yet cross-references related concepts via wikilinks.

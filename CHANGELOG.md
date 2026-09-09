@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Growa IP Protection Document** (`docs/ip-vault/growa/`) — Premium corporate knowledge vault with black-box architecture, Growa design system (#F6F6F2 / #191815 / #35A853), sanitized interface snippets, and PDF export via `scripts/generate_growa_ip_pdf.py`.
+
 - **IP Knowledge Vault** (`docs/ip-vault/`) — Obsidian-style linked-note documentation in English for intellectual property deposit; includes redaction policy, module index, and PDF export via `scripts/generate_ip_vault_pdf.py`.
 
 - **Qatar-corrected thermal physics engine** — Flow-based ventilation (mechanical/wind/stack/infiltration), humidity-ratio moisture balance, kW-rated AC/heating with high-ambient derating, HAF mixing-only, energy-conserving spatial heatmap, hot-water pipe 3D layout. Spec: `docs/THERMAL_EQUIPMENT_AUDIT.csv`.
