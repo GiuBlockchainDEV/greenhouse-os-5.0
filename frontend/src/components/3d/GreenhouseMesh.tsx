@@ -8,6 +8,7 @@ import {
   expandBayArchTypes,
   roofRiseM,
 } from "@/lib/structureUtils";
+import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType } from "@/types/greenhouse";
 
@@ -190,7 +191,7 @@ export function GreenhouseMesh() {
   const cooling = useGreenhouseStore((state) => state.climateEquipment.cooling);
   const { length, width, ridgeHeight, eaveHeight } = dimensions;
   const { bayCount, bayWidthM, archType } = structure;
-  const heatmapActive = heatmapMode !== "off" && cooling !== "none";
+  const heatmapActive = heatmapMode !== "off" && isHeatmapAvailable(cooling);
 
   const bays = useMemo(
     () =>

@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Pad-to-exhaust heatmap gradient** — Zero-mean pad→exhaust airflow model (cool at pad wall, warm at exhaust fans), exhaust-side warming instead of outdoor exchange, reduced solar spatial amplitude with fan-and-pad, and corrected floor texture UV flip so the visual matches physics.
 
+- **Heatmap behavior audit CSV** — Added `docs/HEATMAP_AUDIT.csv`: full pipeline inventory (UI → solver → spatial physics → HAF → render), evolution on every slider, FE/BE divergence flags, dead code, and prioritized fix roadmap.
+
 - **Heatmap requires cooling system** — Spatial heatmap overlay is disabled when cooling is set to none; mode buttons are locked and the map auto-turns off when switching away from an active cooling system.
 
 - **HAF floor jet corridors** — Circulation fans now imprint visible horizontal jet bands and motor-heat hubs on the floor heatmap; mixing flattens pad→exhaust gradient along each HAF row (constant-Z corridors) while preserving energy balance. Fan count, diameter, and rated flow scale corridor width and mixing strength.
