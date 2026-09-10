@@ -366,6 +366,14 @@ export function computeSpatialPerturbation(
   const motorHeat = circulationMotorHeatAt(ctx, x, z);
   tempDelta += motorHeat * 0.35;
 
+  if (ctx.equipment.sizing.circulationFanCount > 0 && ctx.mixingEffectiveness > 0.02) {
+    const mix = Math.min(0.95, ctx.mixingEffectiveness * 1.02);
+    const otherTemp = tempDelta - airflow.tempDelta;
+    const otherRh = rhDelta - airflow.rhDelta;
+    tempDelta = airflow.tempDelta + otherTemp * (1 - mix * 0.94);
+    rhDelta = airflow.rhDelta + otherRh * (1 - mix * 0.9);
+  }
+
   return {
     tempDelta: Math.max(-MAX_LOCAL_TEMP_SPREAD_C, Math.min(MAX_LOCAL_TEMP_SPREAD_C, tempDelta)),
     rhDelta: Math.max(-MAX_LOCAL_RH_SPREAD_PCT, Math.min(MAX_LOCAL_RH_SPREAD_PCT, rhDelta)),

@@ -1,6 +1,6 @@
 /**
  * HAF circulation mixing — uniformizes local T/RH without outdoor air exchange.
- * Preserves pad→exhaust along-length gradients; dampens cross-width and vertical spread.
+ * Preserves pad→exhaust along-length gradients on floor and long walls.
  */
 
 import type { HeatmapFieldContext, HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
@@ -43,27 +43,71 @@ function clampRh(value: number): number {
   );
 }
 
-function resolveMixingStrength(ctx: HeatmapFieldContext): number {
+function linearTrendAt(rowMeans: number[], rowIndex: number): number {
+  const n = rowMeans.length;
+  if (n <= 1) {
+    return rowMeans[0] ?? 0;
+  }
+
+  let sumR = 0;
+  let sumM = 0;
+  let sumRm = 0;
+  let sumR2 = 0;
+  for (let r = 0; r < n; r++) {
+    const mean = rowMeans[r] ?? 0;
+    sumR += r;
+    sumM += mean;
+    sumRm += r * mean;
+    sumR2 += r * r;
+  }
+
+  const denom = n * sumR2 - sumR * sumR;
+  const slope = denom !== 0 ? (n * sumRm - sumR * sumM) / denom : 0;
+  const intercept = (sumM - slope * sumR) / n;
+  return intercept + slope * rowIndex;
+}
+
+function renormalizeToMean(grid: number[][], targetMean: number): number[][] {
+  const shift = targetMean - matrixMean(grid);
+  return grid.map((row) => row.map((value) => value + shift));
+}
+
+/** Mixing strength 0–1 from HAF count, rated flow, and solver mixing coefficient. */
+export function resolveCirculationMixingStrength(ctx: HeatmapFieldContext): number {
   if (ctx.equipment.sizing.circulationFanCount <= 0) {
     return 0;
   }
+
   const capacity = circulationCapacityFactor(ctx.equipment.sizing);
-  return Math.min(0.88, ctx.mixingEffectiveness * (0.55 + capacity * 0.2));
+  return Math.min(0.96, ctx.mixingEffectiveness * (0.72 + capacity * 0.22));
 }
 
-function mixRowsTowardRowMean(
+function usesLengthRowAxis(surfaceKind: HeatmapSurfaceKind): boolean {
+  return surfaceKind === "floor" || surfaceKind === "wall_north" || surfaceKind === "wall_south";
+}
+
+function mixGridWithHaf(
   grid: number[][],
   strength: number,
+  surfaceKind: HeatmapSurfaceKind,
 ): number[][] {
   const targetMean = matrixMean(grid);
-  const mixed = grid.map((row) => {
-    const mean = rowMean(row);
-    const factor = Math.min(0.9, strength);
-    return row.map((value) => value + (mean - value) * factor);
+  const rowMeans = grid.map(rowMean);
+  const preserveLengthTrend = usesLengthRowAxis(surfaceKind);
+
+  const mixed = grid.map((row, rowIndex) => {
+    const rowAvg = rowMeans[rowIndex] ?? targetMean;
+    const trend = preserveLengthTrend ? linearTrendAt(rowMeans, rowIndex) : rowAvg;
+
+    return row.map((value) => {
+      let blended = value + (rowAvg - value) * Math.min(0.98, strength * 0.96);
+      const micro = blended - trend;
+      blended = trend + micro * (1 - strength * (preserveLengthTrend ? 0.62 : 0.82));
+      return blended;
+    });
   });
 
-  const shift = targetMean - matrixMean(mixed);
-  return mixed.map((row) => row.map((value) => value + shift));
+  return renormalizeToMean(mixed, targetMean);
 }
 
 function finalizeMixedSurface(
@@ -96,16 +140,15 @@ function finalizeMixedSurface(
 export function applyCirculationMixingToSurface(
   ctx: HeatmapFieldContext,
   surface: HeatmapSurfaceValues,
-  _surfaceKind: HeatmapSurfaceKind,
+  surfaceKind: HeatmapSurfaceKind,
 ): HeatmapSurfaceValues {
-  const strength = resolveMixingStrength(ctx);
+  const strength = resolveCirculationMixingStrength(ctx);
   if (strength <= 0.02) {
     return surface;
   }
 
-  const temperature = mixRowsTowardRowMean(surface.temperature, strength);
-  const humidity = mixRowsTowardRowMean(surface.humidity, strength * 0.92);
+  const temperature = mixGridWithHaf(surface.temperature, strength, surfaceKind);
+  const humidity = mixGridWithHaf(surface.humidity, strength * 0.94, surfaceKind);
 
   return finalizeMixedSurface(temperature, humidity);
 }
-

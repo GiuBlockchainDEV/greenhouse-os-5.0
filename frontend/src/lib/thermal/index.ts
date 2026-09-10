@@ -5,6 +5,9 @@ export {
   computeVentilationFlows,
   mixingEffectiveness,
 } from "@/lib/thermal/ventilationFlow";
-export { applyCirculationMixingToSurface } from "@/lib/thermal/circulationMixing";
+export {
+  applyCirculationMixingToSurface,
+  resolveCirculationMixingStrength,
+} from "@/lib/thermal/circulationMixing";
 export { ratedAcCoolingKw, acCapacityDerating } from "@/lib/thermal/equipmentLoads";
 export { RATED_CAPACITY_DEFAULTS } from "@/lib/thermal/ratedCapacities";

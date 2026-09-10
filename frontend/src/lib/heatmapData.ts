@@ -301,6 +301,16 @@ export function computeHeatmapVisualRange(
   const { min: dataMin, max: dataMax } = surfaceValueBounds(surface, mode, preview);
 
   if (mode === "temperature") {
+    const spread = dataMax - dataMin;
+    if (spread >= 2.5) {
+      const margin = Math.max(0.35, spread * 0.05);
+      return {
+        min: Math.max(absolute.min, dataMin - margin),
+        max: Math.min(absolute.max, dataMax + margin),
+        unit: absolute.unit,
+      };
+    }
+
     let min = Math.min(dataMin, summary.estimated - minSpan * 0.4);
     let max = Math.max(dataMax, summary.estimated + minSpan * 0.4);
     if (max - min < minSpan) {

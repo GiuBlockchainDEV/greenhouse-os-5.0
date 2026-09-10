@@ -35,6 +35,8 @@ export function heatmapInputRevision(
     s.roofExhaustFanDiameterM,
     s.circulationFanCount,
     s.circulationFanDiameterM,
+    s.circulationFanRatedFlowM3h,
+    s.circulationFanMotorW,
     s.padWallWidthM,
     s.padWallHeightM,
     s.acUnitCount,
