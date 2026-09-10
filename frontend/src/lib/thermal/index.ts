@@ -6,6 +6,10 @@ export {
   mixingEffectiveness,
 } from "@/lib/thermal/ventilationFlow";
 export {
+  circulationFloorMotorHeatDeltaC,
+  circulationJetInfluenceAt,
+} from "@/lib/thermal/circulationJetField";
+export {
   applyCirculationMixingToSurface,
   resolveCirculationMixingStrength,
 } from "@/lib/thermal/circulationMixing";

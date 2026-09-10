@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Pad-to-exhaust heatmap gradient** — Zero-mean pad→exhaust airflow model (cool at pad wall, warm at exhaust fans), exhaust-side warming instead of outdoor exchange, reduced solar spatial amplitude with fan-and-pad, and corrected floor texture UV flip so the visual matches physics.
 
+- **HAF floor jet corridors** — Circulation fans now imprint visible horizontal jet bands and motor-heat hubs on the floor heatmap; mixing flattens pad→exhaust gradient along each HAF row (constant-Z corridors) while preserving energy balance. Fan count, diameter, and rated flow scale corridor width and mixing strength.
+
 - **HAF heatmap visibility** — Stronger circulation-fan mixing in spatial field and grid post-process; legend color range now tracks actual floor spread (not fixed 10°C padding) so adding HAF narrows the displayed range and smooths hotspots.
 
 - **Fan role separation (HAF vs exhaust)** — Circulation fans recirculate air to uniformize cross-width/vertical T and RH (no outdoor ACH); wall and roof exhaust fans model hot-air extraction plenums at gable and ridge. Removed erroneous ACH boost from HAF count.

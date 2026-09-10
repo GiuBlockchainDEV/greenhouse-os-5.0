@@ -9,6 +9,10 @@ import {
   type SolarSurfaceKind,
 } from "@/lib/solarIrradiance";
 import { exhaustCapacityFactor, padCapacityFactor } from "@/lib/climateEquipmentCapacity";
+import {
+  circulationFloorMotorHeatDeltaC,
+  circulationJetInfluenceAt,
+} from "@/lib/thermal/circulationJetField";
 import { rhPctFromHumidityRatio, humidityRatioKgKg } from "@/lib/thermal/psychrometricsExtended";
 
 const MAX_LOCAL_TEMP_SPREAD_C = 8;
@@ -207,22 +211,6 @@ function outdoorInfluenceAt(
   return Math.min(1, influence);
 }
 
-function circulationMotorHeatAt(ctx: HeatmapFieldContext, x: number, z: number): number {
-  if (ctx.equipment.sizing.circulationFanCount <= 0) {
-    return 0;
-  }
-  let heat = 0;
-  for (const fan of ctx.layout.circulationFans) {
-    const sigma = fan.diameterM * 1.6;
-    heat +=
-      gaussian1d(x - fan.x, sigma) *
-      gaussian1d(z - fan.z, sigma) *
-      0.12 *
-      exhaustFanSizeFactor(fan.diameterM);
-  }
-  return heat;
-}
-
 function acSupplyInfluenceAt(
   ctx: HeatmapFieldContext,
   x: number,
@@ -363,15 +351,16 @@ export function computeSpatialPerturbation(
     (1 - ctx.mixingEffectiveness);
   tempDelta += stratification;
 
-  const motorHeat = circulationMotorHeatAt(ctx, x, z);
-  tempDelta += motorHeat * 0.35;
-
-  if (ctx.equipment.sizing.circulationFanCount > 0 && ctx.mixingEffectiveness > 0.02) {
-    const mix = Math.min(0.95, ctx.mixingEffectiveness * 1.02);
+  if (ctx.equipment.sizing.circulationFanCount > 0) {
+    const jet = circulationJetInfluenceAt(ctx, x, z);
+    const mix = jet.mixWeight * Math.min(0.95, ctx.mixingEffectiveness * 1.05);
     const otherTemp = tempDelta - airflow.tempDelta;
     const otherRh = rhDelta - airflow.rhDelta;
-    tempDelta = airflow.tempDelta + otherTemp * (1 - mix * 0.94);
-    rhDelta = airflow.rhDelta + otherRh * (1 - mix * 0.9);
+    tempDelta = airflow.tempDelta + otherTemp * (1 - mix * 0.93);
+    rhDelta = airflow.rhDelta + otherRh * (1 - mix * 0.88);
+    if (!surface || surface === "floor") {
+      tempDelta += circulationFloorMotorHeatDeltaC(ctx, jet) * 0.85;
+    }
   }
 
   return {
