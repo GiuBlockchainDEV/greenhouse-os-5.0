@@ -9,14 +9,14 @@ export interface HeatmapTextureRemap {
 export function heatmapTextureRemap(surfaceKind: HeatmapSurfaceKind): HeatmapTextureRemap {
   switch (surfaceKind) {
     case "wall_south":
-      return { flipRow: true, flipCol: true };
+      return { flipRow: true, flipCol: false };
     case "wall_west":
     case "wall_east":
       return { flipRow: true, flipCol: false };
     case "wall_north":
       return { flipRow: false, flipCol: false };
     case "floor":
-      return { flipRow: true, flipCol: false };
+      return { flipRow: false, flipCol: false };
     default:
       return { flipRow: false, flipCol: false };
   }

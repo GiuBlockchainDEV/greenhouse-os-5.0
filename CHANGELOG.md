@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Pad-to-exhaust heatmap gradient** — Zero-mean pad→exhaust airflow model (cool at pad wall, warm at exhaust fans), exhaust-side warming instead of outdoor exchange, reduced solar spatial amplitude with fan-and-pad, and corrected floor texture UV flip so the visual matches physics.
 
+- **Heatmap floor / long-wall UV alignment** — Floor row mapping no longer flips along greenhouse length; south wall keeps a 180°-aware row flip so pad-side cold and exhaust-side warm read correctly on floor and north/south facades.
+
 - **Exhaust fans & wall heatmaps** — Exhaust fans span 95% of the facade (up to 100 units); fan diameter and pad wall area scale global and spatial thermal effects. North/south/east wall heatmaps use surface-normal solar projection and corrected UV mapping.
 
 - **Equipment fan count limits** — Exhaust fan slider now scales with greenhouse width (up to 96 units, ~2.5 m spacing) instead of a hard cap at 12. Ridge vent max scales with length and bays. Added bay vs length help text in structure controls.
