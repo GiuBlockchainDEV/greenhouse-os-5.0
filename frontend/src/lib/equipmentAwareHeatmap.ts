@@ -4,6 +4,7 @@ import {
   type ClimateEquipmentLayout,
 } from "@/lib/climateEquipmentLayout";
 import { HEATING_SETPOINT_C } from "@/lib/thermal/solveMicroclimate";
+import { anchorWallsToFloorField } from "@/lib/heatmapBoundaryContinuity";
 import {
   applyConservationToGrid,
   computeSpatialPerturbation,
@@ -214,7 +215,9 @@ export function buildHeatmapFieldContext(
 export function generateSurfaceHeatmap(
   ctx: HeatmapFieldContext,
   surface: HeatmapSurfaceKind,
+  options?: { applyConservation?: boolean },
 ): HeatmapSurfaceValues {
+  const applyConservation = options?.applyConservation ?? true;
   const { halfL, halfW } = ctx.coeffs;
 
   if (surface === "floor") {
@@ -270,6 +273,10 @@ export function generateSurfaceHeatmap(
     humidity.push(rhRow);
   }
 
+  if (!applyConservation) {
+    return finalizeSurfaceValues(temperature, humidity);
+  }
+
   const conserved = applyConservationToGrid(
     temperature,
     humidity,
@@ -283,9 +290,19 @@ export function generateSurfaceHeatmap(
 export function generateVisibleSurfaceHeatmaps(
   ctx: HeatmapFieldContext,
 ): Record<(typeof VISIBLE_HEATMAP_SURFACE_KINDS)[number], HeatmapSurfaceValues> {
-  return Object.fromEntries(
-    VISIBLE_HEATMAP_SURFACE_KINDS.map((kind) => [kind, generateSurfaceHeatmap(ctx, kind)]),
-  ) as Record<(typeof VISIBLE_HEATMAP_SURFACE_KINDS)[number], HeatmapSurfaceValues>;
+  const floor = generateSurfaceHeatmap(ctx, "floor");
+  const rawWalls = {
+    wall_west: generateSurfaceHeatmap(ctx, "wall_west", { applyConservation: false }),
+    wall_east: generateSurfaceHeatmap(ctx, "wall_east", { applyConservation: false }),
+    wall_north: generateSurfaceHeatmap(ctx, "wall_north", { applyConservation: false }),
+    wall_south: generateSurfaceHeatmap(ctx, "wall_south", { applyConservation: false }),
+  };
+  const walls = anchorWallsToFloorField(ctx, floor, rawWalls);
+
+  return {
+    floor,
+    ...walls,
+  };
 }
 
 export function generateAllSurfaceHeatmaps(
