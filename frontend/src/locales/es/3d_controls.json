@@ -68,6 +68,7 @@
     "windSpeed": "Velocidad del viento",
     "liveDataHint": "Mapa en vivo del motor de simulación (geometría, cultivo, equipos, clima).",
     "previewHintDetailed": "Estimación previa: ~{{temp}}°C interior, ~{{rh}}% HR — según clima, cubierta y equipos.",
+    "requiresCooling": "Selecciona un sistema de refrigeración (fan-and-pad, AC, nebulización, etc.) para activar el mapa espacial.",
     "equipmentHint": "El mapa incluye pad, ventiladores, ventanas, AC, calefactores y circulación del panel izquierdo.",
     "estimatedValue": "Estimado",
     "workingRange": "Rango de trabajo del cultivo",

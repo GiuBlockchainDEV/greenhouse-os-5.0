@@ -187,9 +187,10 @@ export function GreenhouseMesh() {
   const structure = useGreenhouseStore((state) => state.structure);
   const covering = useGreenhouseStore((state) => state.covering);
   const heatmapMode = useGreenhouseStore((state) => state.heatmapMode);
+  const cooling = useGreenhouseStore((state) => state.climateEquipment.cooling);
   const { length, width, ridgeHeight, eaveHeight } = dimensions;
   const { bayCount, bayWidthM, archType } = structure;
-  const heatmapActive = heatmapMode !== "off";
+  const heatmapActive = heatmapMode !== "off" && cooling !== "none";
 
   const bays = useMemo(
     () =>

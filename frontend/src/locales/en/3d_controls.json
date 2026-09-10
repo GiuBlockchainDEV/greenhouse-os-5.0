@@ -75,6 +75,7 @@
     "solarIntensity": "Solar intensity",
     "liveDataHint": "Map follows your current inputs; simulation engine also receives the same weather data when connected.",
     "previewHintDetailed": "Preview estimate: ~{{temp}}°C internal, ~{{rh}}% RH — based on weather inputs, covering, and equipment above.",
+    "requiresCooling": "Select a cooling system (fan-and-pad, AC, fog, etc.) to enable the spatial heatmap.",
     "equipmentHint": "Impact scales with pad area, fan/AC diameter, and unit count from the left panel.",
     "estimatedValue": "Estimated",
     "workingRange": "Crop working range",

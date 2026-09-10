@@ -12,6 +12,7 @@ import {
 } from "@/lib/heatmapData";
 import { VISIBLE_HEATMAP_SURFACE_KINDS, type HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
 import { heatmapTextureRemap } from "@/lib/heatmapSurfaceUv";
+import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -208,7 +209,7 @@ export function HeatmapPlane() {
   const valueMode = heatmapValueMode(heatmapMode);
   const colorMode = heatmapColorMode(valueMode);
 
-  if (heatmapMode === "off") {
+  if (heatmapMode === "off" || !isHeatmapAvailable(climateEquipment.cooling)) {
     return null;
   }
 

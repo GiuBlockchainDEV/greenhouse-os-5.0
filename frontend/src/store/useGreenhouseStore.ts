@@ -9,6 +9,7 @@ import {
   applyCoolingSystemDefaults,
   normalizeHafFanCount,
 } from "@/lib/climateEquipmentLayout";
+import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import type {
   ClimateEquipment,
   ClimateEquipmentSizing,
@@ -368,9 +369,14 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         if (equipment.cooling && equipment.cooling !== current.cooling) {
           sizing = applyCoolingSystemDefaults(nextCooling, sizing);
         }
+        const heatmapMode =
+          !isHeatmapAvailable(nextCooling) && get().heatmapMode !== "off"
+            ? "off"
+            : get().heatmapMode;
         set(
           {
             climateEquipment: { ...current, ...equipment, sizing },
+            heatmapMode,
           },
           false,
           "setClimateEquipment",
@@ -412,7 +418,12 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       setGizmoMode: (gizmoMode) => set({ gizmoMode }, false, "setGizmoMode"),
 
-      setHeatmapMode: (heatmapMode) => set({ heatmapMode }, false, "setHeatmapMode"),
+      setHeatmapMode: (heatmapMode) => {
+        const cooling = get().climateEquipment.cooling;
+        const nextMode =
+          !isHeatmapAvailable(cooling) && heatmapMode !== "off" ? "off" : heatmapMode;
+        set({ heatmapMode: nextMode }, false, "setHeatmapMode");
+      },
 
       setAiProvider: (aiProvider) => set({ aiProvider }, false, "setAiProvider"),
 

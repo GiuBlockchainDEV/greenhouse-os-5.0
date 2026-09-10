@@ -10,6 +10,7 @@ import {
 } from "@/lib/heatmapData";
 import { HeatmapScaleLegend } from "@/components/ui/HeatmapScaleLegend";
 import { solarAzimuthLabel } from "@/lib/solarIrradiance";
+import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { HeatmapMode } from "@/types/viewport";
@@ -57,18 +58,22 @@ function SliderRow({ label, value, unit, min, max, step, onChange }: SliderRowPr
 interface ToolbarButtonProps {
   label: string;
   active: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }
 
-function ToolbarButton({ label, active, onClick }: ToolbarButtonProps) {
+function ToolbarButton({ label, active, disabled = false, onClick }: ToolbarButtonProps) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
       className={`rounded-lg px-2 py-1 text-xs font-medium transition ${
-        active
-          ? "bg-status-optimalDark text-white shadow-sm"
-          : "bg-surface-muted text-label hover:bg-gray-100"
+        disabled
+          ? "cursor-not-allowed bg-surface-muted text-gray-400"
+          : active
+            ? "bg-status-optimalDark text-white shadow-sm"
+            : "bg-surface-muted text-label hover:bg-gray-100"
       }`}
     >
       {label}
@@ -140,6 +145,7 @@ export function HeatmapControls() {
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";
+  const heatmapAvailable = isHeatmapAvailable(climateEquipment.cooling);
 
   return (
     <div className="ui-card p-2">
@@ -150,12 +156,19 @@ export function HeatmapControls() {
             key={mode}
             label={t(`heatmap.${mode}`)}
             active={heatmapMode === mode}
+            disabled={!heatmapAvailable && mode !== "off"}
             onClick={() => setHeatmapMode(mode)}
           />
         ))}
       </div>
 
-      {heatmapMode !== "off" && (
+      {!heatmapAvailable && (
+        <p className="mt-2 px-1 text-[10px] leading-relaxed text-label">
+          {t("heatmap.requiresCooling")}
+        </p>
+      )}
+
+      {heatmapAvailable && heatmapMode !== "off" && (
         <div className="mt-3 space-y-3 border-t border-border pt-3">
           <div>
             <p className="mb-2 text-[11px] font-semibold text-gray-800">

@@ -75,6 +75,7 @@
     "solarIntensity": "Intensità solare",
     "liveDataHint": "La mappa segue i parametri impostati; con simulazione connessa riceve gli stessi dati meteo.",
     "previewHintDetailed": "Stima anteprima: ~{{temp}}°C interni, ~{{rh}}% UR — da meteo, copertura e impianti sopra.",
+    "requiresCooling": "Seleziona un sistema di raffrescamento (fan-and-pad, AC, nebulizzazione, ecc.) per attivare la heatmap spaziale.",
     "equipmentHint": "L'impatto varia con area pad, diametro ventole/AC e numero unità nel pannello sinistro.",
     "estimatedValue": "Stima",
     "workingRange": "Range di lavoro coltura",
