@@ -111,7 +111,7 @@ function HeatmapSurface({
         fragmentShader={heatmapFragmentShader}
         uniforms={{
           heatmapTexture: { value: shaderData.texture },
-          opacity: { value: 0.96 },
+          opacity: { value: 0.5 },
           colorMode: { value: colorMode },
           minValue: { value: shaderData.min },
           maxValue: { value: shaderData.max },
