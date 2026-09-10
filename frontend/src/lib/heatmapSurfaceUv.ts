@@ -15,6 +15,8 @@ export function heatmapTextureRemap(surfaceKind: HeatmapSurfaceKind): HeatmapTex
       return { flipRow: true, flipCol: false };
     case "wall_north":
       return { flipRow: false, flipCol: false };
+    case "floor":
+      return { flipRow: true, flipCol: false };
     default:
       return { flipRow: false, flipCol: false };
   }

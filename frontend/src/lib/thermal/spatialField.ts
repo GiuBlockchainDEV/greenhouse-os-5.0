@@ -31,36 +31,16 @@ function exhaustFanSizeFactor(diameterM: number): number {
   return Math.max(0.35, Math.min(2.8, ratio * ratio));
 }
 
-function outdoorInfluenceAt(
-  ctx: HeatmapFieldContext,
-  x: number,
-  z: number,
-): number {
-  const edge = Math.min(
-    1,
-    Math.sqrt(((x * ctx.coeffs.invHalfL) ** 2 + (z * ctx.coeffs.invHalfW) ** 2) / 2),
+function isEvaporativeCooling(ctx: HeatmapFieldContext): boolean {
+  return (
+    ctx.equipment.cooling === "fan_and_pad" ||
+    ctx.equipment.cooling === "evaporative"
   );
+}
 
-  let influence = edge * 0.55;
-
-  for (const vent of ctx.layout.vents) {
-    const sigma =
-      vent.kind === "roof" ? vent.widthM * 0.45 : Math.max(vent.widthM, 1.2);
-    const g = gaussian1d(x - vent.x, sigma) * gaussian1d(z - vent.z, sigma);
-    influence += g * 0.35;
-  }
-
-  for (const fan of ctx.layout.exhaustFans) {
-    const sigma = fan.diameterM * 1.55;
-    const sizeWeight = exhaustFanSizeFactor(fan.diameterM);
-    influence +=
-      gaussian1d(x - fan.x, sigma) *
-      gaussian1d(z - fan.z, sigma) *
-      0.32 *
-      sizeWeight;
-  }
-
-  return Math.min(1, influence);
+/** 0 at pad wall (−X), 1 at exhaust wall (+X). */
+function airflowFraction(ctx: HeatmapFieldContext, x: number): number {
+  return Math.max(0, Math.min(1, (x + ctx.coeffs.halfL) / Math.max(ctx.length, 0.1)));
 }
 
 function padCoverageAlongZ(ctx: HeatmapFieldContext, z: number): number {
@@ -78,10 +58,44 @@ function padCoverageAlongZ(ctx: HeatmapFieldContext, z: number): number {
 }
 
 function padTransitInfluence(ctx: HeatmapFieldContext, x: number, z: number): number {
-  const distFromPadM = Math.max(0, x + ctx.coeffs.halfL);
-  const alongX = 1 - Math.min(1, distFromPadM / Math.max(ctx.length * 0.95, 1));
+  const alongX = 1 - airflowFraction(ctx, x);
   const alongZ = padCoverageAlongZ(ctx, z);
   return alongX * alongZ;
+}
+
+/**
+ * Primary pad→exhaust gradient: cool at pad, warm at exhaust.
+ * Zero-mean along greenhouse length so conservation does not erase it.
+ */
+function padExhaustAirflowGradient(
+  ctx: HeatmapFieldContext,
+  x: number,
+  z: number,
+): { tempDelta: number; rhDelta: number } {
+  if (!isEvaporativeCooling(ctx)) {
+    return { tempDelta: 0, rhDelta: 0 };
+  }
+
+  const flow = airflowFraction(ctx, x);
+  const transit = padTransitInfluence(ctx, x, z);
+  const supply = ctx.supplyTempC ?? ctx.externalTemp;
+  const padFactor = padCapacityFactor(ctx.equipment.sizing);
+
+  const outdoorDepression = Math.max(1.5, ctx.externalTemp - supply);
+  const spread = Math.min(
+    MAX_LOCAL_TEMP_SPREAD_C * 0.85,
+    outdoorDepression * (0.42 + padFactor * 0.22),
+  );
+
+  const tempDelta = spread * (flow - 0.5) * 2 * (0.65 + transit * 0.35);
+
+  let rhDelta = 0;
+  if (ctx.supplyHumidityRatioKgKg !== null) {
+    const supplyRh = rhPctFromHumidityRatio(supply, ctx.supplyHumidityRatioKgKg);
+    rhDelta = (supplyRh - ctx.internalRh) * (1 - flow) * transit * 0.55 * padFactor;
+  }
+
+  return { tempDelta, rhDelta };
 }
 
 function padWallLocalEffect(
@@ -90,10 +104,7 @@ function padWallLocalEffect(
   y: number,
   z: number,
 ): { tempDelta: number; rhDelta: number } {
-  if (
-    ctx.equipment.cooling !== "fan_and_pad" &&
-    ctx.equipment.cooling !== "evaporative"
-  ) {
+  if (!isEvaporativeCooling(ctx) || ctx.supplyTempC === null) {
     return { tempDelta: 0, rhDelta: 0 };
   }
 
@@ -106,18 +117,57 @@ function padWallLocalEffect(
     influence = Math.max(influence, face * alongZ * alongY);
   }
 
-  if (influence <= 0 || ctx.supplyTempC === null) {
+  if (influence <= 0) {
     return { tempDelta: 0, rhDelta: 0 };
   }
 
-  const supplyDelta = (ctx.supplyTempC - ctx.baseTemp) * influence * (0.55 + padFactor * 0.25);
+  const supply = ctx.supplyTempC;
+  const localTarget = Math.min(supply, ctx.baseTemp);
+  const tempDelta = (localTarget - ctx.baseTemp) * influence * (0.45 + padFactor * 0.2);
+
   let rhDelta = 0;
   if (ctx.supplyHumidityRatioKgKg !== null) {
-    const supplyRh = rhPctFromHumidityRatio(ctx.supplyTempC, ctx.supplyHumidityRatioKgKg);
-    rhDelta = (supplyRh - ctx.internalRh) * influence * 0.45 * padFactor;
+    const supplyRh = rhPctFromHumidityRatio(supply, ctx.supplyHumidityRatioKgKg);
+    rhDelta = (supplyRh - ctx.internalRh) * influence * 0.35 * padFactor;
   }
 
-  return { tempDelta: supplyDelta, rhDelta };
+  return { tempDelta, rhDelta };
+}
+
+function exhaustWarmthAt(ctx: HeatmapFieldContext, x: number, z: number): number {
+  let warmth = 0;
+  for (const fan of ctx.layout.exhaustFans) {
+    const sigma = fan.diameterM * 1.35;
+    const sizeWeight = exhaustFanSizeFactor(fan.diameterM);
+    warmth +=
+      gaussian1d(x - fan.x, sigma) *
+      gaussian1d(z - fan.z, sigma) *
+      0.28 *
+      sizeWeight;
+  }
+  return warmth;
+}
+
+function outdoorInfluenceAt(
+  ctx: HeatmapFieldContext,
+  x: number,
+  z: number,
+): number {
+  const edge = Math.min(
+    1,
+    Math.sqrt(((x * ctx.coeffs.invHalfL) ** 2 + (z * ctx.coeffs.invHalfW) ** 2) / 2),
+  );
+
+  let influence = edge * 0.35;
+
+  for (const vent of ctx.layout.vents) {
+    const sigma =
+      vent.kind === "roof" ? vent.widthM * 0.45 : Math.max(vent.widthM, 1.2);
+    const g = gaussian1d(x - vent.x, sigma) * gaussian1d(z - vent.z, sigma);
+    influence += g * 0.22;
+  }
+
+  return Math.min(1, influence);
 }
 
 function circulationMixingAt(ctx: HeatmapFieldContext, x: number, z: number): number {
@@ -163,6 +213,13 @@ function fogInfluenceAt(ctx: HeatmapFieldContext, x: number, z: number): number 
   return weight;
 }
 
+function solarSpatialScale(ctx: HeatmapFieldContext): number {
+  if (isEvaporativeCooling(ctx)) {
+    return 0.18;
+  }
+  return 0.55;
+}
+
 function toSolarSurface(surface?: HeatmapSurfaceKind): SolarSurfaceKind | undefined {
   if (!surface || surface === "floor" || surface === "roof") {
     return surface;
@@ -191,67 +248,38 @@ export function computeSpatialPerturbation(
     ctx.eaveHeight,
   );
   const solarSample = solarTempDeltaFromContext(solar, x, y, z, solarSurface);
-  let solarDelta = solarSample;
+  let solarDelta = solarSample * solarSpatialScale(ctx);
+
   if (!surface?.startsWith("wall_")) {
-    const solarWeights: number[] = [];
-    const sampleCount = 5;
-    for (let index = 0; index < sampleCount; index++) {
-      solarWeights.push(
-        Math.max(0, solarTempDeltaFromContext(solar, x, y, z, solarSurface)),
-      );
-    }
-    const solarMean =
-      solarWeights.reduce((acc, value) => acc + value, 0) / Math.max(sampleCount, 1);
-    solarDelta = solarSample - solarMean * 0.15;
+    const solarMean = solarSample * solarSpatialScale(ctx);
+    solarDelta = solarSample * solarSpatialScale(ctx) - solarMean * 0.35;
   }
 
   const outdoorInfl = outdoorInfluenceAt(ctx, x, z);
-  const padTransit =
-    ctx.equipment.cooling === "fan_and_pad" ||
-    ctx.equipment.cooling === "evaporative"
-      ? padTransitInfluence(ctx, x, z)
-      : 0;
+  const padTransit = isEvaporativeCooling(ctx) ? padTransitInfluence(ctx, x, z) : 0;
   const outdoorTempDelta =
-    outdoorInfl * (1 - padTransit * 0.85) * (ctx.externalTemp - ctx.baseTemp) * 0.45;
+    outdoorInfl * (1 - padTransit * 0.9) * (ctx.externalTemp - ctx.baseTemp) * 0.28;
   const wOut = humidityRatioKgKg(ctx.externalTemp, ctx.scenario.externalRhPct);
   const outdoorRhDelta =
     outdoorInfl *
     (rhPctFromHumidityRatio(ctx.externalTemp, wOut) - ctx.internalRh) *
-    0.35;
+    0.22;
 
   let tempDelta = solarDelta + outdoorTempDelta;
-  let rhDelta = -solarDelta * 0.18 + outdoorRhDelta;
+  let rhDelta = -solarDelta * 0.12 + outdoorRhDelta;
+
+  const airflow = padExhaustAirflowGradient(ctx, x, z);
+  tempDelta += airflow.tempDelta;
+  rhDelta += airflow.rhDelta;
 
   const padLocal = padWallLocalEffect(ctx, x, y, z);
   tempDelta += padLocal.tempDelta;
   rhDelta += padLocal.rhDelta;
 
-  if (
-    ctx.equipment.cooling === "fan_and_pad" ||
-    ctx.equipment.cooling === "evaporative"
-  ) {
-    const transit = padTransit;
-    const supplyTemp = ctx.supplyTempC ?? ctx.externalTemp;
-    const padFactor = padCapacityFactor(ctx.equipment.sizing);
-    const supplyDelta = (supplyTemp - ctx.baseTemp) * transit * (0.75 + padFactor * 0.2);
-    tempDelta += supplyDelta;
-    const warmExcess = Math.max(ctx.baseTemp - supplyTemp, 0);
-    const downwind = 1 - transit;
-    const exhaustPull = ctx.layout.exhaustFans.reduce(
-      (acc, fan) => acc + exhaustFanSizeFactor(fan.diameterM),
-      0,
-    );
-    const exhaustNorm = Math.max(1, ctx.layout.exhaustFans.length);
-    tempDelta +=
-      downwind ** 1.3 *
-      warmExcess *
-      0.6 *
-      (0.65 + (exhaustPull / exhaustNorm) * 0.35);
-    if (ctx.supplyHumidityRatioKgKg !== null) {
-      const supplyRh = rhPctFromHumidityRatio(supplyTemp, ctx.supplyHumidityRatioKgKg);
-      rhDelta += (supplyRh - ctx.internalRh) * transit * 0.65 * padFactor;
-      rhDelta -= downwind ** 1.15 * Math.max(supplyRh - ctx.internalRh, 0) * 0.35;
-    }
+  if (isEvaporativeCooling(ctx)) {
+    const exhaustInfl = exhaustWarmthAt(ctx, x, z);
+    const warmBias = Math.max(1.2, ctx.baseTemp - (ctx.supplyTempC ?? ctx.externalTemp) + 1.5);
+    tempDelta += exhaustInfl * warmBias * 0.55;
   }
 
   if (ctx.equipment.cooling === "mechanical_ac") {
@@ -284,13 +312,13 @@ export function computeSpatialPerturbation(
   const stratification =
     (y / Math.max(ctx.eaveHeight, 1)) *
     Math.max(0, ctx.baseTemp - ctx.externalTemp) *
-    0.08 *
+    0.06 *
     (1 - ctx.mixingEffectiveness);
   tempDelta += stratification;
 
   const mix = circulationMixingAt(ctx, x, z);
-  tempDelta *= 1 - mix * 0.35;
-  rhDelta *= 1 - mix * 0.28;
+  tempDelta *= 1 - mix * 0.28;
+  rhDelta *= 1 - mix * 0.22;
 
   return {
     tempDelta: Math.max(-MAX_LOCAL_TEMP_SPREAD_C, Math.min(MAX_LOCAL_TEMP_SPREAD_C, tempDelta)),
