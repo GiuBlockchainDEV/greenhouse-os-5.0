@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Pad-to-exhaust heatmap gradient** — Zero-mean pad→exhaust airflow model (cool at pad wall, warm at exhaust fans), exhaust-side warming instead of outdoor exchange, reduced solar spatial amplitude with fan-and-pad, and corrected floor texture UV flip so the visual matches physics.
 
+- **Fan role separation (HAF vs exhaust)** — Circulation fans recirculate air to uniformize cross-width/vertical T and RH (no outdoor ACH); wall and roof exhaust fans model hot-air extraction plenums at gable and ridge. Removed erroneous ACH boost from HAF count.
+
 - **Heatmap surface boundary continuity** — North/south/west/east walls anchor to the conserved floor field at floor level and blend upward with wall-specific vertical physics, removing sharp temperature breaks at corners and pad/exhaust edges.
 
 - **Heatmap floor / long-wall UV alignment** — Floor row mapping no longer flips along greenhouse length; south wall keeps a 180°-aware row flip so pad-side cold and exhaust-side warm read correctly on floor and north/south facades.

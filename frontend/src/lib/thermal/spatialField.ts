@@ -8,7 +8,7 @@ import {
   solarTempDeltaFromContext,
   type SolarSurfaceKind,
 } from "@/lib/solarIrradiance";
-import { padCapacityFactor } from "@/lib/climateEquipmentCapacity";
+import { exhaustCapacityFactor, padCapacityFactor } from "@/lib/climateEquipmentCapacity";
 import { rhPctFromHumidityRatio, humidityRatioKgKg } from "@/lib/thermal/psychrometricsExtended";
 
 const MAX_LOCAL_TEMP_SPREAD_C = 8;
@@ -134,18 +134,55 @@ function padWallLocalEffect(
   return { tempDelta, rhDelta };
 }
 
-function exhaustWarmthAt(ctx: HeatmapFieldContext, x: number, z: number): number {
-  let warmth = 0;
+function usesExhaustExtraction(ctx: HeatmapFieldContext): boolean {
+  return (
+    isEvaporativeCooling(ctx) ||
+    ctx.equipment.ventilation === "forced_exhaust" ||
+    ctx.equipment.ventilation === "combined"
+  );
+}
+
+/** Hot-air capture plenum at wall/roof exhaust fans (air being expelled, not cooled). */
+function hotAirExhaustPlenumAt(
+  ctx: HeatmapFieldContext,
+  x: number,
+  y: number,
+  z: number,
+): number {
+  if (!usesExhaustExtraction(ctx)) {
+    return 0;
+  }
+
+  const normalizedY = y / Math.max(ctx.eaveHeight, 1);
+  const exhaustScale = Math.min(2.2, 0.75 + exhaustCapacityFactor(ctx.equipment.sizing) * 0.35);
+  let capture = 0;
+
   for (const fan of ctx.layout.exhaustFans) {
-    const sigma = fan.diameterM * 1.35;
+    const sigma = fan.diameterM * 1.4;
     const sizeWeight = exhaustFanSizeFactor(fan.diameterM);
-    warmth +=
+    const heightWeight = 0.2 + 0.8 * Math.max(0, (normalizedY - 0.25) / 0.75);
+    capture +=
       gaussian1d(x - fan.x, sigma) *
       gaussian1d(z - fan.z, sigma) *
-      0.28 *
+      heightWeight *
+      0.32 *
       sizeWeight;
   }
-  return warmth;
+
+  for (const fan of ctx.layout.roofExhaustFans) {
+    const sigmaX = fan.diameterM * 1.5;
+    const sigmaZ = fan.diameterM * 1.1;
+    const sizeWeight = exhaustFanSizeFactor(fan.diameterM);
+    const ridgeWeight = gaussian1d(y - fan.y, fan.diameterM * 0.9);
+    capture +=
+      gaussian1d(x - fan.x, sigmaX) *
+      gaussian1d(z - fan.z, sigmaZ) *
+      ridgeWeight *
+      0.38 *
+      sizeWeight;
+  }
+
+  return Math.min(1, capture * exhaustScale);
 }
 
 function outdoorInfluenceAt(
@@ -170,14 +207,20 @@ function outdoorInfluenceAt(
   return Math.min(1, influence);
 }
 
-function circulationMixingAt(ctx: HeatmapFieldContext, x: number, z: number): number {
-  let mix = 0;
-  for (const fan of ctx.layout.circulationFans) {
-    const sigma = fan.diameterM * 2.4;
-    const g = gaussian1d(x - fan.x, sigma) * gaussian1d(z - fan.z, sigma);
-    mix += g * exhaustFanSizeFactor(fan.diameterM);
+function circulationMotorHeatAt(ctx: HeatmapFieldContext, x: number, z: number): number {
+  if (ctx.equipment.sizing.circulationFanCount <= 0) {
+    return 0;
   }
-  return Math.min(1, mix * ctx.mixingEffectiveness);
+  let heat = 0;
+  for (const fan of ctx.layout.circulationFans) {
+    const sigma = fan.diameterM * 1.6;
+    heat +=
+      gaussian1d(x - fan.x, sigma) *
+      gaussian1d(z - fan.z, sigma) *
+      0.12 *
+      exhaustFanSizeFactor(fan.diameterM);
+  }
+  return heat;
 }
 
 function acSupplyInfluenceAt(
@@ -276,10 +319,14 @@ export function computeSpatialPerturbation(
   tempDelta += padLocal.tempDelta;
   rhDelta += padLocal.rhDelta;
 
-  if (isEvaporativeCooling(ctx)) {
-    const exhaustInfl = exhaustWarmthAt(ctx, x, z);
-    const warmBias = Math.max(1.2, ctx.baseTemp - (ctx.supplyTempC ?? ctx.externalTemp) + 1.5);
-    tempDelta += exhaustInfl * warmBias * 0.55;
+  if (usesExhaustExtraction(ctx)) {
+    const plenum = hotAirExhaustPlenumAt(ctx, x, y, z);
+    const warmBias = Math.max(
+      1.5,
+      ctx.baseTemp - (ctx.supplyTempC ?? ctx.externalTemp) + 2,
+    );
+    tempDelta += plenum * warmBias * 0.62;
+    rhDelta -= plenum * 4.5;
   }
 
   if (ctx.equipment.cooling === "mechanical_ac") {
@@ -316,9 +363,8 @@ export function computeSpatialPerturbation(
     (1 - ctx.mixingEffectiveness);
   tempDelta += stratification;
 
-  const mix = circulationMixingAt(ctx, x, z);
-  tempDelta *= 1 - mix * 0.28;
-  rhDelta *= 1 - mix * 0.22;
+  const motorHeat = circulationMotorHeatAt(ctx, x, z);
+  tempDelta += motorHeat * 0.35;
 
   return {
     tempDelta: Math.max(-MAX_LOCAL_TEMP_SPREAD_C, Math.min(MAX_LOCAL_TEMP_SPREAD_C, tempDelta)),

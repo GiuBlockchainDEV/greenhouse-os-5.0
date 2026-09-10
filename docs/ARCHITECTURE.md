@@ -214,7 +214,7 @@ Internal temperature solved at quasi-steady state from net energy gain and total
 | RH coupling | 1.0 %/°C | Internal RH shift per °C below external dry-bulb |
 | ACH fan boost | $(A_{fan}/A_{floor})\times 8$ | Exhaust fan throat area |
 | ACH vent boost | $(A_{vent}/A_{floor})\times 2.5$ | Roof/side vent openings |
-| ACH circulation | $\min(N_{circ}, 24)\times 0.15$ | HAF mixing (no direct exhaust) |
+| HAF mixing coeff | $0.04 + 0.24\times(\dot V_{recirc}/V)$ | Recirculation only; no outdoor ACH |
 | Evaporative floor | $T_{wb} - 1.5/1.15\,°\mathrm{C}$ | Pad, fog, evaporative cooling (15 % capacity boost) |
 | AC floor | 12 °C | Mechanical cooling minimum |
 | Cooling capacity factor | 1.15 | Applied to pad, fog, evaporative, and AC deltas |
@@ -302,8 +302,8 @@ When cooling mode is `mechanical_ac`, each wall-mounted unit drives an internal 
 |--------|-----------------|-------|
 | Solar | Directional beam on roof/walls/floor | Scales with azimuth, elevation, intensity |
 | Pad / evaporative | Cool humid plume at −X wall + airflow transit | Fan-and-pad stronger than evaporative-only |
-| Exhaust fans | Cool/dry near +X gable | Only when fans are installed |
-| HAF circulation | **Mixing** (dampens local ΔT/ΔRH) | Does not add cooling |
+| Exhaust / roof fans | Hot-air plenum at +X gable & ridge | Extraction path only; no local cooling |
+| HAF circulation | **Mixing** (uniformizes cross-width & vertical ΔT/ΔRH) | Recirculation only; motor heat |
 | Roof/side vents | Cool near openings | Stronger at ridge for roof vents |
 | Mechanical AC | Duct network + diffusers | Floor 12 °C, not wet-bulb |
 | High-pressure fog | Full-length bands along fog lines | RH boost aloft |

@@ -317,7 +317,11 @@ def solve_microclimate(params: ThermalInput) -> MicroclimateState:
         t_ext,
     )
     recirc = _resolve_circulation_flow_m3h(params.equipment.sizing)
-    mix_eff = min(0.92, 0.12 + (total_flow / max(volume, 1.0)) * 0.08 + (recirc / max(volume, 1.0)) * 0.18)
+    recirc_rate = recirc / max(volume, 1.0)
+    vent_rate = total_flow / max(volume, 1.0)
+    haf_mix = min(0.88, 0.04 + recirc_rate * 0.24)
+    vent_turbulence = min(0.18, vent_rate * 0.035)
+    mix_eff = min(0.92, haf_mix + vent_turbulence * (1.0 - haf_mix * 0.5))
 
     q_cond = -params.materials.u_value * (envelope_area / max(floor_area, 1.0)) * (t_in - t_ext)
     q_vent = -(RHO_AIR * CP_AIR * total_flow) / (3600.0 * max(floor_area, 1.0)) * (t_in - t_ext)

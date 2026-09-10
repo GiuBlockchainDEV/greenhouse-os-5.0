@@ -5,6 +5,7 @@ import {
 } from "@/lib/climateEquipmentLayout";
 import { HEATING_SETPOINT_C } from "@/lib/thermal/solveMicroclimate";
 import { anchorWallsToFloorField } from "@/lib/heatmapBoundaryContinuity";
+import { applyCirculationMixingToSurface } from "@/lib/thermal/circulationMixing";
 import {
   applyConservationToGrid,
   computeSpatialPerturbation,
@@ -299,9 +300,17 @@ export function generateVisibleSurfaceHeatmaps(
   };
   const walls = anchorWallsToFloorField(ctx, floor, rawWalls);
 
+  const mixedFloor = applyCirculationMixingToSurface(ctx, floor, "floor");
+  const mixedWalls = {
+    wall_west: applyCirculationMixingToSurface(ctx, walls.wall_west, "wall_west"),
+    wall_east: applyCirculationMixingToSurface(ctx, walls.wall_east, "wall_east"),
+    wall_north: applyCirculationMixingToSurface(ctx, walls.wall_north, "wall_north"),
+    wall_south: applyCirculationMixingToSurface(ctx, walls.wall_south, "wall_south"),
+  };
+
   return {
-    floor,
-    ...walls,
+    floor: mixedFloor,
+    ...mixedWalls,
   };
 }
 

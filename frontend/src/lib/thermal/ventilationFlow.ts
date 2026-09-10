@@ -112,12 +112,25 @@ export function circulationRecirculationM3h(
   return resolveCirculationFlowM3h(equipment.sizing, runtimeFraction);
 }
 
+/** HAF recirculation mixing coefficient (no outdoor air exchange). */
+export function circulationMixingEffectiveness(
+  recirculationM3h: number,
+  volumeM3: number,
+): number {
+  const recircRate = recirculationM3h / Math.max(volumeM3, 1);
+  return Math.min(0.88, 0.04 + recircRate * 0.24);
+}
+
+/**
+ * Combined mixing: dominated by HAF recirculation; ventilation adds minor turbulence only.
+ */
 export function mixingEffectiveness(
   ventilationTotalM3h: number,
   recirculationM3h: number,
   volumeM3: number,
 ): number {
+  const hafMix = circulationMixingEffectiveness(recirculationM3h, volumeM3);
   const ventRate = ventilationTotalM3h / Math.max(volumeM3, 1);
-  const recircRate = recirculationM3h / Math.max(volumeM3, 1);
-  return Math.min(0.92, 0.12 + ventRate * 0.08 + recircRate * 0.18);
+  const ventTurbulence = Math.min(0.18, ventRate * 0.035);
+  return Math.min(0.92, hafMix + ventTurbulence * (1 - hafMix * 0.5));
 }

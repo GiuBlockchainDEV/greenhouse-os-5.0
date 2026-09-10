@@ -222,9 +222,8 @@ export function ventilationAchWithSizing(
     (fanArea / area) * 10 +
     sizing.exhaustFanCount * 0.06 +
     (ventArea / area) * 2.5;
-  const circulationBoost = Math.min(sizing.circulationFanCount, 48) * 0.15;
 
-  return base + windBonus + buoyancy + forcedBoost + circulationBoost;
+  return base + windBonus + buoyancy + forcedBoost;
 }
 
 function resolveSupplyState(

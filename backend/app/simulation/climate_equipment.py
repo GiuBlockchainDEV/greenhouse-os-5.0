@@ -212,5 +212,4 @@ def ventilation_ach_with_sizing(
     vent_area += sizing.side_vent_count * sizing.side_vent_height_m * 1.8
 
     forced_boost = (fan_area / floor_area) * 8.0 + (vent_area / floor_area) * 2.5
-    circulation_boost = min(sizing.circulation_fan_count, 24) * 0.15
-    return base + forced_boost + circulation_boost
+    return base + forced_boost
