@@ -10,6 +10,28 @@ import { formatGreenhouseContext } from "./formatContext";
 import { analysisPrompt, gaiaUnavailableMessage, systemPrompt, truncatedNotice } from "./prompts";
 
 const GAIA_API = "/api/gaia";
+const GAIA_KEY_STORAGE = "greenhouseos.gaiaApiKey";
+
+export function readStoredGaiaKey(): string {
+  if (typeof localStorage === "undefined") return "";
+  return localStorage.getItem(GAIA_KEY_STORAGE)?.trim() ?? "";
+}
+
+export function saveStoredGaiaKey(key: string): void {
+  if (typeof localStorage === "undefined") return;
+  const trimmed = key.trim();
+  if (trimmed) localStorage.setItem(GAIA_KEY_STORAGE, trimmed);
+  else localStorage.removeItem(GAIA_KEY_STORAGE);
+  cachedAvailable = null;
+}
+
+function gaiaHeaders(json = false): HeadersInit {
+  const headers: Record<string, string> = {};
+  if (json) headers["Content-Type"] = "application/json";
+  const key = readStoredGaiaKey();
+  if (key) headers["x-gemini-key"] = key;
+  return headers;
+}
 const BACKEND_CHAT = `${API_V1}/ai/chat`;
 const BACKEND_ANALYZE = `${API_V1}/ai/analyze`;
 const BACKEND_PROVIDERS = `${API_V1}/ai/providers`;
@@ -34,7 +56,7 @@ let cachedAvailable: boolean | null = null;
 
 async function checkBackendStatus(): Promise<GaiaStatus> {
   try {
-    const response = await fetch(BACKEND_PROVIDERS);
+    const response = await fetch(BACKEND_PROVIDERS, { headers: gaiaHeaders() });
     if (!response.ok) return { available: false };
     const providers = (await response.json()) as ProviderInfo[];
     const gemini = providers.find((provider) => provider.id === "gemini" && provider.available);
@@ -48,7 +70,7 @@ async function checkBackendStatus(): Promise<GaiaStatus> {
 
 export async function checkGaiaStatus(): Promise<GaiaStatus> {
   try {
-    const response = await fetch(GAIA_API);
+    const response = await fetch(GAIA_API, { headers: gaiaHeaders() });
     if (response.ok) {
       const data = (await response.json()) as GaiaStatus;
       if (data.available) {
@@ -83,7 +105,7 @@ async function callBackend(path: string, body: unknown): Promise<AIChatResponse 
   try {
     const response = await fetch(path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: gaiaHeaders(true),
       body: JSON.stringify(body),
     });
     if (!response.ok) return null;
@@ -104,7 +126,7 @@ async function callGaia(locale: string, userContent: string): Promise<ProxyAttem
   try {
     const response = await fetch(GAIA_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: gaiaHeaders(true),
       body: JSON.stringify({
         systemPrompt: systemPrompt(locale),
         userContent,

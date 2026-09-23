@@ -134,10 +134,16 @@ async function readBody(req) {
   return readNodeBody(req);
 }
 
+function requestKey(req) {
+  if (isWebRequest(req)) return clean(req.headers.get("x-gemini-key") ?? undefined);
+  const raw = req.headers?.["x-gemini-key"];
+  return clean(Array.isArray(raw) ? raw[0] : raw);
+}
+
 async function route(req) {
   const method = req.method ?? "GET";
   const env = process.env;
-  const apiKey = resolveGeminiApiKey(env);
+  const apiKey = requestKey(req) || resolveGeminiApiKey(env);
   const model = resolveGeminiModel(env);
 
   if (method === "OPTIONS") return { status: 200, body: {} };

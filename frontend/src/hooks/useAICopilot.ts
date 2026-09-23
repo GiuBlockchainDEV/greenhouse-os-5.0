@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { buildGreenhouseContext } from "@/lib/gaia/buildContext";
-import { checkGaiaStatus, gaiaAnalyze, gaiaChat } from "@/lib/gaia/client";
+import { checkGaiaStatus, gaiaAnalyze, gaiaChat, saveStoredGaiaKey } from "@/lib/gaia/client";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type {
   AIAnalysisType,
@@ -19,6 +19,7 @@ export interface UseAICopilotReturn {
   messages: CopilotMessage[];
   status: CopilotStatus;
   gaiaAvailable: boolean;
+  saveGaiaKey: (key: string) => Promise<void>;
   sendMessage: (message: string) => Promise<void>;
   runAnalysis: (
     analysisType: AIAnalysisType,
@@ -35,9 +36,22 @@ export function useAICopilot(): UseAICopilotReturn {
 
   const locale = useGreenhouseStore((s) => s.locale);
 
-  useEffect(() => {
+  const refreshStatus = useCallback(() => {
     void checkGaiaStatus().then((result) => setGaiaAvailable(result.available));
   }, []);
+
+  useEffect(() => {
+    refreshStatus();
+  }, [refreshStatus]);
+
+  const saveGaiaKey = useCallback(
+    async (key: string) => {
+      saveStoredGaiaKey(key);
+      const result = await checkGaiaStatus();
+      setGaiaAvailable(result.available);
+    },
+    [],
+  );
 
   const appendAssistant = useCallback((response: AIChatResponse) => {
     setMessages((prev) => [
@@ -117,6 +131,7 @@ export function useAICopilot(): UseAICopilotReturn {
     messages,
     status,
     gaiaAvailable,
+    saveGaiaKey,
     sendMessage,
     runAnalysis,
     clearMessages,

@@ -4,7 +4,10 @@
     "placeholder": "Pregunta a GAIA sobre tu diseño de invernadero...",
     "welcome": "Configura el sitio y la estación, luego ejecuta un análisis. GAIA evalúa el diseño según el clima local.",
     "poweredBy": "GAIA de Growa",
-    "unavailable": "— servicio no disponible"
+    "unavailable": "— servicio no disponible",
+    "keyPlaceholder": "Clave API de Gemini",
+    "keySave": "Conectar",
+    "keyHint": "No hay clave en el servidor. Pégala aquí: queda en este navegador y solo se envía a GAIA."
   },
   "site": {
     "title": "Sitio de análisis",

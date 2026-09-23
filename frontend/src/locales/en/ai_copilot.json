@@ -4,7 +4,10 @@
     "placeholder": "Ask GAIA about your greenhouse design...",
     "welcome": "Set the site and season, then run an analysis. GAIA evaluates your design against the local climate.",
     "poweredBy": "GAIA by Growa",
-    "unavailable": "— service unavailable"
+    "unavailable": "— service unavailable",
+    "keyPlaceholder": "Gemini API key",
+    "keySave": "Connect",
+    "keyHint": "No server key is configured. Paste your Gemini key here — it stays in this browser and is sent only to GAIA."
   },
   "site": {
     "title": "Analysis site",

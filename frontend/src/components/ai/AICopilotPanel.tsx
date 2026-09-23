@@ -17,12 +17,14 @@ export function AICopilotPanel() {
     messages,
     status,
     gaiaAvailable,
+    saveGaiaKey,
     sendMessage,
     runAnalysis,
     clearMessages,
   } = useAICopilot();
 
   const [input, setInput] = useState("");
+  const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [season, setSeason] = useState<GaiaAnalysisSeason>("simulation");
   const locationLabel = useGreenhouseStore((s) => s.location.label);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -94,6 +96,31 @@ export function AICopilotPanel() {
             <span className="ml-1 text-amber-600">{t("panel.unavailable")}</span>
           )}
         </p>
+        {!gaiaAvailable && (
+          <form
+            className="mt-2 flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!apiKeyDraft.trim()) return;
+              void saveGaiaKey(apiKeyDraft);
+            }}
+          >
+            <input
+              type="password"
+              value={apiKeyDraft}
+              onChange={(event) => setApiKeyDraft(event.target.value)}
+              placeholder={t("panel.keyPlaceholder")}
+              autoComplete="off"
+              className="ui-input min-w-0 flex-1 text-xs"
+            />
+            <button type="submit" className="ui-btn-secondary px-2 py-1 text-[10px]">
+              {t("panel.keySave")}
+            </button>
+          </form>
+        )}
+        {!gaiaAvailable && (
+          <p className="mt-1 text-[10px] leading-relaxed text-label">{t("panel.keyHint")}</p>
+        )}
       </header>
 
       <GaiaSiteContext season={season} onSeasonChange={setSeason} />

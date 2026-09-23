@@ -56,6 +56,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **GAIA browser key** — Production `/api/gaia` is up but the Vercel project has no `GEMINI_API_KEY`. The panel accepts a Gemini key, stores it in the browser, and sends it only to the proxy.
+
 - **GAIA proxy crash** — `/api/gaia` is a single JavaScript function that answers both the Node `(req, res)` runtime and the Web `Request` runtime. The previous TypeScript module crashed on Vercel with `FUNCTION_INVOCATION_FAILED` before it could see `GEMINI_API_KEY`, so the panel stayed on “service unavailable”.
 
 - **GAIA Gemini 3 replies** — Requests use `thinkingLevel: LOW` (retry `MINIMAL`), drop the temperature override that Gemini 3 ignores, raise `maxOutputTokens` to 16384, skip thought-only parts, and extend the Vercel function to 60s. Empty 200 responses with a valid key were the failure mode. The panel falls back to the FastAPI `/ai` gateway when `/api/gaia` is missing. Backend accepts `GOOGLE_API_KEY` aliases and the site/season context fields.

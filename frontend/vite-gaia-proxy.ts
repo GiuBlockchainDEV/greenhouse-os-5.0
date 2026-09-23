@@ -45,7 +45,10 @@ export function gaiaDevProxy(): Plugin {
         }
 
         const env = loadEnv(server.config.mode, server.config.envDir ?? process.cwd(), "");
-        const apiKey = resolveGeminiApiKey(env);
+        const headerKey = req.headers["x-gemini-key"];
+        const apiKey =
+          (Array.isArray(headerKey) ? headerKey[0] : headerKey)?.trim() ||
+          resolveGeminiApiKey(env);
         const defaultModel = resolveGeminiModel(env);
 
         if (req.method === "GET") {

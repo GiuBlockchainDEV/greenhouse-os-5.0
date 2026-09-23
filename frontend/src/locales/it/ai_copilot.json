@@ -4,7 +4,10 @@
     "placeholder": "Chiedi a GAIA informazioni sul tuo progetto di serra...",
     "welcome": "Imposta il sito e la stagione, poi avvia un'analisi. GAIA valuta il design rispetto al clima locale reale.",
     "poweredBy": "GAIA di Growa",
-    "unavailable": "— servizio non disponibile"
+    "unavailable": "— servizio non disponibile",
+    "keyPlaceholder": "Chiave API Gemini",
+    "keySave": "Collega",
+    "keyHint": "Nessuna chiave sul server. Incollala qui: resta in questo browser e viene inviata solo a GAIA."
   },
   "site": {
     "title": "Sito di analisi",
