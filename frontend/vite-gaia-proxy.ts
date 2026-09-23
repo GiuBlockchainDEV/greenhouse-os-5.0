@@ -7,7 +7,7 @@ import {
   resolveGeminiApiKey,
   resolveGeminiBaseUrl,
   resolveGeminiModel,
-} from "./api/geminiRequest";
+} from "./api/gaia.js";
 
 interface GaiaProxyBody {
   systemPrompt?: string;

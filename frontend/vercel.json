@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/gaia.ts": {
+    "api/gaia.js": {
       "maxDuration": 60
     }
   },
