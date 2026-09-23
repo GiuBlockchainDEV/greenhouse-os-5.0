@@ -2,6 +2,13 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { loadEnv } from "vite";
 
+import {
+  generateGeminiContent,
+  resolveGeminiApiKey,
+  resolveGeminiBaseUrl,
+  resolveGeminiModel,
+} from "./api/geminiRequest";
+
 interface GaiaProxyBody {
   systemPrompt?: string;
   userContent?: string;
@@ -38,15 +45,8 @@ export function gaiaDevProxy(): Plugin {
         }
 
         const env = loadEnv(server.config.mode, server.config.envDir ?? process.cwd(), "");
-        const apiKey =
-          env.GEMINI_API_KEY?.trim() ||
-          env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
-          env.GOOGLE_API_KEY?.trim();
-        const baseUrl = env.GEMINI_BASE_URL?.trim() || "https://generativelanguage.googleapis.com";
-        const defaultModel =
-          env.GEMINI_MODEL?.trim() ||
-          env.GOOGLE_GENERATIVE_AI_MODEL?.trim() ||
-          "gemini-3.5-flash";
+        const apiKey = resolveGeminiApiKey(env);
+        const defaultModel = resolveGeminiModel(env);
 
         if (req.method === "GET") {
           sendJson(res, 200, { available: Boolean(apiKey), model: defaultModel });
@@ -77,49 +77,17 @@ export function gaiaDevProxy(): Plugin {
             return;
           }
 
-          const usedModel = body.model?.trim() || defaultModel;
-          const url = `${baseUrl}/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
-
-          const upstream = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              systemInstruction: { parts: [{ text: body.systemPrompt }] },
-              contents: [{ role: "user", parts: [{ text: body.userContent }] }],
-              generationConfig: { temperature: 0.35, maxOutputTokens: 8192 },
-            }),
+          const result = await generateGeminiContent({
+            apiKey,
+            baseUrl: resolveGeminiBaseUrl(env),
+            model: body.model?.trim() || defaultModel,
+            systemPrompt: body.systemPrompt,
+            userContent: body.userContent,
           });
-
-          const data = (await upstream.json()) as {
-            candidates?: Array<{
-              content?: { parts?: Array<{ text?: string }> };
-              finishReason?: string;
-            }>;
-            error?: { message?: string };
-          };
-
-          if (!upstream.ok) {
-            sendJson(res, upstream.status, {
-              error: "upstream_error",
-              message: data.error?.message ?? `HTTP ${upstream.status}`,
-            });
-            return;
-          }
-
-          const candidate = data.candidates?.[0];
-          const parts = candidate?.content?.parts ?? [];
-          const content = parts.map((part) => part.text ?? "").join("").trim();
-          const truncated = candidate?.finishReason === "MAX_TOKENS";
-
-          if (!content) {
-            sendJson(res, 502, { error: "empty_response" });
-            return;
-          }
-
-          sendJson(res, 200, { content, model: usedModel, truncated });
+          sendJson(res, 200, result);
         } catch (error) {
           sendJson(res, 502, {
-            error: "proxy_error",
+            error: "upstream_error",
             message: error instanceof Error ? error.message : "Unknown proxy error",
           });
         }

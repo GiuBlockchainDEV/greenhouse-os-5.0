@@ -216,8 +216,23 @@ def format_context(ctx: GreenhouseContext) -> str:
         f"Roof vents: {ctx.roof_vent_count} | Side vents: {ctx.side_vent_count} | AC units: {ctx.ac_unit_count}",
         f"Pad wall: {ctx.pad_wall_width_m}×{ctx.pad_wall_height_m}m | Heaters: {ctx.heater_unit_count}",
     ]
-    if ctx.latitude is not None and ctx.longitude is not None:
-        lines.append(f"Location: {ctx.latitude}°, {ctx.longitude}°")
+    if ctx.location_label or (ctx.latitude is not None and ctx.longitude is not None):
+        label = ctx.location_label or "unspecified"
+        if ctx.latitude is not None and ctx.longitude is not None:
+            elevation = f", {ctx.elevation_m} m" if ctx.elevation_m is not None else ""
+            lines.append(f"Location: {label} ({ctx.latitude}°, {ctx.longitude}°{elevation})")
+        else:
+            lines.append(f"Location: {label}")
+    if ctx.analysis_season:
+        lines.append(f"Analysis season: {ctx.analysis_season}")
+    if ctx.scenario_external_temp_c is not None:
+        lines.append(
+            "Scenario: "
+            f"T={ctx.scenario_external_temp_c}°C "
+            f"RH={ctx.scenario_external_rh_pct}% "
+            f"wind={ctx.scenario_wind_speed_m_s} m/s "
+            f"solar={ctx.scenario_solar_intensity_pct}%"
+        )
     lines.append("")
     lines.append("=== MICROCLIMATE ===")
     if ctx.internal_temp_c is not None:

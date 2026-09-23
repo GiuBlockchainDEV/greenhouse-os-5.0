@@ -1,5 +1,8 @@
 """Application configuration via environment variables."""
 
+import os
+
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +25,20 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_base_url: str = "https://generativelanguage.googleapis.com"
     gemini_model: str = "gemini-3.5-flash"
+
+    @model_validator(mode="after")
+    def resolve_gemini_credentials(self) -> "Settings":
+        key = self.gemini_api_key.strip().strip('"').strip("'")
+        if not key:
+            for name in ("GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"):
+                candidate = os.getenv(name, "").strip().strip('"').strip("'")
+                if candidate:
+                    key = candidate
+                    break
+        self.gemini_api_key = key
+        model = os.getenv("GEMINI_MODEL", "").strip() or self.gemini_model
+        self.gemini_model = model
+        return self
 
     supabase_url: str = ""
     supabase_anon_key: str = ""

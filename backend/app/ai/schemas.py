@@ -68,6 +68,15 @@ class GreenhouseContext(BaseModel):
     q_net_delta: float | None = None
     latitude: float | None = None
     longitude: float | None = None
+    elevation_m: float | None = None
+    location_label: str | None = None
+    analysis_season: str | None = None
+    scenario_external_temp_c: float | None = None
+    scenario_external_rh_pct: float | None = None
+    scenario_wind_speed_m_s: float | None = None
+    scenario_solar_elevation_deg: float | None = None
+    scenario_solar_intensity_pct: float | None = None
+    has_live_simulation: bool | None = None
 
 
 class ClimateSetpoint(BaseModel):

@@ -260,7 +260,9 @@ Autonomous microclimate optimization with structured Priva/Ridder-compatible set
 
 `POST /api/gaia` — Proxies Gemini `generateContent` with `{ systemPrompt, userContent, model? }`.
 
-Set `GEMINI_API_KEY` on the **Vercel frontend project** (Root Directory: `frontend`), scoped to **Production** and **Preview**, then redeploy. Accepted aliases: `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_API_KEY`.
+Gemini 3.x thinking is pinned to `LOW`, then retried at `MINIMAL` if the answer text is empty. `temperature` is omitted. `maxOutputTokens` is 16384. The function `maxDuration` is 60 seconds.
+
+Set `GEMINI_API_KEY` on the **Vercel frontend project** (Root Directory: `frontend`), scoped to **Production** and **Preview**, then redeploy. Accepted aliases: `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_API_KEY`. The same names work on the FastAPI process; the panel calls `/api/v1/ai/chat` when the Vercel proxy is not configured.
 
 ### Environment Variables
 

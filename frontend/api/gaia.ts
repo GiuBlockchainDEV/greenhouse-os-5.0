@@ -1,10 +1,14 @@
-const GEMINI_API_KEY_NAMES = [
-  "GEMINI_API_KEY",
-  "GOOGLE_GENERATIVE_AI_API_KEY",
-  "GOOGLE_API_KEY",
-] as const;
+import type { IncomingMessage, ServerResponse } from "node:http";
 
-const MAX_OUTPUT_TOKENS = 8192;
+import {
+  generateGeminiContent,
+  resolveGeminiApiKey,
+  resolveGeminiBaseUrl,
+  resolveGeminiModel,
+} from "./geminiRequest";
+
+/** Hobby/Pro cap. Keeps Gemini from being killed mid-generation. */
+export const maxDuration = 60;
 
 interface GaiaProxyBody {
   systemPrompt?: string;
@@ -12,137 +16,95 @@ interface GaiaProxyBody {
   model?: string;
 }
 
-interface GeminiCandidate {
-  content?: { parts?: Array<{ text?: string }> };
-  finishReason?: string;
+interface NodeRequest extends IncomingMessage {
+  body?: unknown;
 }
 
-interface VercelRequest {
-  method?: string;
-  body?: GaiaProxyBody;
-}
-
-interface VercelResponse {
-  setHeader(name: string, value: string): void;
-  status(code: number): {
-    json(body: unknown): void;
-    end(): void;
-  };
-}
-
-function readEnv(name: string): string | undefined {
-  const value = process.env[name];
-  return typeof value === "string" ? value.trim() : undefined;
-}
-
-function resolveGeminiApiKey(): string | undefined {
-  for (const name of GEMINI_API_KEY_NAMES) {
-    const value = readEnv(name);
-    if (value) return value;
-  }
-
-  const dynamic = readEnv(`GEMINI_${"API_KEY"}`);
-  return dynamic || undefined;
-}
-
-function resolveGeminiModel(): string {
-  return (
-    readEnv("GEMINI_MODEL") ??
-    readEnv("GOOGLE_GENERATIVE_AI_MODEL") ??
-    "gemini-3.5-flash"
-  );
-}
-
-function resolveGeminiBaseUrl(): string {
-  return readEnv("GEMINI_BASE_URL") ?? "https://generativelanguage.googleapis.com";
-}
-
-function extractGeminiText(data: { candidates?: GeminiCandidate[] }): {
-  content: string;
-  truncated: boolean;
-} {
-  const candidate = data.candidates?.[0];
-  const parts = candidate?.content?.parts ?? [];
-  const content = parts.map((part) => part.text ?? "").join("").trim();
-  const truncated = candidate?.finishReason === "MAX_TOKENS";
-  return { content, truncated };
-}
-
-export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+function sendJson(res: ServerResponse, status: number, body: unknown): void {
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.end(JSON.stringify(body));
+}
 
+function runtimeEnv(): Record<string, string | undefined> {
+  return process.env;
+}
+
+async function readJsonBody(req: NodeRequest): Promise<GaiaProxyBody> {
+  const existing = req.body;
+  if (existing && typeof existing === "object" && !Buffer.isBuffer(existing)) {
+    const record = existing as GaiaProxyBody;
+    if (record.systemPrompt || record.userContent) return record;
+  }
+  if (typeof existing === "string" && existing.trim()) {
+    return JSON.parse(existing) as GaiaProxyBody;
+  }
+  if (Buffer.isBuffer(existing) && existing.length > 0) {
+    return JSON.parse(existing.toString("utf8")) as GaiaProxyBody;
+  }
+
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString("utf8").trim();
+  if (!raw) return {};
+  return JSON.parse(raw) as GaiaProxyBody;
+}
+
+export default async function handler(req: NodeRequest, res: ServerResponse): Promise<void> {
   if (req.method === "OPTIONS") {
-    res.status(200).end();
+    sendJson(res, 200, {});
     return;
   }
 
-  const apiKey = resolveGeminiApiKey();
-  const defaultModel = resolveGeminiModel();
+  const env = runtimeEnv();
+  const apiKey = resolveGeminiApiKey(env);
+  const defaultModel = resolveGeminiModel(env);
 
   if (req.method === "GET") {
-    res.status(200).json({
-      available: Boolean(apiKey),
-      model: defaultModel,
-    });
+    sendJson(res, 200, { available: Boolean(apiKey), model: defaultModel });
     return;
   }
 
   if (req.method !== "POST") {
-    res.status(405).json({ error: "method_not_allowed" });
+    sendJson(res, 405, { error: "method_not_allowed" });
     return;
   }
 
   if (!apiKey) {
-    res.status(503).json({ error: "not_configured" });
+    sendJson(res, 503, { error: "not_configured" });
     return;
   }
 
-  const { systemPrompt, userContent, model } = req.body ?? {};
-  if (!systemPrompt || !userContent) {
-    res.status(400).json({ error: "invalid_request" });
+  let body: GaiaProxyBody;
+  try {
+    body = await readJsonBody(req);
+  } catch {
+    sendJson(res, 400, { error: "invalid_json" });
     return;
   }
 
-  const usedModel = model?.trim() || defaultModel;
-  const baseUrl = resolveGeminiBaseUrl();
-  const url = `${baseUrl}/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
+  if (!body.systemPrompt || !body.userContent) {
+    sendJson(res, 400, { error: "invalid_request" });
+    return;
+  }
 
   try {
-    const upstream = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: userContent }] }],
-        generationConfig: { temperature: 0.35, maxOutputTokens: MAX_OUTPUT_TOKENS },
-      }),
+    const result = await generateGeminiContent({
+      apiKey,
+      baseUrl: resolveGeminiBaseUrl(env),
+      model: body.model?.trim() || defaultModel,
+      systemPrompt: body.systemPrompt,
+      userContent: body.userContent,
     });
-
-    const data = (await upstream.json()) as {
-      candidates?: GeminiCandidate[];
-      error?: { message?: string };
-    };
-
-    if (!upstream.ok) {
-      res.status(upstream.status).json({
-        error: "upstream_error",
-        message: data.error?.message ?? `HTTP ${upstream.status}`,
-      });
-      return;
-    }
-
-    const { content, truncated } = extractGeminiText(data);
-    if (!content) {
-      res.status(502).json({ error: "empty_response" });
-      return;
-    }
-
-    res.status(200).json({ content, model: usedModel, truncated });
+    sendJson(res, 200, result);
   } catch (error) {
-    res.status(502).json({
-      error: "proxy_error",
+    sendJson(res, 502, {
+      error: "upstream_error",
       message: error instanceof Error ? error.message : "Unknown proxy error",
     });
   }

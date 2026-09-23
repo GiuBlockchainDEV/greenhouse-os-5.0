@@ -1,9 +1,18 @@
-import type { AIAnalysisType, AIChatResponse, GreenhouseAIContext } from "@/types/ai";
+import { API_V1 } from "@/lib/apiConfig";
+import type {
+  AIAnalysisType,
+  AIChatResponse,
+  GreenhouseAIContext,
+  ProviderInfo,
+} from "@/types/ai";
 
 import { formatGreenhouseContext } from "./formatContext";
 import { analysisPrompt, gaiaUnavailableMessage, systemPrompt, truncatedNotice } from "./prompts";
 
 const GAIA_API = "/api/gaia";
+const BACKEND_CHAT = `${API_V1}/ai/chat`;
+const BACKEND_ANALYZE = `${API_V1}/ai/analyze`;
+const BACKEND_PROVIDERS = `${API_V1}/ai/providers`;
 
 interface GaiaStatus {
   available: boolean;
@@ -23,24 +32,75 @@ interface GaiaProxyError {
 
 let cachedAvailable: boolean | null = null;
 
+async function checkBackendStatus(): Promise<GaiaStatus> {
+  try {
+    const response = await fetch(BACKEND_PROVIDERS);
+    if (!response.ok) return { available: false };
+    const providers = (await response.json()) as ProviderInfo[];
+    const gemini = providers.find((provider) => provider.id === "gemini" && provider.available);
+    return gemini
+      ? { available: true, model: gemini.default_model }
+      : { available: false };
+  } catch {
+    return { available: false };
+  }
+}
+
 export async function checkGaiaStatus(): Promise<GaiaStatus> {
   try {
     const response = await fetch(GAIA_API);
-    if (!response.ok) return { available: false };
-    const data = (await response.json()) as GaiaStatus;
-    cachedAvailable = data.available;
-    return data;
+    if (response.ok) {
+      const data = (await response.json()) as GaiaStatus;
+      if (data.available) {
+        cachedAvailable = true;
+        return data;
+      }
+    }
   } catch {
-    cachedAvailable = false;
-    return { available: false };
+    // Fall through to the FastAPI gateway when the Vercel proxy is absent.
   }
+
+  const backend = await checkBackendStatus();
+  cachedAvailable = backend.available;
+  return backend;
 }
 
 export function isGaiaConfigured(): boolean {
   return cachedAvailable ?? false;
 }
 
-async function callGaia(locale: string, userContent: string): Promise<AIChatResponse> {
+function errorResponse(locale: string, detail: string): AIChatResponse {
+  return {
+    provider: "gemini",
+    model: "gaia-error",
+    content: `${gaiaUnavailableMessage(locale)}\n\n(${detail})`,
+    setpoints: [],
+    used_local_engine: true,
+  };
+}
+
+async function callBackend(path: string, body: unknown): Promise<AIChatResponse | null> {
+  try {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as AIChatResponse;
+    cachedAvailable = !data.used_local_engine;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+interface ProxyAttempt {
+  response: AIChatResponse;
+  fallback: boolean;
+}
+
+async function callGaia(locale: string, userContent: string): Promise<ProxyAttempt> {
   try {
     const response = await fetch(GAIA_API, {
       method: "POST",
@@ -60,18 +120,10 @@ async function callGaia(locale: string, userContent: string): Promise<AIChatResp
           : "error" in data
             ? data.error
             : `HTTP ${response.status}`;
-
-      if ("error" in data && data.error === "not_configured") {
-        cachedAvailable = false;
-      }
-
-      return {
-        provider: "gemini",
-        model: "gaia-error",
-        content: `${gaiaUnavailableMessage(locale)}\n\n(${detail})`,
-        setpoints: [],
-        used_local_engine: true,
-      };
+      const missing =
+        response.status === 404 || ("error" in data && data.error === "not_configured");
+      if (missing) cachedAvailable = false;
+      return { response: errorResponse(locale, detail), fallback: missing };
     }
 
     const success = data as GaiaProxySuccess;
@@ -82,22 +134,19 @@ async function callGaia(locale: string, userContent: string): Promise<AIChatResp
       : success.content;
 
     return {
-      provider: "gemini",
-      model: success.model,
-      content,
-      setpoints: [],
-      used_local_engine: false,
-      truncated: success.truncated,
+      fallback: false,
+      response: {
+        provider: "gemini",
+        model: success.model,
+        content,
+        setpoints: [],
+        used_local_engine: false,
+        truncated: success.truncated,
+      },
     };
   } catch (error) {
-    const detail = error instanceof Error ? error.message : "network_error";
-    return {
-      provider: "gemini",
-      model: "gaia-error",
-      content: `${gaiaUnavailableMessage(locale)}\n\n(${detail})`,
-      setpoints: [],
-      used_local_engine: true,
-    };
+    const detail = error instanceof Error ? error.message : "proxy_unreachable";
+    return { response: errorResponse(locale, detail), fallback: true };
   }
 }
 
@@ -108,7 +157,11 @@ export async function gaiaChat(
 ): Promise<AIChatResponse> {
   const contextBlock = formatGreenhouseContext(context);
   const userContent = `${contextBlock}\n\n--- USER REQUEST ---\n${message}`;
-  return callGaia(locale, userContent);
+  const proxied = await callGaia(locale, userContent);
+  if (!proxied.fallback) return proxied.response;
+
+  const backend = await callBackend(BACKEND_CHAT, { message, context, locale });
+  return backend ?? proxied.response;
 }
 
 export async function gaiaAnalyze(
@@ -119,6 +172,17 @@ export async function gaiaAnalyze(
   const contextBlock = formatGreenhouseContext(context);
   const prompt = analysisPrompt(analysisType, locale);
   const userContent = `${contextBlock}\n\n--- ANALYSIS TASK ---\n${prompt}`;
-  const result = await callGaia(locale, userContent);
-  return { ...result, analysis_type: analysisType };
+  const proxied = await callGaia(locale, userContent);
+  if (!proxied.fallback) {
+    return { ...proxied.response, analysis_type: analysisType };
+  }
+
+  const backend = await callBackend(BACKEND_ANALYZE, {
+    analysis_type: analysisType,
+    context,
+    locale,
+  });
+  return backend
+    ? { ...backend, analysis_type: analysisType }
+    : { ...proxied.response, analysis_type: analysisType };
 }
