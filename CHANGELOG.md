@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Realistic 3D greenhouse** — Aluminum posts and gutters, physical glass/PC/PE/ETFE cladding, ACES grading, procedural sky, grass site, and contact shadows replace the flat green CAD shell.
+
 - **GAIA panel width** — Assistant column widened from 300px to 480px so chat and analysis text have more room beside the 3D view.
 
 ### Fixed

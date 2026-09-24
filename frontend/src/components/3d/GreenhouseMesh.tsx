@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { Edges } from "@react-three/drei";
 import * as THREE from "three";
 
+import { claddingLook, ALUMINUM } from "@/components/3d/claddingMaterials";
+import { GreenhouseFrame } from "@/components/3d/GreenhouseFrame";
 import {
   bayApexHeight,
   bayCenterZ,
@@ -10,27 +11,7 @@ import {
 } from "@/lib/structureUtils";
 import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
-import type { ArchType } from "@/types/greenhouse";
-
-const FRAME_COLOR = "#059669";
-const GLASS_COLOR = "#ecfdf5";
-
-function glassMaterialProps(heatmapActive: boolean, glassOpacity: number) {
-  if (heatmapActive) {
-    return {
-      opacity: 0.03,
-      transmission: 0.94,
-      roughness: 0.02,
-      depthWrite: false,
-    };
-  }
-  return {
-    opacity: 0.22,
-    transmission: glassOpacity,
-    roughness: 0.05,
-    depthWrite: true,
-  };
-}
+import type { ArchType, CoveringMaterial } from "@/types/greenhouse";
 
 function createTriangularBayRoof(
   length: number,
@@ -107,7 +88,7 @@ interface BayRoofProps {
   ridgeHeight: number;
   zCenter: number;
   archType: ArchType;
-  glassOpacity: number;
+  coveringType: CoveringMaterial["type"];
   heatmapActive: boolean;
 }
 
@@ -118,7 +99,7 @@ function BayRoof({
   ridgeHeight,
   zCenter,
   archType,
-  glassOpacity,
+  coveringType,
   heatmapActive,
 }: BayRoofProps) {
   const geometry = useMemo(() => {
@@ -129,27 +110,30 @@ function BayRoof({
   }, [archType, bayWidth, eaveHeight, length, ridgeHeight, zCenter]);
 
   const apex = bayApexHeight(archType, eaveHeight, ridgeHeight, bayWidth);
-  const glass = glassMaterialProps(heatmapActive, glassOpacity);
+  const glass = claddingLook(coveringType, heatmapActive);
 
   return (
     <group>
-      <mesh geometry={geometry} renderOrder={heatmapActive ? 0 : 1}>
+      <mesh geometry={geometry} castShadow renderOrder={heatmapActive ? 0 : 1}>
         <meshPhysicalMaterial
-          color={GLASS_COLOR}
+          color={glass.color}
           transparent
           opacity={glass.opacity}
           roughness={glass.roughness}
-          metalness={0.1}
+          metalness={0}
           transmission={glass.transmission}
+          thickness={glass.thickness}
+          ior={glass.ior}
+          clearcoat={glass.clearcoat}
+          clearcoatRoughness={glass.clearcoatRoughness}
+          envMapIntensity={1.15}
           depthWrite={glass.depthWrite}
           side={THREE.DoubleSide}
-          thickness={0.2}
         />
-        <Edges color={FRAME_COLOR} threshold={15} />
       </mesh>
-      <mesh position={[0, apex, zCenter]}>
-        <boxGeometry args={[length, 0.06, archType === "semicircular" ? 0.06 : 0.08]} />
-        <meshStandardMaterial color={FRAME_COLOR} metalness={0.7} roughness={0.2} />
+      <mesh position={[0, apex, zCenter]} castShadow>
+        <boxGeometry args={[length, 0.07, archType === "semicircular" ? 0.07 : 0.09]} />
+        <meshStandardMaterial color={ALUMINUM} metalness={0.84} roughness={0.24} />
       </mesh>
     </group>
   );
@@ -158,27 +142,30 @@ function BayRoof({
 interface WallGlassProps {
   position: [number, number, number];
   args: [number, number, number];
-  glassOpacity: number;
+  coveringType: CoveringMaterial["type"];
   heatmapActive: boolean;
 }
 
-function WallGlass({ position, args, glassOpacity, heatmapActive }: WallGlassProps) {
-  const glass = glassMaterialProps(heatmapActive, glassOpacity);
+function WallGlass({ position, args, coveringType, heatmapActive }: WallGlassProps) {
+  const glass = claddingLook(coveringType, heatmapActive);
   return (
-    <mesh position={position} renderOrder={heatmapActive ? 0 : 1}>
+    <mesh position={position} castShadow renderOrder={heatmapActive ? 0 : 1}>
       <boxGeometry args={args} />
       <meshPhysicalMaterial
-        color={GLASS_COLOR}
+        color={glass.color}
         transparent
         opacity={glass.opacity}
         roughness={glass.roughness}
-        metalness={0.1}
+        metalness={0}
         transmission={glass.transmission}
+        thickness={glass.thickness}
+        ior={glass.ior}
+        clearcoat={glass.clearcoat}
+        clearcoatRoughness={glass.clearcoatRoughness}
+        envMapIntensity={1.15}
         depthWrite={glass.depthWrite}
         side={THREE.DoubleSide}
-        thickness={0.4}
       />
-      <Edges color={FRAME_COLOR} threshold={15} />
     </mesh>
   );
 }
@@ -203,42 +190,49 @@ export function GreenhouseMesh() {
     [archType, bayCount, bayWidthM, width],
   );
 
-  const glassOpacity = 0.12 + covering.transmittance * 0.2;
-
   return (
     <group position={[0, 0, 0]}>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
-        <planeGeometry args={[length + 4, width + 4]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.13, 0]} receiveShadow>
+        <planeGeometry args={[length, width]} />
         <meshStandardMaterial
-          color="#e2e8f0"
-          roughness={0.85}
+          color="#cfc8bc"
+          roughness={0.94}
+          metalness={0}
           transparent={heatmapActive}
-          opacity={heatmapActive ? 0.35 : 1}
+          opacity={heatmapActive ? 0.28 : 1}
         />
       </mesh>
 
+      <GreenhouseFrame
+        length={length}
+        width={width}
+        eaveHeight={eaveHeight}
+        bayCount={bayCount}
+        bayWidthM={bayWidthM}
+      />
+
       <WallGlass
         position={[0, eaveHeight / 2, -width / 2]}
-        args={[length, eaveHeight, 0.08]}
-        glassOpacity={glassOpacity}
+        args={[length, eaveHeight, 0.04]}
+        coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
       <WallGlass
         position={[0, eaveHeight / 2, width / 2]}
-        args={[length, eaveHeight, 0.08]}
-        glassOpacity={glassOpacity}
+        args={[length, eaveHeight, 0.04]}
+        coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
       <WallGlass
         position={[-length / 2, eaveHeight / 2, 0]}
-        args={[0.08, eaveHeight, width]}
-        glassOpacity={glassOpacity}
+        args={[0.04, eaveHeight, width]}
+        coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
       <WallGlass
         position={[length / 2, eaveHeight / 2, 0]}
-        args={[0.08, eaveHeight, width]}
-        glassOpacity={glassOpacity}
+        args={[0.04, eaveHeight, width]}
+        coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
 
@@ -251,20 +245,10 @@ export function GreenhouseMesh() {
           ridgeHeight={ridgeHeight}
           zCenter={bay.zCenter}
           archType={bay.archType}
-          glassOpacity={glassOpacity}
+          coveringType={covering.type}
           heatmapActive={heatmapActive}
         />
       ))}
-
-      {Array.from({ length: Math.floor(length / 3) + 1 }, (_, index) => {
-        const x = -length / 2 + index * 3;
-        return (
-          <mesh key={`frame-${index}`} position={[x, eaveHeight, 0]}>
-            <boxGeometry args={[0.06, 0.06, width]} />
-            <meshStandardMaterial color={FRAME_COLOR} metalness={0.6} roughness={0.3} />
-          </mesh>
-        );
-      })}
     </group>
   );
 }
