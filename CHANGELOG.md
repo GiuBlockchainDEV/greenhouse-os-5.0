@@ -18,6 +18,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Market preset cooling** — Every commercial model now loads a real cooling system (fog on glass Venlo, mechanical AC on semi-closed and ETFE, fan-and-pad or evaporative on tunnels and gothic spans) so the climate dropdown, pad/AC/fog equipment, and heatmap unlock with the structure.
+
 - **Pad-to-exhaust heatmap gradient** — Zero-mean pad→exhaust airflow model (cool at pad wall, warm at exhaust fans), exhaust-side warming instead of outdoor exchange, reduced solar spatial amplitude with fan-and-pad, and corrected floor texture UV flip so the visual matches physics.
 
 - **Heatmap behavior audit CSV** — Added `docs/HEATMAP_AUDIT.csv`: full pipeline inventory (UI → solver → spatial physics → HAF → render), evolution on every slider, FE/BE divergence flags, dead code, and prioritized fix roadmap.
