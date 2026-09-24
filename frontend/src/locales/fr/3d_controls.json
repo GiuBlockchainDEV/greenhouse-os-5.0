@@ -9,6 +9,11 @@
     "ridgeHeight": "Hauteur de Faîtage",
     "eaveHeight": "Hauteur de Gouttière"
   },
+  "presets": {
+    "title": "Structure du marché",
+    "hint": "Chargez une serre commerciale déjà configurée, ou gardez un dessin sur mesure. La météo du site reste celle choisie.",
+    "custom": "Conception sur mesure"
+  },
   "structure": {
     "title": "Structure de la Serre",
     "bayCount": "Nombre de Travées",

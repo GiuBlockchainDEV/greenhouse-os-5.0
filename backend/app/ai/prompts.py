@@ -223,6 +223,8 @@ def format_context(ctx: GreenhouseContext) -> str:
             lines.append(f"Location: {label} ({ctx.latitude}°, {ctx.longitude}°{elevation})")
         else:
             lines.append(f"Location: {label}")
+    if ctx.market_preset_label:
+        lines.append(f"Commercial model: {ctx.market_preset_label}")
     if ctx.analysis_season:
         lines.append(f"Analysis season: {ctx.analysis_season}")
     if ctx.scenario_external_temp_c is not None:

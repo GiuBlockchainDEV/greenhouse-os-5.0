@@ -10,6 +10,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Equipment rated capacity UI** — Explicit m³/h, kW, COP, SHR, pad/fog efficiency, and leakage ACH fields in climate controls; wired through WebSocket and backend solver.
 
+- **Market greenhouse catalog** — 24 selectable commercial models (Venlo, semi-closed, gothic multispan, tunnels) load structure, covering, crop, and typical HVAC so GAIA can analyze a built product as well as a custom design.
+
 ### Changed
 
 - **GAIA panel width** — Assistant column widened from 300px to 480px so chat and analysis text have more room beside the 3D view.

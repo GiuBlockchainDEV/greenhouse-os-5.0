@@ -70,6 +70,8 @@ class GreenhouseContext(BaseModel):
     longitude: float | None = None
     elevation_m: float | None = None
     location_label: str | None = None
+    market_preset_id: str | None = None
+    market_preset_label: str | None = None
     analysis_season: str | None = None
     scenario_external_temp_c: float | None = None
     scenario_external_rh_pct: float | None = None

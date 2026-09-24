@@ -9,6 +9,11 @@
     "ridgeHeight": "Altura de Cumbrera",
     "eaveHeight": "Altura de Alero"
   },
+  "presets": {
+    "title": "Estructura de mercado",
+    "hint": "Carga un invernadero comercial ya configurado, o sigue con un diseño a medida. El clima del sitio no cambia.",
+    "custom": "Diseño a medida"
+  },
   "structure": {
     "title": "Estructura del Invernadero",
     "bayCount": "Número de Módulos (Campatas)",

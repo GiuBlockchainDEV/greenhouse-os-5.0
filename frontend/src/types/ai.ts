@@ -59,6 +59,8 @@ export interface GreenhouseAIContext {
   longitude?: number;
   elevation_m?: number;
   location_label?: string;
+  market_preset_id?: string;
+  market_preset_label?: string;
   analysis_season?: GaiaAnalysisSeason;
   scenario_external_temp_c?: number;
   scenario_external_rh_pct?: number;

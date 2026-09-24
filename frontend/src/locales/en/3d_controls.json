@@ -9,6 +9,11 @@
     "ridgeHeight": "Ridge Height",
     "eaveHeight": "Eave Height"
   },
+  "presets": {
+    "title": "Market structure",
+    "hint": "Load a commercial greenhouse as sold, or keep editing a custom design. Site weather stays as you set it.",
+    "custom": "Custom design"
+  },
   "structure": {
     "title": "Greenhouse Structure",
     "bayCount": "Number of Bays (Campate)",

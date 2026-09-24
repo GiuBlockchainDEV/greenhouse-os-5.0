@@ -9,6 +9,11 @@
     "ridgeHeight": "Altezza Colmo",
     "eaveHeight": "Altezza Gronda"
   },
+  "presets": {
+    "title": "Struttura di mercato",
+    "hint": "Carica una serra commerciale già configurata, oppure continua con un design custom. Il meteo del sito resta quello impostato.",
+    "custom": "Design custom"
+  },
   "structure": {
     "title": "Struttura Serra",
     "bayCount": "Numero di Campate",

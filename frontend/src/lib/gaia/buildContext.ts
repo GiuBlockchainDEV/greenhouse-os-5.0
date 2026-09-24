@@ -1,3 +1,4 @@
+import { marketPresetById, marketPresetLabel } from "@/lib/marketGreenhousePresets";
 import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { GreenhouseAIContext } from "@/types/ai";
@@ -67,6 +68,11 @@ export function buildGreenhouseContext(options: BuildContextOptions = {}): Green
     longitude: state.location.lon,
     elevation_m: state.location.elevationM,
     location_label: state.location.label,
+    market_preset_id: state.marketPresetId,
+    market_preset_label: (() => {
+      const presetItem = marketPresetById(state.marketPresetId);
+      return presetItem ? marketPresetLabel(presetItem) : "custom";
+    })(),
     analysis_season: season,
     scenario_external_temp_c: scenario.externalTempC,
     scenario_external_rh_pct: scenario.externalRhPct,

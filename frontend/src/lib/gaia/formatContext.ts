@@ -15,6 +15,9 @@ export function formatGreenhouseContext(ctx: GreenhouseAIContext): string {
 
   const lines = [
     "=== SITE ===",
+    ctx.market_preset_label && ctx.market_preset_label !== "custom"
+      ? `Commercial model: ${ctx.market_preset_label}`
+      : "Commercial model: custom design",
     siteLine,
     `Analysis season: ${SEASON_LABEL[ctx.analysis_season ?? "simulation"] ?? ctx.analysis_season}`,
     "",

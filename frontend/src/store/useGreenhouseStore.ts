@@ -10,6 +10,10 @@ import {
   normalizeHafFanCount,
 } from "@/lib/climateEquipmentLayout";
 import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
+import {
+  CUSTOM_GREENHOUSE_PRESET_ID,
+  marketPresetById,
+} from "@/lib/marketGreenhousePresets";
 import type {
   ClimateEquipment,
   ClimateEquipmentSizing,
@@ -237,6 +241,7 @@ interface GreenhouseStore {
   crop: CropConfig;
   climateEquipment: ClimateEquipment;
   climateScenario: ClimateScenario;
+  marketPresetId: string;
   metrics: VolumeMetrics;
   simulationStatus: WSConnectionStatus;
   simulationResults: SimulationData | null;
@@ -259,6 +264,7 @@ interface GreenhouseStore {
   setSimulationResults: (results: SimulationData) => void;
   setGizmoMode: (mode: GizmoMode) => void;
   setHeatmapMode: (mode: HeatmapMode) => void;
+  applyMarketPreset: (presetId: string) => void;
   setAiProvider: (provider: AIProviderType) => void;
   resetToDefaults: () => void;
 }
@@ -276,6 +282,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       crop: initialCrop,
       climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
       climateScenario: DEFAULT_CLIMATE_SCENARIO,
+      marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
       metrics: initialMetrics,
       simulationStatus: "idle",
       simulationResults: null,
@@ -314,7 +321,14 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
                 },
               };
         set(
-          { structure, dimensions, crop, metrics, climateEquipment: nextEquipment },
+          {
+            structure,
+            dimensions,
+            crop,
+            metrics,
+            climateEquipment: nextEquipment,
+            marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
+          },
           false,
           "setStructure",
         );
@@ -327,12 +341,19 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           ...update,
         });
         const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {});
-        set({ dimensions, crop, metrics }, false, "setDimensions");
+        set(
+          { dimensions, crop, metrics, marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID },
+          false,
+          "setDimensions",
+        );
       },
 
       setCovering: (covering) =>
         set(
-          { covering: { ...get().covering, ...covering } },
+          {
+            covering: { ...get().covering, ...covering },
+            marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
+          },
           false,
           "setCovering",
         ),
@@ -418,6 +439,53 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
 
       setGizmoMode: (gizmoMode) => set({ gizmoMode }, false, "setGizmoMode"),
 
+      applyMarketPreset: (presetId) => {
+        if (presetId === CUSTOM_GREENHOUSE_PRESET_ID) {
+          set({ marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID }, false, "applyMarketPreset");
+          return;
+        }
+        const presetItem = marketPresetById(presetId);
+        if (!presetItem) return;
+        const structure = presetItem.structure;
+        const dimensions = syncDimensionsFromStructure(structure, {
+          length: presetItem.lengthM,
+          width: structure.bayCount * structure.bayWidthM,
+          eaveHeight: presetItem.eaveM,
+          ridgeHeight: presetItem.ridgeM,
+        });
+        const crop = syncCropFromLayout(structure, dimensions, {
+          type: presetItem.crop,
+          system: presetItem.system,
+          lai: presetItem.lai,
+          growthStage: "mid_season",
+          layout: {
+            ...DEFAULT_LAYOUT,
+            bedLineCount: presetItem.bedsPerBay,
+            tierCount: presetItem.crop === "strawberry" ? 2 : 1,
+          },
+        });
+        const cooling = presetItem.equipment.cooling;
+        set(
+          {
+            name: `${presetItem.manufacturer} ${presetItem.model}`,
+            structure,
+            dimensions,
+            covering: presetItem.covering,
+            shadingScreen: {
+              installed: presetItem.screen,
+              deploymentPct: presetItem.screen ? 35 : 0,
+            },
+            crop,
+            climateEquipment: presetItem.equipment,
+            metrics: computeVolumeMetrics(structure, dimensions, crop),
+            marketPresetId: presetItem.id,
+            heatmapMode: isHeatmapAvailable(cooling) ? get().heatmapMode : "off",
+          },
+          false,
+          "applyMarketPreset",
+        );
+      },
+
       setHeatmapMode: (heatmapMode) => {
         const cooling = get().climateEquipment.cooling;
         const nextMode =
@@ -441,6 +509,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             crop,
             climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
             climateScenario: DEFAULT_CLIMATE_SCENARIO,
+            marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
             metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, dimensions, crop),
           },
           false,

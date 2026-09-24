@@ -1,19 +1,24 @@
 import { useTranslation } from "react-i18next";
 
 import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
+import {
+  CUSTOM_GREENHOUSE_PRESET_ID,
+  MARKET_GREENHOUSE_PRESETS,
+  marketPresetLabel,
+} from "@/lib/marketGreenhousePresets";
 import { effectiveSolarTransmittance } from "@/lib/shadingScreen";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { ArchType, CoveringMaterial, CropType, DimensionUpdate } from "@/types/greenhouse";
 
 const DIMENSION_LIMITS = {
-  length: { min: 6, max: 120, step: 1 },
+  length: { min: 6, max: 180, step: 1 },
   ridgeHeight: { min: 2.5, max: 12, step: 0.1 },
   eaveHeight: { min: 2, max: 10, step: 0.1 },
 } as const;
 
 const STRUCTURE_LIMITS = {
-  bayCount: { min: 1, max: 15, step: 1 },
-  bayWidthM: { min: 4, max: 12, step: 0.5 },
+  bayCount: { min: 1, max: 12, step: 1 },
+  bayWidthM: { min: 4, max: 12.8, step: 0.1 },
 } as const;
 
 type DimensionKey = keyof typeof DIMENSION_LIMITS;
@@ -90,6 +95,8 @@ export function DimensionControls() {
   const covering = useGreenhouseStore((state) => state.covering);
   const shadingScreen = useGreenhouseStore((state) => state.shadingScreen);
   const crop = useGreenhouseStore((state) => state.crop);
+  const marketPresetId = useGreenhouseStore((state) => state.marketPresetId);
+  const applyMarketPreset = useGreenhouseStore((state) => state.applyMarketPreset);
   const setStructure = useGreenhouseStore((state) => state.setStructure);
   const setDimensions = useGreenhouseStore((state) => state.setDimensions);
   const setCovering = useGreenhouseStore((state) => state.setCovering);
@@ -116,6 +123,20 @@ export function DimensionControls() {
       </div>
 
       <section className="flex flex-col gap-3">
+        <h4 className="ui-section-title">{tControls("presets.title")}</h4>
+        <p className="text-[10px] leading-relaxed text-label">{tControls("presets.hint")}</p>
+        <select
+          value={marketPresetId}
+          onChange={(event) => applyMarketPreset(event.target.value)}
+          className="ui-select"
+        >
+          <option value={CUSTOM_GREENHOUSE_PRESET_ID}>{tControls("presets.custom")}</option>
+          {MARKET_GREENHOUSE_PRESETS.map((presetItem) => (
+            <option key={presetItem.id} value={presetItem.id}>
+              {marketPresetLabel(presetItem)}
+            </option>
+          ))}
+        </select>
         <h4 className="ui-section-title">
           {tControls("structure.title")}
         </h4>
