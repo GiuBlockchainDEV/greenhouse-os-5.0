@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Greenhouse frame** — Restored the procedural aluminum posts, gutters, and eave trusses instead of repeating `venlo-bay.glb` / `gothic-arch.glb` for structure.
+
 - **Roof exhaust fans** — Ridge/gable roof exhaust units reuse the same `exhaust-fan.glb` asset as the wall fans (scaled and mounted on the east gable).
 
 - **Exhaust fan GLB v2** — Updated `exhaust-fan.glb` (housing, guard, venturi, mount brackets) scales to fan diameter and aligns its mount face with the east gable.
