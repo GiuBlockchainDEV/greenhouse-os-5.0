@@ -18,12 +18,18 @@ function repeats(span: number, moduleLength: number, cap: number): { count: numb
   return { count, step: span / count };
 }
 
+const EXHAUST_FAN_REF_M = 1.412;
+/** Mount face sits on the east gable (local Z = -0.05 m in the authored asset). */
+const EXHAUST_FAN_MOUNT_Z_M = 0.05;
+
 export function ExhaustFanModel({ fan }: { fan: FanPlacement }) {
-  const scale = fan.diameterM / 1.45;
+  const scale = fan.diameterM / EXHAUST_FAN_REF_M;
+  const wallX = fan.x + 0.12;
+  const x = wallX + EXHAUST_FAN_MOUNT_Z_M * scale;
   return (
     <GltfPart
       file="exhaust-fan.glb"
-      position={[fan.x, fan.y, fan.z]}
+      position={[x, fan.y, fan.z]}
       rotation={[0, -Math.PI / 2, 0]}
       scale={[scale, scale, scale]}
     />
