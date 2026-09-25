@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Perforated exhaust fan openings** — The east gable cuts glass around each exhaust fan and shows a framed perforated metal panel instead of a solid pane.
+
 - **GLB component library** — Structure bays, glazing bars, fans, pads, AC, ducts, vents, heaters, fog, and cultivation lines now load the authored models from `growa_greenhouse_glb_library` and repeat them at real size.
 
 - **Realistic climate hardware** — Exhaust and HAF fans use round shrouds and metal blades; pad walls read as cellulose; AC, ducts, vents, heaters, fog lines, and crop gutters use galvanized or white commercial finishes. The site plane around the house is white.

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 
 import { claddingLook, ALUMINUM } from "@/components/3d/claddingMaterials";
+import { ExhaustGableWall } from "@/components/3d/ExhaustGableWall";
 import { GreenhouseFrame } from "@/components/3d/GreenhouseFrame";
 import {
   bayApexHeight,
@@ -175,7 +176,8 @@ export function GreenhouseMesh() {
   const structure = useGreenhouseStore((state) => state.structure);
   const covering = useGreenhouseStore((state) => state.covering);
   const heatmapMode = useGreenhouseStore((state) => state.heatmapMode);
-  const cooling = useGreenhouseStore((state) => state.climateEquipment.cooling);
+  const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
+  const cooling = climateEquipment.cooling;
   const { length, width, ridgeHeight, eaveHeight } = dimensions;
   const { bayCount, bayWidthM, archType } = structure;
   const heatmapActive = heatmapMode !== "off" && isHeatmapAvailable(cooling);
@@ -230,9 +232,13 @@ export function GreenhouseMesh() {
         coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
-      <WallGlass
-        position={[length / 2, eaveHeight / 2, 0]}
-        args={[0.04, eaveHeight, width]}
+      <ExhaustGableWall
+        x={length / 2}
+        width={width}
+        eaveHeight={eaveHeight}
+        dimensions={dimensions}
+        structure={structure}
+        equipment={climateEquipment}
         coveringType={covering.type}
         heatmapActive={heatmapActive}
       />
