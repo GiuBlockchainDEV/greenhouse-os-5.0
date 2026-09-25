@@ -33,7 +33,6 @@ const FILES = [
   "gothic-arch.glb",
   "glazing-bar.glb",
   "exhaust-fan.glb",
-  "roof-exhaust-fan.glb",
   "haf-fan.glb",
   "pad-module.glb",
   "ac-unit.glb",
