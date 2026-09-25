@@ -8,15 +8,15 @@ import {
 import type { BedZone } from "@/lib/cultivationLayout";
 import type { CultivationSystem } from "@/types/greenhouse";
 
-const WATER = "#1d4ed8";
-const WATER_DARK = "#1e3a8a";
-const MEDIA_SOIL = "#3e2723";
-const MEDIA_GRAVEL = "#8d6e63";
-const SUBSTRATE = "#c5e1a5";
-const GUTTER = "#9ca3af";
-const GUTTER_INNER = "#6b7280";
-const RAFT = "#e0f2fe";
-const TRAY = "#4b5563";
+const WATER = "#6f93a8";
+const WATER_DARK = "#3e5c6e";
+const MEDIA_SOIL = "#5c4033";
+const MEDIA_GRAVEL = "#a89080";
+const SUBSTRATE = "#efe6d6";
+const GUTTER = "#f4f5f7";
+const GUTTER_INNER = "#d5d8de";
+const RAFT = "#f7f8fa";
+const TRAY = "#c5ccd4";
 
 interface BedMeshProps {
   bed: BedZone;

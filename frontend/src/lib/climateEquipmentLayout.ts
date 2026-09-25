@@ -56,7 +56,7 @@ export interface VentPlacement extends Vec3 {
 }
 
 export interface HeaterPlacement extends Vec3 {
-  kind: "unit" | "air" | "geothermal";
+  kind: "unit" | "air" | "geothermal" | "pipe";
 }
 
 export interface FogLinePlacement {
@@ -590,7 +590,7 @@ export function computeClimateEquipmentLayout(params: {
         x: 0,
         y: 0.35,
         z: offsetZ,
-        kind: "unit",
+        kind: "pipe",
       });
     });
   }

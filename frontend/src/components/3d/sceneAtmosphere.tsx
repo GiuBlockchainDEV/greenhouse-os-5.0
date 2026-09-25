@@ -37,7 +37,7 @@ export function SceneLook() {
         mieCoefficient={0.004}
         mieDirectionalG={0.82}
       />
-      <hemisphereLight args={["#dbeafe", "#8a9a72", 0.42]} />
+      <hemisphereLight args={["#dbeafe", "#f3f4f6", 0.42]} />
       <ambientLight intensity={0.18} />
       <directionalLight
         position={SUN_POSITION}
@@ -65,7 +65,7 @@ export function SiteGround({ span }: { span: number }) {
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.04, 0]} receiveShadow>
         <planeGeometry args={[size, size]} />
-        <meshStandardMaterial color="#6f8f55" roughness={1} metalness={0} />
+        <meshStandardMaterial color="#ffffff" roughness={0.92} metalness={0} />
       </mesh>
       <ContactShadows
         position={[0, 0.005, 0]}
