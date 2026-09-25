@@ -16,7 +16,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Exhaust fan GLB v2** — Updated `exhaust-fan.glb` (housing, guard, venturi, mount brackets) scales to fan diameter and aligns its mount face with the east gable.
 
-- **Perforated exhaust fan openings** — The east gable cuts glass around each exhaust fan and shows a framed perforated metal panel instead of a solid pane.
+- **Exhaust fan wall openings** — The east gable leaves empty holes at each exhaust fan (no infill mesh); only the authored `exhaust-fan.glb` is visible in the opening.
 
 - **GLB component library** — Structure bays, glazing bars, fans, pads, AC, ducts, vents, heaters, fog, and cultivation lines now load the authored models from `growa_greenhouse_glb_library` and repeat them at real size.
 

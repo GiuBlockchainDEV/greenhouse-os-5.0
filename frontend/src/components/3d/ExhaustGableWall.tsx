@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { ALUMINUM, claddingLook } from "@/components/3d/claddingMaterials";
+import { claddingLook } from "@/components/3d/claddingMaterials";
 import { computeClimateEquipmentLayout } from "@/lib/climateEquipmentLayout";
 import type { ClimateEquipment, CoveringMaterial, GreenhouseDimensions, GreenhouseStructure } from "@/types/greenhouse";
 
@@ -46,79 +46,6 @@ function glassSegments(full: Rect, cuts: Rect[]): Rect[] {
   return segments;
 }
 
-function createPerforationAlphaMap(repeatX: number, repeatY: number): THREE.CanvasTexture {
-  const size = 128;
-  const holes = 10;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    return new THREE.CanvasTexture(canvas);
-  }
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, size, size);
-  ctx.fillStyle = "#000000";
-  const step = size / holes;
-  const radius = step * 0.34;
-  for (let row = 0; row < holes; row += 1) {
-    for (let col = 0; col < holes; col += 1) {
-      ctx.beginPath();
-      ctx.arc((col + 0.5) * step, (row + 0.5) * step, radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(repeatX, repeatY);
-  return texture;
-}
-
-function PerforatedFanWindow({
-  x,
-  y,
-  z,
-  widthM,
-  heightM,
-}: {
-  x: number;
-  y: number;
-  z: number;
-  widthM: number;
-  heightM: number;
-}) {
-  const alphaMap = useMemo(
-    () =>
-      createPerforationAlphaMap(
-        Math.max(2, widthM / 0.14),
-        Math.max(2, heightM / 0.14),
-      ),
-    [heightM, widthM],
-  );
-
-  return (
-    <group position={[x, y, z]}>
-      <mesh position={[0.022, 0, 0]}>
-        <boxGeometry args={[0.05, heightM + 0.12, widthM + 0.12]} />
-        <meshStandardMaterial color={ALUMINUM} metalness={0.82} roughness={0.28} />
-      </mesh>
-      <mesh position={[0.04, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[widthM, heightM]} />
-        <meshStandardMaterial
-          color="#4a5562"
-          metalness={0.88}
-          roughness={0.38}
-          transparent
-          alphaMap={alphaMap}
-          alphaTest={0.35}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
 interface ExhaustGableWallProps {
   x: number;
   width: number;
@@ -130,7 +57,7 @@ interface ExhaustGableWallProps {
   heatmapActive: boolean;
 }
 
-/** East gable with cut-outs and perforated metal panels at each exhaust fan. */
+/** East gable glazing with empty openings at each exhaust fan (no infill — the GLB sits in the hole). */
 export function ExhaustGableWall({
   x,
   width,
@@ -146,19 +73,15 @@ export function ExhaustGableWall({
     [dimensions, structure, equipment],
   );
 
-  const openings = useMemo(
+  const cutouts = useMemo(
     () =>
       layout.exhaustFans.map((fan) => {
         const span = fan.diameterM + 0.28;
         return {
-          fan,
-          rect: {
-            zMin: fan.z - span / 2,
-            zMax: fan.z + span / 2,
-            yMin: fan.y - span / 2,
-            yMax: fan.y + span / 2,
-          },
-          span,
+          zMin: fan.z - span / 2,
+          zMax: fan.z + span / 2,
+          yMin: fan.y - span / 2,
+          yMax: fan.y + span / 2,
         };
       }),
     [layout.exhaustFans],
@@ -166,16 +89,13 @@ export function ExhaustGableWall({
 
   const segments = useMemo(() => {
     const full: Rect = { zMin: -width / 2, zMax: width / 2, yMin: 0, yMax: eaveHeight };
-    if (openings.length === 0) return [full];
-    return glassSegments(
-      full,
-      openings.map((item) => item.rect),
-    );
-  }, [openings, width, eaveHeight]);
+    if (cutouts.length === 0) return [full];
+    return glassSegments(full, cutouts);
+  }, [cutouts, width, eaveHeight]);
 
   const glass = claddingLook(coveringType, heatmapActive);
 
-  if (openings.length === 0) {
+  if (cutouts.length === 0) {
     return (
       <mesh position={[x, eaveHeight / 2, 0]} castShadow renderOrder={heatmapActive ? 0 : 1}>
         <boxGeometry args={[0.04, eaveHeight, width]} />
@@ -224,16 +144,6 @@ export function ExhaustGableWall({
           </mesh>
         );
       })}
-      {openings.map((item, index) => (
-        <PerforatedFanWindow
-          key={`fan-window-${index}`}
-          x={x}
-          y={item.fan.y}
-          z={item.fan.z}
-          widthM={item.span}
-          heightM={item.span}
-        />
-      ))}
     </group>
   );
 }
