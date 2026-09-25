@@ -14,6 +14,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **GLB component library** — Structure bays, glazing bars, fans, pads, AC, ducts, vents, heaters, fog, and cultivation lines now load the authored models from `growa_greenhouse_glb_library` and repeat them at real size.
+
 - **Realistic climate hardware** — Exhaust and HAF fans use round shrouds and metal blades; pad walls read as cellulose; AC, ducts, vents, heaters, fog lines, and crop gutters use galvanized or white commercial finishes. The site plane around the house is white.
 
 - **Realistic 3D greenhouse** — Aluminum posts and gutters, physical glass/PC/PE/ETFE cladding, ACES grading, procedural sky, grass site, and contact shadows replace the flat green CAD shell.

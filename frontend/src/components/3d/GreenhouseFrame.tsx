@@ -1,109 +1,89 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
-import * as THREE from "three";
+import { useMemo } from "react";
 
-import { ALUMINUM, ALUMINUM_DARK, CONCRETE } from "@/components/3d/claddingMaterials";
+import { GltfPart } from "@/components/3d/GltfPart";
 import { bayCenterZ } from "@/lib/structureUtils";
+import type { ArchType } from "@/types/greenhouse";
 
-const POST_SPACING_M = 4;
+const VENLO = { width: 4, height: 5.2, slice: 1 };
+const GOTHIC = { width: 8, height: 5.9, slice: 1 };
+const MULLION_H = 2.4;
+
+interface BayFrame {
+  archType: ArchType;
+  zCenter: number;
+}
 
 interface GreenhouseFrameProps {
   length: number;
   width: number;
   eaveHeight: number;
-  bayCount: number;
+  ridgeHeight: number;
   bayWidthM: number;
+  bays: BayFrame[];
 }
 
-function columnPositions(
-  length: number,
-  width: number,
-  eaveHeight: number,
-  bayCount: number,
-  bayWidthM: number,
-): THREE.Matrix4[] {
-  const matrices: THREE.Matrix4[] = [];
-  const dummy = new THREE.Object3D();
-  const xCount = Math.max(2, Math.floor(length / POST_SPACING_M) + 1);
-  for (let xi = 0; xi < xCount; xi += 1) {
-    const x = -length / 2 + (xi * length) / Math.max(1, xCount - 1);
-    for (let bay = 0; bay <= bayCount; bay += 1) {
-      const z = -width / 2 + bay * bayWidthM;
-      dummy.position.set(x, eaveHeight / 2, z);
-      dummy.updateMatrix();
-      matrices.push(dummy.matrix.clone());
-    }
-  }
-  return matrices;
-}
-
-function InstancedPosts({
-  matrices,
-  eaveHeight,
-}: {
-  matrices: THREE.Matrix4[];
-  eaveHeight: number;
-}) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    matrices.forEach((matrix, index) => {
-      mesh.setMatrixAt(index, matrix);
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-  }, [matrices]);
-
-  if (matrices.length === 0) return null;
-
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]} castShadow receiveShadow>
-      <boxGeometry args={[0.08, eaveHeight, 0.08]} />
-      <meshStandardMaterial color={ALUMINUM} metalness={0.82} roughness={0.28} />
-    </instancedMesh>
-  );
+function sliceCount(length: number): { count: number; step: number } {
+  const count = Math.min(24, Math.max(2, Math.round(length / 4)));
+  return { count, step: length / count };
 }
 
 export function GreenhouseFrame({
   length,
   width,
   eaveHeight,
-  bayCount,
+  ridgeHeight,
   bayWidthM,
+  bays,
 }: GreenhouseFrameProps) {
-  const matrices = useMemo(
-    () => columnPositions(length, width, eaveHeight, bayCount, bayWidthM),
-    [bayCount, bayWidthM, eaveHeight, length, width],
-  );
-
-  const gutters = useMemo(
-    () =>
-      Array.from({ length: bayCount + 1 }, (_, bay) => ({
-        z: bay === bayCount ? width / 2 : bayCenterZ(bay, bayWidthM, width) - bayWidthM / 2,
-      })),
-    [bayCount, bayWidthM, width],
-  );
+  const slices = useMemo(() => sliceCount(length), [length]);
+  const mullions = useMemo(() => {
+    const count = Math.min(36, Math.max(4, Math.round(length / 2)));
+    return Array.from({ length: count }, (_, index) => -length / 2 + ((index + 0.5) * length) / count);
+  }, [length]);
 
   return (
     <group>
-      <mesh position={[0, 0.06, 0]} receiveShadow>
-        <boxGeometry args={[length + 1.2, 0.12, width + 1.2]} />
-        <meshStandardMaterial color={CONCRETE} roughness={0.92} metalness={0.02} />
-      </mesh>
-      <InstancedPosts matrices={matrices} eaveHeight={eaveHeight} />
-      {gutters.map((gutter) => (
-        <mesh key={`gutter-${gutter.z}`} position={[0, eaveHeight, gutter.z]} castShadow>
-          <boxGeometry args={[length, 0.1, 0.14]} />
-          <meshStandardMaterial color={ALUMINUM_DARK} metalness={0.78} roughness={0.32} />
-        </mesh>
-      ))}
-      <mesh position={[0, eaveHeight / 2, -width / 2]} castShadow>
-        <boxGeometry args={[length, 0.06, 0.06]} />
-        <meshStandardMaterial color={ALUMINUM} metalness={0.8} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, eaveHeight / 2, width / 2]} castShadow>
-        <boxGeometry args={[length, 0.06, 0.06]} />
-        <meshStandardMaterial color={ALUMINUM} metalness={0.8} roughness={0.3} />
-      </mesh>
+      {bays.map((bay) => {
+        const gothic = bay.archType === "semicircular";
+        const nominal = gothic ? GOTHIC : VENLO;
+        const file = gothic ? "gothic-arch.glb" : "venlo-bay.glb";
+        const scale: [number, number, number] = [
+          bayWidthM / nominal.width,
+          ridgeHeight / nominal.height,
+          slices.step / nominal.slice,
+        ];
+        return Array.from({ length: slices.count }, (_, index) => (
+          <GltfPart
+            key={`${bay.zCenter}-${index}`}
+            file={file}
+            position={[-length / 2 + (index + 0.5) * slices.step, 0, bay.zCenter]}
+            rotation={[0, Math.PI / 2, 0]}
+            scale={scale}
+          />
+        ));
+      })}
+      {mullions.map((x) =>
+        ([-1, 1] as const).map((side) => (
+          <GltfPart
+            key={`mullion-${side}-${x}`}
+            file="glazing-bar.glb"
+            position={[x, 0, (side * width) / 2]}
+            scale={[1, eaveHeight / MULLION_H, 1]}
+          />
+        )),
+      )}
+      {Array.from({ length: Math.max(2, Math.round(width / bayWidthM)) }, (_, index) => {
+        const z = bayCenterZ(index, bayWidthM, width);
+        return ([-1, 1] as const).map((side) => (
+          <GltfPart
+            key={`gable-mullion-${side}-${z}`}
+            file="glazing-bar.glb"
+            position={[(side * length) / 2, 0, z]}
+            rotation={[0, Math.PI / 2, 0]}
+            scale={[1, eaveHeight / MULLION_H, 1]}
+          />
+        ));
+      })}
     </group>
   );
 }

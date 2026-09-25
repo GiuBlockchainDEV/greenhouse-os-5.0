@@ -207,8 +207,9 @@ export function GreenhouseMesh() {
         length={length}
         width={width}
         eaveHeight={eaveHeight}
-        bayCount={bayCount}
+        ridgeHeight={ridgeHeight}
         bayWidthM={bayWidthM}
+        bays={bays}
       />
 
       <WallGlass
