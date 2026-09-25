@@ -1,0 +1,558 @@
+{
+  "format": "glTF 2.0 binary",
+  "units": "meters",
+  "up_axis": "Y",
+  "compression": "none",
+  "assets": [
+    {
+      "dimensions_m": [
+        4.0,
+        5.2,
+        1.0
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 72,
+      "file": "venlo-bay.glb",
+      "mesh_names": [
+        "column_1",
+        "column_2",
+        "gutter_beam",
+        "ridge_profile",
+        "roof_rafter_left",
+        "roof_rafter_right"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        8.0,
+        5.9,
+        1.0
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 192,
+      "file": "gothic-arch.glb",
+      "mesh_names": [
+        "arch_segment_01",
+        "arch_segment_02",
+        "arch_segment_03",
+        "arch_segment_04",
+        "arch_segment_05",
+        "arch_segment_06",
+        "arch_segment_07",
+        "arch_segment_08",
+        "arch_segment_09",
+        "arch_segment_10",
+        "arch_segment_11",
+        "arch_segment_12",
+        "arch_segment_13",
+        "arch_segment_14",
+        "gutter_left",
+        "gutter_right"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.073,
+        2.4,
+        0.05
+      ],
+      "origin": "bottom_mount",
+      "y_up": true,
+      "triangles": 24,
+      "file": "glazing-bar.glb",
+      "mesh_names": [
+        "aluminium_mullion",
+        "rubber_gasket"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.45,
+        1.45,
+        0.55
+      ],
+      "origin": "fan_axis",
+      "y_up": true,
+      "triangles": 280,
+      "file": "exhaust-fan.glb",
+      "mesh_names": [
+        "fan_blade_1",
+        "fan_blade_2",
+        "fan_blade_3",
+        "fan_blade_4",
+        "fan_blade_5",
+        "fan_cone",
+        "fan_housing",
+        "motor_hub"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.25,
+        1.06,
+        1.25
+      ],
+      "origin": "roof_base_center",
+      "y_up": true,
+      "triangles": 328,
+      "file": "roof-exhaust-fan.glb",
+      "mesh_names": [
+        "exhaust_stack",
+        "fan_blade_1",
+        "fan_blade_2",
+        "fan_blade_3",
+        "fan_blade_4",
+        "fan_blade_5",
+        "motor_hub",
+        "rain_cap",
+        "roof_base"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.9,
+        0.9,
+        0.32
+      ],
+      "origin": "hanger_mount",
+      "y_up": true,
+      "triangles": 256,
+      "file": "haf-fan.glb",
+      "mesh_names": [
+        "fan_blade_1",
+        "fan_blade_2",
+        "fan_blade_3",
+        "fan_blade_4",
+        "guard_ring",
+        "hanger",
+        "motor_hub",
+        "mount_bracket"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.08,
+        2.08,
+        0.16
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 60,
+      "file": "pad-module.glb",
+      "mesh_names": [
+        "cellulose_pad",
+        "frame_part_2",
+        "frame_part_3",
+        "frame_part_4",
+        "frame_part_5"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.1,
+        1.8,
+        0.83
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 136,
+      "file": "ac-unit.glb",
+      "mesh_names": [
+        "ac_cabinet",
+        "condenser_fan",
+        "service_panel"
+      ],
+      "triangle_budget": 50000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.6,
+        0.6,
+        1.5
+      ],
+      "origin": "inlet_center_bottom",
+      "y_up": true,
+      "triangles": 12,
+      "file": "duct-straight.glb",
+      "mesh_names": [
+        "rectangular_duct"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.62,
+        1.05,
+        1.06
+      ],
+      "origin": "inlet_face_center",
+      "y_up": true,
+      "triangles": 36,
+      "file": "duct-elbow.glb",
+      "mesh_names": [
+        "duct_horizontal",
+        "duct_vertical",
+        "elbow_transition"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.7,
+        0.1,
+        0.7
+      ],
+      "origin": "duct_connection_center",
+      "y_up": true,
+      "triangles": 72,
+      "file": "duct-diffuser.glb",
+      "mesh_names": [
+        "diffuser_frame",
+        "diffuser_vane_1",
+        "diffuser_vane_2",
+        "diffuser_vane_3",
+        "diffuser_vane_4",
+        "diffuser_vane_5"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.2,
+        0.5,
+        3.0
+      ],
+      "origin": "hinge_axis_start",
+      "y_up": true,
+      "triangles": 36,
+      "file": "roof-vent.glb",
+      "mesh_names": [
+        "actuator_arm",
+        "hinge_profile",
+        "vent_panel"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.2,
+        1.6,
+        0.14
+      ],
+      "origin": "bottom_center",
+      "y_up": true,
+      "triangles": 120,
+      "file": "side-louver.glb",
+      "mesh_names": [
+        "louver_blade_1",
+        "louver_blade_2",
+        "louver_blade_3",
+        "louver_blade_4",
+        "louver_blade_5",
+        "louver_blade_6",
+        "louver_frame_1",
+        "louver_frame_2",
+        "louver_frame_3",
+        "louver_frame_4"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.8,
+        1.8,
+        0.14
+      ],
+      "origin": "bottom_center",
+      "y_up": true,
+      "triangles": 120,
+      "file": "gable-louver.glb",
+      "mesh_names": [
+        "louver_blade_1",
+        "louver_blade_2",
+        "louver_blade_3",
+        "louver_blade_4",
+        "louver_blade_5",
+        "louver_blade_6",
+        "louver_frame_1",
+        "louver_frame_2",
+        "louver_frame_3",
+        "louver_frame_4"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.8,
+        0.9,
+        0.6799999999999999
+      ],
+      "origin": "ceiling_mount_plane",
+      "y_up": true,
+      "triangles": 132,
+      "file": "unit-heater.glb",
+      "mesh_names": [
+        "hanger_left",
+        "hanger_right",
+        "heater_cabinet",
+        "heater_fan"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.75,
+        2.46,
+        0.65
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 156,
+      "file": "air-heater.glb",
+      "mesh_names": [
+        "chimney",
+        "chimney_cap",
+        "heater_body"
+      ],
+      "triangle_budget": 50000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.26,
+        0.18,
+        2.0
+      ],
+      "origin": "support_base_center",
+      "y_up": true,
+      "triangles": 124,
+      "file": "heat-pipe.glb",
+      "mesh_names": [
+        "pipe_support",
+        "return_pipe",
+        "supply_pipe"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.94,
+        0.08,
+        1.64
+      ],
+      "origin": "floor_loop_start",
+      "y_up": true,
+      "triangles": 336,
+      "file": "floor-loop.glb",
+      "mesh_names": [
+        "floor_pipe_1",
+        "floor_pipe_2",
+        "floor_pipe_3",
+        "floor_pipe_4",
+        "loop_connector_1",
+        "loop_connector_2",
+        "loop_connector_3"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.05,
+        0.09,
+        0.5
+      ],
+      "origin": "pipe_segment_start",
+      "y_up": true,
+      "triangles": 136,
+      "file": "fog-nozzle.glb",
+      "mesh_names": [
+        "nozzle_body",
+        "nozzle_tip",
+        "stainless_pipe"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.36,
+        0.24,
+        2.0
+      ],
+      "origin": "support_base_start",
+      "y_up": true,
+      "triangles": 36,
+      "file": "substrate-gutter.glb",
+      "mesh_names": [
+        "gutter_support",
+        "rockwool_slab",
+        "substrate_gutter"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.16,
+        0.16,
+        2.0
+      ],
+      "origin": "channel_start_bottom",
+      "y_up": true,
+      "triangles": 268,
+      "file": "nft-channel.glb",
+      "mesh_names": [
+        "nft_channel",
+        "plant_hole_125",
+        "plant_hole_170",
+        "plant_hole_35",
+        "plant_hole_80"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.06,
+        0.36,
+        2.0
+      ],
+      "origin": "bed_start_floor_center",
+      "y_up": true,
+      "triangles": 36,
+      "file": "soil-bed.glb",
+      "mesh_names": [
+        "bed_edge_left",
+        "bed_edge_right",
+        "soil_volume"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.2,
+        0.38,
+        2.0
+      ],
+      "origin": "tank_start_floor_center",
+      "y_up": true,
+      "triangles": 36,
+      "file": "dwc-raft.glb",
+      "mesh_names": [
+        "dwc_tank",
+        "floating_raft",
+        "water_volume"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.04,
+        0.27,
+        2.0
+      ],
+      "origin": "line_start_ground",
+      "y_up": true,
+      "triangles": 112,
+      "file": "drip-line.glb",
+      "mesh_names": [
+        "drip_line",
+        "dripper_body",
+        "dripper_stake"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.8,
+        0.42,
+        2.0
+      ],
+      "origin": "bed_start_floor_center",
+      "y_up": true,
+      "triangles": 36,
+      "file": "growbed.glb",
+      "mesh_names": [
+        "growbed_shell",
+        "substrate_layer",
+        "water_level"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        1.2,
+        0.8999999999999999,
+        2.0
+      ],
+      "origin": "bench_start_floor_center",
+      "y_up": true,
+      "triangles": 72,
+      "file": "ebb-flow-bench.glb",
+      "mesh_names": [
+        "bench_leg_2",
+        "bench_leg_3",
+        "bench_leg_4",
+        "bench_leg_5",
+        "ebb_flow_tray",
+        "flood_surface"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.45,
+        0.33999999999999997,
+        2.0
+      ],
+      "origin": "channel_start_floor_center",
+      "y_up": true,
+      "triangles": 332,
+      "file": "aeroponic-channel.glb",
+      "mesh_names": [
+        "aeroponic_channel",
+        "mist_nozzle_12",
+        "mist_nozzle_16",
+        "mist_nozzle_4",
+        "mist_nozzle_8",
+        "plant_port_12",
+        "plant_port_16",
+        "plant_port_4",
+        "plant_port_8"
+      ],
+      "triangle_budget": 15000,
+      "within_budget": true
+    }
+  ]
+}
