@@ -42,6 +42,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Fertigation tank mount & pipes** — Tank rim at floor level (no sink below grade); model aligned to skid flow (+Y rotation); flange-height connections; orthogonal pipe runs to/from tanks.
 
+- **Fertigation source GLB** — Author skid wired to `source` nodes (`fertigation-source-skid.glb`, ~0.35×0.98×0.38 m).
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.

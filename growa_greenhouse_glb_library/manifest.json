@@ -540,6 +540,24 @@
     },
     {
       "dimensions_m": [
+        0.35,
+        0.98,
+        0.38
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 0,
+      "file": "fertigation-source-skid.glb",
+      "mesh_names": [
+        "fertigation_source_skid"
+      ],
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_centrifpump_as_source",
+      "category": "fertigation"
+    },
+    {
+      "dimensions_m": [
         0.5,
         0.56,
         0.98

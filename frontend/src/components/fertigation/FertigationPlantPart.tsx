@@ -38,21 +38,7 @@ interface PartProps {
   position: [number, number, number];
 }
 
-function WaterSource({ position }: PartProps) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.35, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.55, 0.7, 0.55]} />
-        <meshStandardMaterial color={STEEL} metalness={0.55} roughness={0.35} />
-      </mesh>
-      <mesh position={[0, 0.78, 0.18]} castShadow>
-        <cylinderGeometry args={[0.12, 0.12, 0.28, 16]} />
-        <meshStandardMaterial color={LIQUID} metalness={0.2} roughness={0.4} transparent opacity={0.85} />
-      </mesh>
-    </group>
-  );
-}
-
+const FERTIGATION_SOURCE_GLB = "fertigation-source-skid.glb";
 const FERTIGATION_FILTER_GLB = "fertigation-filter-system.glb";
 const FERTIGATION_WATER_TANK_GLB = "fertigation-water-tank.glb";
 
@@ -175,7 +161,14 @@ function JunctionTee({ position }: PartProps) {
 function renderPart(node: FertigationNode, position: [number, number, number]) {
   switch (node.kind as FertigationComponentKind) {
     case "source":
-      return <WaterSource position={position} />;
+      return (
+        <GltfPart
+          file={FERTIGATION_SOURCE_GLB}
+          position={position}
+          rotation={[0, Math.PI / 2, 0]}
+          scale={[1, 1, 1]}
+        />
+      );
     case "filter":
       return (
         <GltfPart
