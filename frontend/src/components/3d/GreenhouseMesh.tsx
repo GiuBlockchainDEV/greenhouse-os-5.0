@@ -182,7 +182,9 @@ export function GreenhouseMesh() {
   const { ridgeHeight, eaveHeight } = dimensions;
   const { length, width } = greenhouseEnvelope(structure, dimensions);
   const { bayCount, bayWidthM, archType } = structure;
-  const heatmapActive = heatmapMode !== "off" && isHeatmapAvailable(cooling);
+  const heating = climateEquipment.heating;
+  const heatmapActive =
+    heatmapMode !== "off" && isHeatmapAvailable(cooling, heating);
 
   const bays = useMemo(
     () =>
@@ -203,7 +205,7 @@ export function GreenhouseMesh() {
           roughness={0.94}
           metalness={0}
           transparent={heatmapActive}
-          opacity={heatmapActive ? 0.28 : 1}
+          opacity={heatmapActive ? 0.18 : 1}
         />
       </mesh>
 

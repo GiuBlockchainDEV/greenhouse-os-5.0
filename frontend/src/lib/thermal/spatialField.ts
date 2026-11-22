@@ -252,8 +252,8 @@ function solarSpatialScale(ctx: HeatmapFieldContext): number {
 }
 
 function toSolarSurface(surface?: HeatmapSurfaceKind): SolarSurfaceKind | undefined {
-  if (!surface || surface === "floor" || surface === "roof") {
-    return surface;
+  if (!surface || surface === "floor" || surface === "canopy" || surface === "roof") {
+    return surface === "canopy" ? "floor" : surface;
   }
   return surface;
 }

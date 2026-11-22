@@ -27,6 +27,7 @@ import type {
 
 export type HeatmapSurfaceKind =
   | "floor"
+  | "canopy"
   | "roof"
   | "wall_west"
   | "wall_east"
@@ -35,6 +36,8 @@ export type HeatmapSurfaceKind =
 
 export const VISIBLE_HEATMAP_SURFACE_KINDS = [
   "floor",
+  "canopy",
+  "roof",
   "wall_west",
   "wall_east",
   "wall_north",
@@ -228,6 +231,11 @@ export function generateSurfaceHeatmap(
     return fillHorizontalGrid(ctx, gridSize(ctx.length), gridSize(ctx.width), 0.2, "floor");
   }
 
+  if (surface === "canopy") {
+    const canopyY = Math.max(0.85, Math.min(ctx.eaveHeight * 0.62, ctx.ridgeHeight - 0.45));
+    return fillHorizontalGrid(ctx, gridSize(ctx.length), gridSize(ctx.width), canopyY, "canopy");
+  }
+
   if (surface === "roof") {
     return fillHorizontalGrid(
       ctx,
@@ -303,7 +311,12 @@ export function generateVisibleSurfaceHeatmaps(
   };
   const walls = anchorWallsToFloorField(ctx, floor, rawWalls);
 
+  const roof = generateSurfaceHeatmap(ctx, "roof");
+  const canopy = generateSurfaceHeatmap(ctx, "canopy");
+
   const mixedFloor = applyCirculationMixingToSurface(ctx, floor, "floor");
+  const mixedCanopy = applyCirculationMixingToSurface(ctx, canopy, "canopy");
+  const mixedRoof = applyCirculationMixingToSurface(ctx, roof, "roof");
   const mixedWalls = {
     wall_west: applyCirculationMixingToSurface(ctx, walls.wall_west, "wall_west"),
     wall_east: applyCirculationMixingToSurface(ctx, walls.wall_east, "wall_east"),
@@ -313,6 +326,8 @@ export function generateVisibleSurfaceHeatmaps(
 
   return {
     floor: mixedFloor,
+    canopy: mixedCanopy,
+    roof: mixedRoof,
     ...mixedWalls,
   };
 }
@@ -322,6 +337,7 @@ export function generateAllSurfaceHeatmaps(
 ): Record<HeatmapSurfaceKind, HeatmapSurfaceValues> {
   const kinds: HeatmapSurfaceKind[] = [
     "floor",
+    "canopy",
     "roof",
     "wall_west",
     "wall_east",

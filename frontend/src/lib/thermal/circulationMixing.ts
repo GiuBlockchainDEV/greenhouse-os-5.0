@@ -84,7 +84,8 @@ function mixGridAlongHafJets(
     return grid;
   }
 
-  const isHorizontal = surfaceKind === "floor" || surfaceKind === "roof";
+  const isHorizontal =
+    surfaceKind === "floor" || surfaceKind === "canopy" || surfaceKind === "roof";
   if (!isHorizontal) {
     return grid;
   }

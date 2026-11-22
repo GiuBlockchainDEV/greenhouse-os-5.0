@@ -166,7 +166,10 @@ export function HeatmapControls() {
   );
 
   const isLive = heatmapSource.isLive && simulationStatus === "connected";
-  const heatmapAvailable = isHeatmapAvailable(climateEquipment.cooling);
+  const heatmapAvailable = isHeatmapAvailable(
+    climateEquipment.cooling,
+    climateEquipment.heating,
+  );
 
   return (
     <div className="ui-card p-2">

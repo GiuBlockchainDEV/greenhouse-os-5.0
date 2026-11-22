@@ -456,7 +456,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           sizing = applyCoolingSystemDefaults(nextCooling, sizing);
         }
         const heatmapMode =
-          !isHeatmapAvailable(nextCooling) && get().heatmapMode !== "off"
+          !isHeatmapAvailable(nextCooling, get().climateEquipment.heating) &&
+            get().heatmapMode !== "off"
             ? "off"
             : get().heatmapMode;
         set(
@@ -556,7 +557,9 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             climateEquipment: presetItem.equipment,
             metrics: computeVolumeMetrics(structure, dimensions, crop),
             marketPresetId: presetItem.id,
-            heatmapMode: isHeatmapAvailable(cooling) ? get().heatmapMode : "off",
+            heatmapMode: isHeatmapAvailable(cooling, presetItem.equipment.heating)
+              ? get().heatmapMode
+              : "off",
           },
           false,
           "applyMarketPreset",
@@ -566,7 +569,9 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       setHeatmapMode: (heatmapMode) => {
         const cooling = get().climateEquipment.cooling;
         const nextMode =
-          !isHeatmapAvailable(cooling) && heatmapMode !== "off" ? "off" : heatmapMode;
+          !isHeatmapAvailable(cooling, get().climateEquipment.heating) && heatmapMode !== "off"
+            ? "off"
+            : heatmapMode;
         set({ heatmapMode: nextMode }, false, "setHeatmapMode");
       },
 

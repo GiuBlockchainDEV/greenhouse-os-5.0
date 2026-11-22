@@ -1,6 +1,11 @@
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 
+import {
+  HEATMAP_OVERLAY_OPACITY,
+  HEATMAP_SURFACE_RENDER_ORDER,
+  heatmapSurfaceLayout,
+} from "@/components/3d/heatmapOverlayConfig";
 import { heatmapFragmentShader, heatmapVertexShader } from "@/components/3d/shaders/heatmapShader";
 import {
   computeHeatmapVisualRange,
@@ -35,30 +40,26 @@ function buildHeatmapTexture(
   const displayRange = computeHeatmapVisualRange(surface, mode, preview);
 
   if (rows === 0 || cols === 0) {
-    const fallback = new THREE.DataTexture(new Float32Array([25]), 1, 1, THREE.RedFormat, THREE.FloatType);
+    const fallback = new THREE.DataTexture(new Uint8Array([128]), 1, 1, THREE.RedFormat, THREE.UnsignedByteType);
     fallback.needsUpdate = true;
     return { texture: fallback, min: displayRange.min, max: displayRange.max };
   }
 
   const { flipRow, flipCol } = heatmapTextureRemap(surfaceKind);
 
-  const values = new Float32Array(rows * cols);
+  const range = Math.max(displayRange.max - displayRange.min, 0.001);
+  const values = new Uint8Array(rows * cols);
   for (let row = 0; row < rows; row++) {
     const texRow = flipRow ? rows - 1 - row : row;
     for (let col = 0; col < cols; col++) {
       const texCol = flipCol ? cols - 1 - col : col;
-      values[texCol * rows + texRow] = matrixValueAt(
-        surface,
-        mode,
-        preview.internalRh,
-        row,
-        col,
-      );
+      const raw = matrixValueAt(surface, mode, preview.internalRh, row, col);
+      const normalized = Math.min(1, Math.max(0, (raw - displayRange.min) / range));
+      values[texCol * rows + texRow] = Math.round(normalized * 255);
     }
   }
 
-  const data = values;
-  const texture = new THREE.DataTexture(data, rows, cols, THREE.RedFormat, THREE.FloatType);
+  const texture = new THREE.DataTexture(values, rows, cols, THREE.RedFormat, THREE.UnsignedByteType);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.flipY = true;
@@ -102,9 +103,16 @@ function HeatmapSurface({
 
   const segmentsU = Math.max(surface.temperature.length - 1, 1);
   const segmentsV = Math.max((surface.temperature[0]?.length ?? 1) - 1, 1);
+  const renderOrder = HEATMAP_SURFACE_RENDER_ORDER[surfaceKind];
 
   return (
-    <mesh key={surfaceKey} position={position} rotation={rotation} renderOrder={25}>
+    <mesh
+      key={surfaceKey}
+      position={position}
+      rotation={rotation}
+      renderOrder={renderOrder}
+      frustumCulled={false}
+    >
       <planeGeometry args={[planeSize[0], planeSize[1], segmentsU, segmentsV]} />
       <shaderMaterial
         attach="material"
@@ -113,59 +121,22 @@ function HeatmapSurface({
         fragmentShader={heatmapFragmentShader}
         uniforms={{
           heatmapTexture: { value: shaderData.texture },
-          opacity: { value: 0.5 },
+          opacity: { value: HEATMAP_OVERLAY_OPACITY },
           colorMode: { value: colorMode },
-          minValue: { value: shaderData.min },
-          maxValue: { value: shaderData.max },
+          minValue: { value: 0 },
+          maxValue: { value: 1 },
         }}
         transparent
         depthWrite={false}
-        depthTest={true}
+        depthTest={false}
+        blending={THREE.NormalBlending}
         side={THREE.DoubleSide}
-        polygonOffset
-        polygonOffsetFactor={-4}
-        polygonOffsetUnits={-4}
       />
     </mesh>
   );
 }
 
 const VISIBLE_HEATMAP_SURFACES = VISIBLE_HEATMAP_SURFACE_KINDS;
-
-const SURFACE_LAYOUT: Record<
-  (typeof VISIBLE_HEATMAP_SURFACES)[number],
-  (d: { length: number; width: number; eaveHeight: number; ridgeHeight: number }) => {
-    position: [number, number, number];
-    rotation: [number, number, number];
-    planeSize: [number, number];
-  }
-> = {
-  floor: ({ length, width }) => ({
-    position: [0, 0.22, 0],
-    rotation: [-Math.PI / 2, 0, 0],
-    planeSize: [length * 0.98, width * 0.98],
-  }),
-  wall_west: ({ length, width, eaveHeight }) => ({
-    position: [-length / 2 + 0.045, eaveHeight / 2, 0],
-    rotation: [0, Math.PI / 2, 0],
-    planeSize: [width * 0.98, eaveHeight * 0.98],
-  }),
-  wall_east: ({ length, width, eaveHeight }) => ({
-    position: [length / 2 - 0.045, eaveHeight / 2, 0],
-    rotation: [0, -Math.PI / 2, 0],
-    planeSize: [width * 0.98, eaveHeight * 0.98],
-  }),
-  wall_north: ({ length, width, eaveHeight }) => ({
-    position: [0, eaveHeight / 2, -width / 2 + 0.045],
-    rotation: [0, 0, 0],
-    planeSize: [length * 0.98, eaveHeight * 0.98],
-  }),
-  wall_south: ({ length, width, eaveHeight }) => ({
-    position: [0, eaveHeight / 2, width / 2 - 0.045],
-    rotation: [0, Math.PI, 0],
-    planeSize: [length * 0.98, eaveHeight * 0.98],
-  }),
-};
 
 export function HeatmapPlane() {
   const heatmapMode = useGreenhouseStore((s) => s.heatmapMode);
@@ -210,7 +181,10 @@ export function HeatmapPlane() {
   const valueMode = heatmapValueMode(heatmapMode);
   const colorMode = heatmapColorMode(valueMode);
 
-  if (heatmapMode === "off" || !isHeatmapAvailable(climateEquipment.cooling)) {
+  if (
+    heatmapMode === "off" ||
+    !isHeatmapAvailable(climateEquipment.cooling, climateEquipment.heating)
+  ) {
     return null;
   }
 
@@ -224,9 +198,9 @@ export function HeatmapPlane() {
   };
 
   return (
-    <group renderOrder={25}>
+    <group renderOrder={28}>
       {VISIBLE_HEATMAP_SURFACES.map((surfaceKind) => {
-        const layout = SURFACE_LAYOUT[surfaceKind](geom);
+        const layout = heatmapSurfaceLayout(surfaceKind, geom);
         return (
           <HeatmapSurface
             key={`${surfaceKind}-${revision}-${valueMode}`}

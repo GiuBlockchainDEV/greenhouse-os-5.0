@@ -52,7 +52,10 @@ export function usesMechanicalAc(cooling: CoolingSystem): boolean {
   return cooling === "mechanical_ac";
 }
 
-/** Spatial heatmap requires an active cooling system to model pad/AC/fog gradients. */
-export function isHeatmapAvailable(cooling: CoolingSystem): boolean {
-  return cooling !== "none";
+/** Spatial heatmap needs at least one conditioning mode that creates in-house gradients. */
+export function isHeatmapAvailable(
+  cooling: CoolingSystem,
+  heating: HeatingSystem = "none",
+): boolean {
+  return cooling !== "none" || heating !== "none";
 }
