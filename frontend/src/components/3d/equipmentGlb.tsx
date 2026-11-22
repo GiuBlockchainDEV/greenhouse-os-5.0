@@ -14,11 +14,6 @@ import type {
 } from "@/lib/climateEquipmentLayout";
 import { exhaustFanOpeningSpanM } from "@/lib/exhaustFanGable";
 
-function repeats(span: number, moduleLength: number, cap: number): { count: number; step: number } {
-  const count = Math.min(cap, Math.max(1, Math.round(span / moduleLength)));
-  return { count, step: span / count };
-}
-
 /** Author fanex asset size (m): square face width and height. */
 const EXHAUST_FAN_FACE_M = 0.978;
 
@@ -167,16 +162,30 @@ export function VentModel({ vent }: { vent: VentPlacement }) {
   );
 }
 
+function distributedRunPositions(
+  houseLength: number,
+  moduleLength: number,
+  maxInstances: number,
+  endInsetM = 0.35,
+): { count: number; step: number; xStart: number } {
+  const xMin = -houseLength / 2 + endInsetM;
+  const xMax = houseLength / 2 - endInsetM;
+  const runLen = Math.max(0, xMax - xMin);
+  const count = Math.min(maxInstances, Math.max(1, Math.ceil(runLen / moduleLength)));
+  const step = count > 0 ? runLen / count : runLen;
+  return { count, step, xStart: xMin };
+}
+
 export function HeaterModel({ heater, houseLength }: { heater: HeaterPlacement; houseLength: number }) {
   if (heater.kind === "pipe") {
-    const { count, step } = repeats(houseLength, 2, 40);
+    const { count, step, xStart } = distributedRunPositions(houseLength, 2, 40);
     return (
       <group>
         {Array.from({ length: count }, (_, index) => (
           <GltfPart
             key={`pipe-${heater.z}-${index}`}
             file="heat-pipe.glb"
-            position={[-houseLength / 2 + index * step, heater.y, heater.z]}
+            position={[xStart + index * step, heater.y, heater.z]}
             rotation={[0, Math.PI / 2, 0]}
             scale={[1, 1, step / 2]}
           />
@@ -185,14 +194,14 @@ export function HeaterModel({ heater, houseLength }: { heater: HeaterPlacement; 
     );
   }
   if (heater.kind === "geothermal") {
-    const { count, step } = repeats(houseLength, 1.64, 40);
+    const { count, step, xStart } = distributedRunPositions(houseLength, 1.64, 40);
     return (
       <group>
         {Array.from({ length: count }, (_, index) => (
           <GltfPart
             key={`loop-${heater.z}-${index}`}
             file="floor-loop.glb"
-            position={[-houseLength / 2 + index * step, 0, heater.z]}
+            position={[xStart + index * step, 0, heater.z]}
             rotation={[0, Math.PI / 2, 0]}
             scale={[1, 1, step / 1.64]}
           />
@@ -213,14 +222,16 @@ export function HeaterModel({ heater, houseLength }: { heater: HeaterPlacement; 
 
 export function FogLineModel({ line, length }: { line: FogLinePlacement; length: number }) {
   const count = Math.min(line.nozzleCount, 48);
-  const step = (length * 0.9) / Math.max(1, count);
+  const usable = length * 0.84;
+  const step = usable / Math.max(1, count);
+  const xStart = -usable / 2;
   return (
     <group>
       {Array.from({ length: count }, (_, index) => (
         <GltfPart
           key={`fog-${line.z}-${index}`}
           file="fog-nozzle.glb"
-          position={[-length * 0.45 + index * step, line.y, line.z]}
+          position={[xStart + index * step, line.y, line.z]}
           rotation={[0, Math.PI / 2, 0]}
           scale={[1, 1, step / 0.5]}
         />

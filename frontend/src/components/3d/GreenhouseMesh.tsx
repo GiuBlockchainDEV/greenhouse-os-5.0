@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { claddingLook, ALUMINUM } from "@/components/3d/claddingMaterials";
 import { ExhaustGableWall } from "@/components/3d/ExhaustGableWall";
 import { GreenhouseFrame } from "@/components/3d/GreenhouseFrame";
+import { greenhouseEnvelope } from "@/lib/greenhouseEnvelope";
 import {
   bayApexHeight,
   bayCenterZ,
@@ -178,7 +179,8 @@ export function GreenhouseMesh() {
   const heatmapMode = useGreenhouseStore((state) => state.heatmapMode);
   const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const cooling = climateEquipment.cooling;
-  const { length, width, ridgeHeight, eaveHeight } = dimensions;
+  const { ridgeHeight, eaveHeight } = dimensions;
+  const { length, width } = greenhouseEnvelope(structure, dimensions);
   const { bayCount, bayWidthM, archType } = structure;
   const heatmapActive = heatmapMode !== "off" && isHeatmapAvailable(cooling);
 

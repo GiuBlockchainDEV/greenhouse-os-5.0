@@ -1,4 +1,5 @@
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
+import { greenhouseEnvelope } from "@/lib/greenhouseEnvelope";
 import {
   computeClimateEquipmentLayout,
   type ClimateEquipmentLayout,
@@ -162,9 +163,11 @@ export function buildHeatmapFieldContext(
     supplyHumidityRatioKgKg?: number | null;
   },
 ): HeatmapFieldContext {
+  const { width: spanWidth } = greenhouseEnvelope(structure, dimensions);
+
   const cultivation = computeCultivationLayout({
     length: dimensions.length,
-    totalWidth: dimensions.width,
+    totalWidth: spanWidth,
     bayCount: structure.bayCount,
     bayWidthM: structure.bayWidthM,
     eaveHeight: dimensions.eaveHeight,
@@ -184,11 +187,11 @@ export function buildHeatmapFieldContext(
   });
 
   const halfL = dimensions.length / 2;
-  const halfW = dimensions.width / 2;
+  const halfW = spanWidth / 2;
 
   return {
     length: dimensions.length,
-    width: dimensions.width,
+    width: spanWidth,
     eaveHeight: dimensions.eaveHeight,
     ridgeHeight: dimensions.ridgeHeight,
     structureBayWidth: structure.bayWidthM,

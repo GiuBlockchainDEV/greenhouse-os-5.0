@@ -12,6 +12,7 @@ import {
 } from "@/lib/heatmapData";
 import { VISIBLE_HEATMAP_SURFACE_KINDS, type HeatmapSurfaceKind } from "@/lib/equipmentAwareHeatmap";
 import { heatmapTextureRemap } from "@/lib/heatmapSurfaceUv";
+import { greenhouseEnvelope } from "@/lib/greenhouseEnvelope";
 import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { heatmapInputRevision } from "@/lib/heatmapRevision";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
@@ -213,9 +214,11 @@ export function HeatmapPlane() {
     return null;
   }
 
+  const { length, width } = greenhouseEnvelope(structure, dimensions);
+
   const geom = {
-    length: dimensions.length,
-    width: dimensions.width,
+    length,
+    width,
     eaveHeight: dimensions.eaveHeight,
     ridgeHeight: dimensions.ridgeHeight,
   };

@@ -4,6 +4,7 @@ import { computeAcDuctNetwork, type AcDuctNetwork } from "@/lib/acDuctLayout";
 
 import type { BedZone } from "@/lib/cultivationLayout";
 import { RATED_CAPACITY_DEFAULTS } from "@/lib/thermal/ratedCapacities";
+import { greenhouseEnvelope } from "@/lib/greenhouseEnvelope";
 import { bayCenterZ, roofRiseM } from "@/lib/structureUtils";
 import type {
   ArchType,
@@ -412,12 +413,11 @@ export function computeClimateEquipmentLayout(params: {
   bedLineCount?: number;
 }): ClimateEquipmentLayout {
   const { dimensions, structure, equipment } = params;
-  const { length, width, eaveHeight, ridgeHeight } = dimensions;
+  const { length, eaveHeight, ridgeHeight } = dimensions;
+  const { width, halfLength, halfWidth } = greenhouseEnvelope(structure, dimensions);
   const { bayCount, bayWidthM, archType } = structure;
   const sizing = equipment.sizing;
 
-  const halfLength = length / 2;
-  const halfWidth = width / 2;
   const exhaustFans: FanPlacement[] = [];
   const roofExhaustFans: RoofExhaustFanPlacement[] = [];
   const circulationFans: CirculationFanPlacement[] = [];

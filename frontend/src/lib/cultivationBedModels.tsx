@@ -4,6 +4,13 @@ import { GltfPart } from "@/components/3d/GltfPart";
 import type { BedZone } from "@/lib/cultivationLayout";
 import type { CultivationSystem } from "@/types/greenhouse";
 
+/** Manifest Z origin: min-edge lines anchor at zMin; centered beds anchor at bay midpoint. */
+const MODULE_Z_ANCHOR: Partial<Record<CultivationSystem, "center" | "min">> = {
+  substrate: "min",
+  nft: "min",
+  drip: "min",
+};
+
 const MODULES: Record<CultivationSystem, { file: string; length: number; width: number }> = {
   soil: { file: "soil-bed.glb", length: 2, width: 1.06 },
   substrate: { file: "substrate-gutter.glb", length: 2, width: 0.36 },
@@ -44,10 +51,16 @@ function buildRunSegments(
   return segments;
 }
 
+function bedAnchorZ(bed: BedZone, system: CultivationSystem): number {
+  const lineW = Math.max(0.05, bed.zMax - bed.zMin);
+  const anchor = MODULE_Z_ANCHOR[system] ?? "center";
+  return anchor === "min" ? bed.zMin : bed.zMin + lineW / 2;
+}
+
 function CultivationBedMesh({ bed, system }: { bed: BedZone; system: CultivationSystem }) {
   const module = MODULES[system] ?? MODULES.soil;
   const lineW = Math.max(0.05, bed.zMax - bed.zMin);
-  const z = (bed.zMin + bed.zMax) / 2;
+  const z = bedAnchorZ(bed, system);
   const segments = buildRunSegments(bed.xMin, bed.xMax, module.length, 24);
 
   return (

@@ -30,6 +30,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **3D layout envelope** — Cultivation, structure roof/frame, HVAC, and heatmaps use `bayCount × bayWidthM` as authoritative width; NFT/substrate/drip GLBs anchor on the bay min-Z edge; heating pipes and fog lines inset from gable ends.
+
 - **Twin scenario clock (React #185)** — `setClimateScenario` no longer mutates `twinRuntime` baselines; diurnal clock reads baselines via `getState()`; weather sliders in `HeatmapControls` update baselines explicitly.
 
 ### Changed

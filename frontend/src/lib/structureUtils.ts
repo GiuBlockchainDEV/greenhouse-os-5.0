@@ -1,6 +1,9 @@
 /** Per-bay roof geometry helpers for 3D rendering and metrics. */
 
+import { structureTotalWidthM } from "@/lib/greenhouseEnvelope";
 import type { ArchType, GreenhouseStructure } from "@/types/greenhouse";
+
+export { structureTotalWidthM };
 
 /** Expand a single arch type to one entry per bay (all campate share the same roof). */
 export function expandBayArchTypes(bayCount: number, archType: ArchType): ArchType[] {

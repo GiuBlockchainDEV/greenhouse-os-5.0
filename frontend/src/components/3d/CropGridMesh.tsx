@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { CultivationBedsGroup } from "@/lib/cultivationBedModels";
 import { CultivationPathwaysGroup } from "@/lib/cultivationPathwayModels";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
+import { greenhouseEnvelope } from "@/lib/greenhouseEnvelope";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 /** Renders cultivation infrastructure only (beds/gutters/rafts) — plants are not shown in 3D. */
@@ -11,11 +12,13 @@ export function CropGridMesh() {
   const structure = useGreenhouseStore((s) => s.structure);
   const crop = useGreenhouseStore((s) => s.crop);
 
+  const envelope = greenhouseEnvelope(structure, dimensions);
+
   const layoutResult = useMemo(
     () =>
       computeCultivationLayout({
-        length: dimensions.length,
-        totalWidth: dimensions.width,
+        length: envelope.length,
+        totalWidth: envelope.width,
         bayCount: structure.bayCount,
         bayWidthM: structure.bayWidthM,
         eaveHeight: dimensions.eaveHeight,
@@ -26,8 +29,8 @@ export function CropGridMesh() {
         growthStage: crop.growthStage,
       }),
     [
-      dimensions.length,
-      dimensions.width,
+      envelope.length,
+      envelope.width,
       dimensions.eaveHeight,
       structure.bayCount,
       structure.bayWidthM,
