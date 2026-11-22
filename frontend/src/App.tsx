@@ -11,7 +11,8 @@ import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
-import { useGreenhousePersist } from "@/hooks/useGreenhousePersist";
+import { useFertigationGreenhouseSync } from "@/hooks/useFertigationGreenhouseSync";
+import { useTwinProjectPersist } from "@/hooks/useTwinProjectPersist";
 import { useSimulationWS } from "@/hooks/useSimulationWS";
 import { useTwinScenarioClock } from "@/hooks/useTwinScenarioClock";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
@@ -21,7 +22,8 @@ export function AppShell() {
   const workspaceMode = useWorkspaceStore((state) => state.mode);
   const { reconnect } = useSimulationWS();
   useTwinScenarioClock();
-  useGreenhousePersist();
+  useTwinProjectPersist();
+  useFertigationGreenhouseSync();
 
   return (
     <div className="flex h-screen flex-col bg-surface-page text-gray-900">

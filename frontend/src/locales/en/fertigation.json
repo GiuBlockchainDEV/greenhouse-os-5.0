@@ -57,6 +57,9 @@
     "greenhouseCrop": "Greenhouse crop",
     "greenhouseArea": "Cultivation area",
     "lines": "lines",
+    "twinPhysics": "Greenhouse physics link",
+    "twinPhysicsPreview": "Preview solver (backend offline)",
+    "twinCropLoads": "Crop node: uptake {{uptake}} L/d · evaporation {{evap}} L/d",
     "category": "Hydraulic class",
     "plants": "plants mapped",
     "footer": "Edit pipes and setpoints inside the twin. Preset changes reload the project from the typed catalog (no placeholder graphs)."

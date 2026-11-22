@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { TwinLinkBadge } from "@/components/ui/TwinLinkBadge";
 import { useWorkspaceStore, type WorkspaceMode } from "@/store/useWorkspaceStore";
 
 const MODES: WorkspaceMode[] = ["greenhouse", "fertigation"];
@@ -10,6 +11,7 @@ export function WorkspaceModeSwitch() {
   const setMode = useWorkspaceStore((state) => state.setMode);
 
   return (
+    <div className="flex items-center gap-2">
     <div
       className="flex items-center rounded-lg border border-border bg-surface-page p-0.5"
       role="tablist"
@@ -31,6 +33,8 @@ export function WorkspaceModeSwitch() {
           {t(`workspace.${item}`)}
         </button>
       ))}
+    </div>
+    <TwinLinkBadge />
     </div>
   );
 }

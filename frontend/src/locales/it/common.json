@@ -29,7 +29,10 @@
     "greenhouse": "Gemello serra",
     "fertigation": "Studio fertirrigazione",
     "fertigationTitle": "Growa Digital Twin — simulatore fertirrigazione e P&ID",
-    "fertigationHint": "Preset commerciali, catalogo componenti tipizzato e simulazione P&ID — stesso schema del gemello serra."
+    "fertigationHint": "Preset commerciali, catalogo componenti tipizzato e simulazione P&ID — stesso schema del gemello serra.",
+    "twinLinked": "Gemello collegato",
+    "twinUnlinked": "Gemello scollegato",
+    "twinPreview": "clima anteprima"
   },
   "units": {
     "meters": "m",

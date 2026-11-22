@@ -19,8 +19,21 @@ GreenhouseOS operates as a **self-contained virtual twin**: geometry, equipment,
 - **Twin runtime panel** — left sidebar: play/pause day, synthetic sensor table.
 - **HUD** — connection state (physics vs preview), not a generic “Live” badge.
 
+## Unified twin project (`greenhouseos-twin-project-v1`)
+
+One `localStorage` bundle restores:
+
+- Greenhouse geometry, climate, equipment, scenario clock
+- Fertigation preset, template, studio tab, active P&ID project
+- Last workspace (`greenhouse` | `fertigation`)
+
+With **sync to greenhouse** enabled, crop node uptake/evaporation tracks greenhouse metrics and WS physics (VPD, transpiration).
+
+Legacy keys (`greenhouseos-twin-design-v1`, fertigation project key) are still written for the P&ID iframe.
+
 ## Roadmap (autonomous)
 
-1. Unified `TwinProject` schema linking greenhouse + fertigation React views (replace iframe-only process twin).
-2. Single microclimate authority selector (WS vs preview) for heatmap means.
-3. Offline deterministic recommendations (no cloud API keys) for standalone demos.
+1. ~~Unified `TwinProject` bundle~~ (shipped).
+2. Map WebSocket `heatmap_matrix` to shaders (today: equipment-aware preview field, labeled honestly).
+3. Replace iframe process twin with native React simulator or formal `postMessage` bridge.
+4. Offline deterministic setpoint recommendations (no cloud API keys).

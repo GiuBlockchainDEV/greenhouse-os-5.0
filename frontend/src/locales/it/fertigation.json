@@ -57,6 +57,9 @@
     "greenhouseCrop": "Coltura in serra",
     "greenhouseArea": "Superficie coltivata",
     "lines": "linee",
+    "twinPhysics": "Collegamento fisica serra",
+    "twinPhysicsPreview": "Solver anteprima (backend offline)",
+    "twinCropLoads": "Nodo coltura: assorbimento {{uptake}} L/d · evaporazione {{evap}} L/d",
     "category": "Classe idraulica",
     "plants": "piante mappate",
     "footer": "Modifica tubazioni e setpoint nel twin. Il cambio preset ricarica il progetto dal catalogo tipizzato."

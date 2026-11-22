@@ -17,7 +17,7 @@ export function resolveHeatmapField(
   covering: CoveringMaterial,
   shadingScreen: ShadingScreen,
   scenario: ClimateScenario,
-  simulationResults: SimulationData | null,
+  _simulationResults: SimulationData | null,
 ): {
   ctx: ReturnType<typeof buildHeatmapFieldContext>;
   surfaces: Record<VisibleHeatmapSurface, HeatmapSurfaceValues>;
@@ -34,9 +34,8 @@ export function resolveHeatmapField(
     crop,
   );
 
-  const isLive = Boolean(
-    simulationResults?.heatmap_matrix && simulationResults.heatmap_matrix.length > 0,
-  );
+  /** Spatial shaders follow the equipment-aware preview field until WS matrix mapping ships. */
+  const isLive = false;
 
   // Heatmap visualization always follows current UI inputs (immediate slider feedback).
   const baseTemp = preview.internalTemp;

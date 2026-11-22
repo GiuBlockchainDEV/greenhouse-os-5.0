@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Unified twin project** — Single `greenhouseos-twin-project-v1` bundle (greenhouse + fertigation + workspace); live greenhouse→fertigation sync on VPD/transpiration; twin link badge in header; honest heatmap preview label.
+
 - **Standalone twin runtime** — Climate dashboard mounted on viewport; virtual day clock with diurnal weather; synthetic sensor panel; greenhouse design `localStorage` persist; WS agronomic fields (DLI, Botrytis risk); `docs/DIGITAL_TWIN_STANDALONE.md`.
 
 - **Fertigation studio UX simplification** — Single center area with tabs (`Vista 3D` / `P&ID e simulazione`), numbered steps in the sidebar, plain-language help panel, centered GLB layout; removed stacked dual views and catalog clutter.

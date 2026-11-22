@@ -57,6 +57,9 @@
     "greenhouseCrop": "Culture en serre",
     "greenhouseArea": "Surface cultivée",
     "lines": "lignes",
+    "twinPhysics": "Lien physique serre",
+    "twinPhysicsPreview": "Solveur aperçu (backend hors ligne)",
+    "twinCropLoads": "Nœud culture : absorption {{uptake}} L/d · évaporation {{evap}} L/d",
     "category": "Classe hydraulique",
     "plants": "plantes mappées",
     "footer": "Modifiez tuyauterie et consignes dans le twin. Le changement de preset recharge le projet typé."

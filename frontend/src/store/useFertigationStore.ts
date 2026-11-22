@@ -39,11 +39,18 @@ function buildAndPersist(
   if (syncWithGreenhouse) {
     const gh = useGreenhouseStore.getState();
     const ghMarket = marketPresetById(gh.marketPresetId);
+    const micro = gh.simulationResults?.microclimate;
+    const thermal = gh.simulationResults?.thermal_balance;
     project = applyGreenhouseContextToProject(project, {
       system: gh.crop.system,
       cropType: gh.crop.type,
       metrics: gh.metrics,
       marketPresetLabel: ghMarket ? marketPresetLabel(ghMarket) : undefined,
+      vpdKpa: micro?.vpd_kpa,
+      internalTempC: micro?.internal_temp,
+      internalRhPct: micro?.internal_rh,
+      transpirationWm2: thermal?.q_transpiration,
+      et0MmDay: micro?.et0_fao56,
     });
   }
   persistFertigationProjectToStorage(project);

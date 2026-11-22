@@ -14,8 +14,12 @@ export function FertigationSummaryPanel() {
   const marketPresetId = useFertigationStore((s) => s.marketPresetId);
   const activeProject = useFertigationStore((s) => s.activeProject);
   const studioView = useFertigationStore((s) => s.studioView);
+  const syncWithGreenhouse = useFertigationStore((s) => s.syncWithGreenhouse);
   const crop = useGreenhouseStore((s) => s.crop);
   const metrics = useGreenhouseStore((s) => s.metrics);
+  const simulationStatus = useGreenhouseStore((s) => s.simulationStatus);
+  const micro = useGreenhouseStore((s) => s.simulationResults?.microclimate);
+  const cropNode = activeProject?.nodes.find((node) => node.role === "crop");
 
   const preset =
     marketPresetId !== CUSTOM_FERTIGATION_PRESET_ID
@@ -67,6 +71,24 @@ export function FertigationSummaryPanel() {
             {t("summary.lines")}
           </dd>
         </div>
+        {syncWithGreenhouse && (
+          <div>
+            <dt className="text-label">{t("summary.twinPhysics")}</dt>
+            <dd className="text-gray-900">
+              {simulationStatus === "connected" && micro
+                ? `${micro.internal_temp.toFixed(1)} °C · VPD ${micro.vpd_kpa.toFixed(2)} kPa`
+                : t("summary.twinPhysicsPreview")}
+            </dd>
+            {cropNode?.params && (
+              <dd className="mt-1 text-[11px] text-label">
+                {t("summary.twinCropLoads", {
+                  uptake: cropNode.params.uptakeLpd ?? "—",
+                  evap: cropNode.params.evaporationLpd ?? "—",
+                })}
+              </dd>
+            )}
+          </div>
+        )}
       </dl>
 
       <p className="text-[11px] leading-relaxed text-label">{t("help.footer")}</p>

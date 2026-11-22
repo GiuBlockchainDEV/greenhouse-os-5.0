@@ -57,6 +57,9 @@
     "greenhouseCrop": "Cultivo en serra",
     "greenhouseArea": "Área cultivada",
     "lines": "líneas",
+    "twinPhysics": "Enlace física invernadero",
+    "twinPhysicsPreview": "Solver de vista previa (backend offline)",
+    "twinCropLoads": "Nodo cultivo: absorción {{uptake}} L/d · evaporación {{evap}} L/d",
     "category": "Clase hidráulica",
     "plants": "plantas mapeadas",
     "footer": "Edite tuberías y consignas en el twin. El cambio de preset recarga el proyecto desde el catálogo tipado."
