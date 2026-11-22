@@ -75,88 +75,39 @@
     },
     {
       "dimensions_m": [
-        1.412,
-        1.412,
-        0.946
+        0.978,
+        0.978,
+        0.398
       ],
-      "origin": "fan_axis",
+      "origin": "floor_center",
       "y_up": true,
-      "triangles": 6336,
+      "triangles": 0,
       "file": "exhaust-fan.glb",
       "mesh_names": [
-        "HousingTop",
-        "HousingBottom",
-        "HousingLeft",
-        "HousingRight",
-        "CornerPlate_1",
-        "CornerPlate_2",
-        "CornerPlate_3",
-        "CornerPlate_4",
-        "VenturiShroud",
-        "DischargeCone",
-        "VenturiLip",
-        "ConeLip",
-        "FanHub",
-        "HubCap",
-        "MotorBody",
-        "MotorRearCap",
-        "Blade_1",
-        "Blade_2",
-        "Blade_3",
-        "Blade_4",
-        "Blade_5",
-        "Blade_6",
-        "MotorSupport_1",
-        "MotorSupport_2",
-        "MotorSupport_3",
-        "MotorSupport_4",
-        "GuardRing_1",
-        "GuardRing_2",
-        "GuardRing_3",
-        "GuardRing_4",
-        "GuardSpoke_1",
-        "GuardSpoke_2",
-        "GuardSpoke_3",
-        "GuardSpoke_4",
-        "GuardSpoke_5",
-        "GuardSpoke_6",
-        "GuardSpoke_7",
-        "GuardSpoke_8",
-        "GuardSpoke_9",
-        "GuardSpoke_10",
-        "GuardSpoke_11",
-        "GuardSpoke_12",
-        "MountBracket_1",
-        "MountBracket_2",
-        "MountBracket_3",
-        "MountBracket_4"
+        "fanex_exhaust"
       ],
-      "triangle_budget": 15000,
-      "within_budget": true
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_fanex",
+      "category": "ventilation"
     },
     {
       "dimensions_m": [
-        1.25,
-        1.06,
-        1.25
+        0.978,
+        0.978,
+        0.398
       ],
-      "origin": "roof_base_center",
+      "origin": "floor_center",
       "y_up": true,
-      "triangles": 884,
+      "triangles": 0,
       "file": "roof-exhaust-fan.glb",
       "mesh_names": [
-        "exhaust_stack",
-        "fan_blade_1",
-        "fan_blade_2",
-        "fan_blade_3",
-        "fan_blade_4",
-        "fan_blade_5",
-        "motor_hub",
-        "rain_cap",
-        "roof_base"
+        "fanex_exhaust"
       ],
-      "triangle_budget": 15000,
-      "within_budget": true
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_fanex",
+      "category": "ventilation"
     },
     {
       "dimensions_m": [

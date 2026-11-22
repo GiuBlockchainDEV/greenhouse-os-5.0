@@ -18,9 +18,10 @@ function repeats(span: number, moduleLength: number, cap: number): { count: numb
   return { count, step: span / count };
 }
 
-const EXHAUST_FAN_REF_M = 1.412;
-/** Mount face sits on the east gable (local Z = -0.05 m in the authored asset). */
-const EXHAUST_FAN_MOUNT_Z_M = 0.05;
+/** Native horizontal span of `exhaust-fan.glb` (author fanex asset, meters). */
+const EXHAUST_FAN_REF_M = 0.978;
+/** Mount face depth from origin toward gable plane (asset Y-up, back face ≈ −Z). */
+const EXHAUST_FAN_MOUNT_Z_M = 0.199;
 
 function EastGableExhaustFanModel({
   fan,
