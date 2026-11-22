@@ -3,7 +3,7 @@
     "kicker": "Avant le béton",
     "title": "Dimensionnez la serre. OPEX, climat et risque en quelques minutes.",
     "subtitle": "Choisissez un modèle commercial, stressez la météo, voyez le microclimat en 3D — sans télémétrie.",
-    "skip": "Ouvrir une serre vide",
+    "skip": "Passer — démo stress Golfe",
     "pillars": {
       "capex": "Géométrie & CVC d'ingénierie",
       "opex": "€/jour et kWh·m² issus de la physique",
@@ -44,6 +44,33 @@
     "tabAdvisor": "Actions",
     "tabCopilot": "Copilote GAIA",
     "advisorHint": "Corrections en un clic — export vers ordinateur climatique."
+  },
+  "executive": {
+    "kicker": "Décision d'investissement",
+    "scoreLabel": "Score twin",
+    "headline.proceed": "Conception conforme culture et OPEX",
+    "headline.caution": "Régler le HVAC avant la commande",
+    "headline.redesign": "Stop — échec sous cette météo",
+    "detail.heatStress": "Température canopy trop élevée.",
+    "detail.botrytis": "Risque Botrytis élevé.",
+    "detail.vpd": "VPD hors plage culture.",
+    "detail.cooling": "Refroidissement ou ombrage insuffisant.",
+    "detail.fixPack": "Le pack correctif récupère la marge.",
+    "detail.tune": "Réglages mineurs conseillés.",
+    "detail.stable": "Microclimat stable.",
+    "detail.optimize": "Optimisations OPEX possibles.",
+    "annualOpex": "OPEX annuel",
+    "atRisk": "À risque",
+    "savings": "Économisez jusqu'à",
+    "applyFixPack": "Appliquer {{count}} correctifs critiques",
+    "exportBrief": "Exporter le brief",
+    "fixPackDone": "{{count}} correctifs appliqués",
+    "loadStressDemo": "Charger la démo stress Golfe"
+  },
+  "design": {
+    "open": "Design et presets",
+    "close": "Fermer le design",
+    "title": "Structure, culture et équipements"
   },
   "mission": {
     "title": "Votre parcours",

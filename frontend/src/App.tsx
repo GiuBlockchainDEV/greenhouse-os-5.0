@@ -6,15 +6,15 @@ import { Viewport3D } from "@/components/3d/Viewport3D";
 import { FertigationPresetControls } from "@/components/fertigation/FertigationPresetControls";
 import { FertigationStudioCenter } from "@/components/fertigation/FertigationStudioCenter";
 import { FertigationSummaryPanel } from "@/components/fertigation/FertigationSummaryPanel";
-import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
 import { TwinInsightColumn } from "@/components/ui/TwinInsightColumn";
 import { TwinLaunchExperience } from "@/components/ui/TwinLaunchExperience";
-import { TwinMissionRibbon } from "@/components/ui/TwinMissionRibbon";
-import { TwinValueStrip } from "@/components/ui/TwinValueStrip";
+import { TwinDesignDrawer } from "@/components/ui/TwinDesignDrawer";
+import { TwinExecutiveBrief } from "@/components/ui/TwinExecutiveBrief";
+import { TwinFocusChrome } from "@/components/ui/TwinFocusChrome";
 import { hasCompletedTwinLaunch } from "@/lib/twin/twinLaunchState";
 import { useFertigationGreenhouseSync } from "@/hooks/useFertigationGreenhouseSync";
 import { useTwinProjectPersist } from "@/hooks/useTwinProjectPersist";
@@ -26,6 +26,7 @@ export function AppShell() {
   const { t } = useTranslation("common");
   const workspaceMode = useWorkspaceStore((state) => state.mode);
   const [launchOpen, setLaunchOpen] = useState(false);
+  const [designOpen, setDesignOpen] = useState(false);
   const { reconnect } = useSimulationWS();
   useTwinScenarioClock();
   useTwinProjectPersist();
@@ -66,17 +67,19 @@ export function AppShell() {
       </header>
 
       {workspaceMode === "greenhouse" ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[300px_1fr_400px] gap-4 overflow-hidden p-4">
-          <DimensionControls />
-          <div className="relative min-h-0">
-            <Viewport3D />
-            <HUDOverlay />
-            <TwinValueStrip />
-            <TwinMissionRibbon />
-            <ClimateDashboard onReconnect={reconnect} />
-          </div>
-          <TwinInsightColumn />
-        </main>
+        <>
+          <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] gap-3 overflow-hidden p-3">
+            <div className="relative min-h-0 min-w-0">
+              <Viewport3D />
+              <TwinExecutiveBrief />
+              <TwinFocusChrome designOpen={designOpen} onToggleDesign={() => setDesignOpen((v) => !v)} />
+              <HUDOverlay />
+              <ClimateDashboard onReconnect={reconnect} />
+            </div>
+            <TwinInsightColumn />
+          </main>
+          <TwinDesignDrawer open={designOpen} onClose={() => setDesignOpen(false)} />
+        </>
       ) : (
         <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">
           <FertigationPresetControls />

@@ -30,6 +30,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Executive twin brief** — Investment score, annual/at-risk OPEX, one-click fix pack, exportable brief; focus layout with design drawer and 3D-first chrome.
+
 - **Product launch experience** — First-run scenario picker (Venlo semi-closed, fan & pad, Gulf stress), floating OPEX/VPD value strip, mission ribbon, preview-filled climate dashboard, and Actions vs GAIA tab column.
 
 ### Fixed

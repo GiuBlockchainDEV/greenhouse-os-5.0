@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 
 import { applyTwinLaunchScenario } from "@/lib/twin/applyTwinLaunchScenario";
 import { TWIN_LAUNCH_SCENARIOS, type TwinLaunchScenario } from "@/lib/twin/launchScenarios";
-import { markTwinLaunchComplete } from "@/lib/twin/twinLaunchState";
 
 interface TwinLaunchExperienceProps {
   open: boolean;
@@ -39,7 +38,7 @@ export function TwinLaunchExperience({ open, onClose }: TwinLaunchExperienceProp
   };
 
   const handleSkip = () => {
-    markTwinLaunchComplete();
+    applyTwinLaunchScenario("gulf-summer-stress");
     onClose();
   };
 

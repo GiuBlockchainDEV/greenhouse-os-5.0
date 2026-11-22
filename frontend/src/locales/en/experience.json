@@ -3,7 +3,7 @@
     "kicker": "Before you pour concrete",
     "title": "Size your greenhouse. See OPEX, climate, and crop risk in minutes.",
     "subtitle": "Pick a real commercial model, stress the weather, and watch microclimate flow across the 3D twin — no telemetry required.",
-    "skip": "Open blank custom twin",
+    "skip": "Skip — load Gulf stress demo",
     "pillars": {
       "capex": "Engineering-grade geometry & HVAC counts",
       "opex": "Daily € / kWh·m² from physics, not spreadsheets",
@@ -44,6 +44,33 @@
     "tabAdvisor": "Actions",
     "tabCopilot": "GAIA copilot",
     "advisorHint": "One-click fixes applied to your twin — exportable to climate computers."
+  },
+  "executive": {
+    "kicker": "Investment decision",
+    "scoreLabel": "Twin score",
+    "headline.proceed": "Design is within crop and OPEX targets",
+    "headline.caution": "Tune HVAC before you sign the PO",
+    "headline.redesign": "Stop — this layout fails under this weather",
+    "detail.heatStress": "Canopy temperature exceeds generative comfort.",
+    "detail.botrytis": "Botrytis risk is elevated at this RH band.",
+    "detail.vpd": "VPD is outside the crop steering window.",
+    "detail.cooling": "Cooling capacity or screening needs adjustment.",
+    "detail.fixPack": "One-click fix pack can recover margin.",
+    "detail.tune": "Minor equipment tweaks recommended.",
+    "detail.stable": "Microclimate sits in the agronomic band.",
+    "detail.optimize": "Optional optimizations can lower annual OPEX.",
+    "annualOpex": "Annual OPEX",
+    "atRisk": "At risk",
+    "savings": "Save up to",
+    "applyFixPack": "Apply {{count}} critical fixes",
+    "exportBrief": "Export brief",
+    "fixPackDone": "{{count}} fixes applied — check 3D & dashboard",
+    "loadStressDemo": "Load Gulf stress demo to see value"
+  },
+  "design": {
+    "open": "Design & presets",
+    "close": "Close design panel",
+    "title": "Structure, crop & equipment"
   },
   "mission": {
     "title": "Your workflow",

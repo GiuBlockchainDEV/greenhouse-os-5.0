@@ -79,7 +79,7 @@ export function computeOfflineTwinRecommendations(input: {
   const sizing = input.equipment.sizing;
   const recs: TwinRecommendation[] = [];
 
-  if (internalTemp > 30.5) {
+  if (internalTemp > 28) {
     const nextScreen = Math.min(85, input.shadingScreen.deploymentPct + 20);
     if (input.shadingScreen.installed && nextScreen > input.shadingScreen.deploymentPct) {
       pushUnique(recs, {
@@ -149,7 +149,7 @@ export function computeOfflineTwinRecommendations(input: {
     }
   }
 
-  if (vpd > vpdBand.max + 0.15) {
+  if (vpd > vpdBand.max + 0.08 || (input.scenario.externalTempC > 36 && vpd > vpdBand.max)) {
     const nextRh = Math.min(88, input.scenario.externalRhPct + 8);
     pushUnique(recs, {
       id: "vpd-high-rh",
@@ -167,7 +167,15 @@ export function computeOfflineTwinRecommendations(input: {
     });
   }
 
-  if (botrytis >= 35) {
+  const previewBotrytis =
+    botrytis > 0
+      ? botrytis
+      : Math.min(
+          100,
+          Math.max(0, internalRh - 70) * 1.1 + Math.max(0, internalTemp - 26) * 4,
+        );
+
+  if (previewBotrytis >= 28) {
     const nextHaf = Math.min(
       MARKET_PRESET_WS_LIMITS.circulationFanCount,
       sizing.circulationFanCount + 2,
@@ -180,7 +188,7 @@ export function computeOfflineTwinRecommendations(input: {
       recommendedValue: nextHaf,
       unit: "#",
       rationale: "Botrytis risk index elevated — improve air movement and avoid stagnant pockets.",
-      impactHint: `RH ${internalRh.toFixed(0)}% · risk ${botrytis.toFixed(0)}`,
+      impactHint: `RH ${internalRh.toFixed(0)}% · risk ${previewBotrytis.toFixed(0)}`,
       action: { kind: "equipmentSizing", patch: { circulationFanCount: nextHaf } },
     });
   }

@@ -3,7 +3,7 @@
     "kicker": "Prima di versare il cemento",
     "title": "Dimensiona la serra. OPEX, clima e rischio coltura in pochi minuti.",
     "subtitle": "Scegli un modello commerciale reale, stressa il meteo e guarda il microclima sul gemello 3D — senza telemetria.",
-    "skip": "Apri serra custom vuota",
+    "skip": "Salta — carica demo stress Golfo",
     "pillars": {
       "capex": "Geometria e HVAC da progetto",
       "opex": "€/giorno e kWh·m² dalla fisica",
@@ -44,6 +44,33 @@
     "tabAdvisor": "Azioni",
     "tabCopilot": "Copilot GAIA",
     "advisorHint": "Correzioni in un clic sul gemello — esportabili ai climate computer."
+  },
+  "executive": {
+    "kicker": "Decisione d'investimento",
+    "scoreLabel": "Twin score",
+    "headline.proceed": "Il progetto è in banda coltura e OPEX",
+    "headline.caution": "Tarare l'HVAC prima dell'ordine d'acquisto",
+    "headline.redesign": "Stop — con questo meteo il layout fallisce",
+    "detail.heatStress": "Temperatura canopy oltre il comfort generativo.",
+    "detail.botrytis": "Rischio Botrytis elevato a questa UR.",
+    "detail.vpd": "VPD fuori dalla finestra di guida coltura.",
+    "detail.cooling": "Serve più raffrescamento o schermatura.",
+    "detail.fixPack": "Il pacchetto fix recupera margine.",
+    "detail.tune": "Piccoli aggiustamenti consigliati.",
+    "detail.stable": "Microclima in banda agronomica.",
+    "detail.optimize": "Ottimizzazioni possibili sull'OPEX annuo.",
+    "annualOpex": "OPEX annuo",
+    "atRisk": "A rischio",
+    "savings": "Risparmia fino a",
+    "applyFixPack": "Applica {{count}} fix critici",
+    "exportBrief": "Esporta brief",
+    "fixPackDone": "{{count}} fix applicati — controlla 3D e dashboard",
+    "loadStressDemo": "Carica demo stress Golfo"
+  },
+  "design": {
+    "open": "Design e preset",
+    "close": "Chiudi pannello design",
+    "title": "Struttura, coltura e impianti"
   },
   "mission": {
     "title": "Il tuo flusso",

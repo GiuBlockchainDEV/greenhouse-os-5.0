@@ -3,7 +3,7 @@
     "kicker": "Antes del hormigón",
     "title": "Dimensiona el invernadero. OPEX, clima y riesgo en minutos.",
     "subtitle": "Elige un modelo comercial, estrés meteorológico y microclima en el gemelo 3D — sin telemetría.",
-    "skip": "Abrir invernadero vacío",
+    "skip": "Saltar — demo estrés Golfo",
     "pillars": {
       "capex": "Geometría e HVAC de ingeniería",
       "opex": "€/día y kWh·m² con física real",
@@ -44,6 +44,33 @@
     "tabAdvisor": "Acciones",
     "tabCopilot": "Copiloto GAIA",
     "advisorHint": "Ajustes con un clic — exportables al climatizador."
+  },
+  "executive": {
+    "kicker": "Decisión de inversión",
+    "scoreLabel": "Twin score",
+    "headline.proceed": "El diseño cumple cultivo y OPEX",
+    "headline.caution": "Ajusta HVAC antes del pedido",
+    "headline.redesign": "Alto — el layout falla con este clima",
+    "detail.heatStress": "Temperatura de copa por encima del confort.",
+    "detail.botrytis": "Riesgo Botrytis elevado.",
+    "detail.vpd": "VPD fuera de banda de cultivo.",
+    "detail.cooling": "Falta capacidad de refrigeración o sombreado.",
+    "detail.fixPack": "El paquete de fixes recupera margen.",
+    "detail.tune": "Ajustes menores recomendados.",
+    "detail.stable": "Microclima estable.",
+    "detail.optimize": "Optimizaciones opcionales de OPEX.",
+    "annualOpex": "OPEX anual",
+    "atRisk": "En riesgo",
+    "savings": "Ahorra hasta",
+    "applyFixPack": "Aplicar {{count}} fixes críticos",
+    "exportBrief": "Exportar brief",
+    "fixPackDone": "{{count}} fixes aplicados",
+    "loadStressDemo": "Cargar demo estrés Golfo"
+  },
+  "design": {
+    "open": "Diseño y presets",
+    "close": "Cerrar diseño",
+    "title": "Estructura, cultivo y equipos"
   },
   "mission": {
     "title": "Tu flujo",
