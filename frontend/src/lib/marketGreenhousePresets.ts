@@ -3,7 +3,8 @@
  * Dimensions follow published bay modules (Venlo 8.00 / 9.60 / 12.80 m, gothic multispan).
  */
 
-import { DEFAULT_CLIMATE_SIZING, normalizeHafFanCount } from "@/lib/climateEquipmentLayout";
+import { buildClimateEquipmentForMarketSpec } from "@/lib/marketGreenhouseEquipment";
+import { normalizeMarketRidgeHeights } from "@/lib/marketGreenhouseGeometry";
 import type {
   ClimateEquipment,
   CoveringMaterial,
@@ -59,58 +60,29 @@ interface Spec {
   ventilation: ClimateEquipment["ventilation"];
 }
 
-function equipmentFor(spec: Spec): ClimateEquipment {
-  const width = spec.bays * spec.bayM;
-  const area = width * spec.lengthM;
-  const sizing = { ...DEFAULT_CLIMATE_SIZING };
-  sizing.circulationFanCount = normalizeHafFanCount(spec.bays * 4, spec.bays).total;
-  sizing.padWallWidthM = Number((width * 0.9).toFixed(1));
-  sizing.padWallHeightM = Math.min(2, Math.max(1.2, spec.eaveM - 0.8));
-  const usesExhaust =
-    spec.cooling === "fan_and_pad" ||
-    spec.cooling === "evaporative" ||
-    spec.ventilation === "forced_exhaust" ||
-    spec.ventilation === "combined";
-  sizing.exhaustFanCount = usesExhaust ? Math.min(24, Math.max(2, Math.round(width / 3))) : 0;
-  sizing.roofExhaustFanCount = spec.ventilation === "combined" ? Math.max(1, Math.round(spec.bays / 2)) : 0;
-  sizing.acUnitCount = spec.cooling === "mechanical_ac" ? Math.max(2, Math.round(area / 1800)) : 0;
-  sizing.fogLineCount = spec.cooling === "high_pressure_fog" ? spec.bays : 0;
-  const usesRoof =
-    spec.ventilation === "roof_vents" ||
-    spec.ventilation === "natural_ridge" ||
-    spec.ventilation === "combined";
-  sizing.roofVentCount = usesRoof ? Math.min(24, Math.max(spec.bays, Math.round(spec.lengthM / 10))) : 0;
-  const usesSide = spec.ventilation === "side_vents" || spec.ventilation === "combined";
-  sizing.sideVentCount = usesSide ? Math.max(2, spec.bays) : 0;
-  sizing.pipeRowCount = spec.heating === "hot_water_pipes" ? Math.min(6, Math.max(2, spec.bays)) : 0;
-  sizing.heaterUnitCount =
-    spec.heating === "unit_heater" || spec.heating === "air_heater"
-      ? Math.max(2, Math.round(area / 700))
-      : 0;
-  return {
-    cooling: spec.cooling,
-    heating: spec.heating,
-    ventilation: spec.ventilation,
-    sizing,
-  };
-}
-
 function preset(spec: Spec): MarketGreenhousePreset {
+  const heights = normalizeMarketRidgeHeights({
+    bays: spec.bays,
+    bayM: spec.bayM,
+    arch: spec.arch,
+    eaveM: spec.eaveM,
+    ridgeM: spec.ridgeM,
+  });
   return {
     id: spec.id,
     manufacturer: spec.manufacturer,
     model: spec.model,
     structure: { bayCount: spec.bays, bayWidthM: spec.bayM, archType: spec.arch },
     lengthM: spec.lengthM,
-    eaveM: spec.eaveM,
-    ridgeM: spec.ridgeM,
+    eaveM: heights.eaveM,
+    ridgeM: heights.ridgeM,
     covering: COVER[spec.cover],
     screen: spec.screen,
     crop: spec.crop,
     system: spec.system,
     lai: spec.lai,
     bedsPerBay: spec.beds,
-    equipment: equipmentFor(spec),
+    equipment: buildClimateEquipmentForMarketSpec(spec),
   };
 }
 
@@ -121,7 +93,7 @@ const SPECS: Spec[] = [
   { id: "certhon-suprimair", manufacturer: "Certhon", model: "SuprimAir", bays: 6, bayM: 9.6, arch: "triangular", lengthM: 144, eaveM: 7, ridgeM: 8.8, cover: "glass", screen: true, crop: "pepper", system: "substrate", lai: 3.2, beds: 5, cooling: "mechanical_ac", heating: "hot_water_pipes", ventilation: "combined" },
   { id: "havecon-highwire", manufacturer: "Havecon", model: "High-wire Venlo", bays: 10, bayM: 8, arch: "triangular", lengthM: 160, eaveM: 6.5, ridgeM: 8.1, cover: "glass", screen: true, crop: "tomato", system: "substrate", lai: 3.8, beds: 4, cooling: "high_pressure_fog", heating: "hot_water_pipes", ventilation: "roof_vents" },
   { id: "vdh-moduleair", manufacturer: "Van der Hoeven", model: "ModuleAir", bays: 8, bayM: 9.6, arch: "triangular", lengthM: 115, eaveM: 6, ridgeM: 7.8, cover: "glass", screen: true, crop: "cucumber", system: "substrate", lai: 3.3, beds: 5, cooling: "mechanical_ac", heating: "hot_water_pipes", ventilation: "combined" },
-  { id: "alweco-cabrio", manufacturer: "Alweco", model: "Cabrio", bays: 6, bayM: 8, arch: "triangular", lengthM: 80, eaveM: 4.5, ridgeM: 6.1, cover: "glass", screen: true, crop: "lettuce", system: "nft", lai: 2.2, beds: 6, cooling: "evaporative", heating: "hot_water_pipes", ventilation: "roof_vents" },
+  { id: "alweco-cabrio", manufacturer: "Alweco", model: "Cabrio", bays: 6, bayM: 8, arch: "triangular", lengthM: 80, eaveM: 4.5, ridgeM: 6.1, cover: "glass", screen: true, crop: "lettuce", system: "nft", lai: 2.2, beds: 6, cooling: "evaporative", heating: "none", ventilation: "side_vents" },
   { id: "deforche-1280", manufacturer: "Deforche", model: "Venlo 12.80", bays: 4, bayM: 12.8, arch: "triangular", lengthM: 100, eaveM: 6, ridgeM: 8.2, cover: "glass", screen: true, crop: "tomato", system: "substrate", lai: 3.4, beds: 6, cooling: "high_pressure_fog", heating: "hot_water_pipes", ventilation: "roof_vents" },
   { id: "richel-960", manufacturer: "Richel", model: "960 Multispan", bays: 4, bayM: 9.6, arch: "semicircular", lengthM: 50, eaveM: 4, ridgeM: 6.8, cover: "polyethylene", screen: false, crop: "tomato", system: "soil", lai: 3, beds: 4, cooling: "fan_and_pad", heating: "none", ventilation: "combined" },
   { id: "richel-ov90", manufacturer: "Richel", model: "OV90", bays: 5, bayM: 9.6, arch: "semicircular", lengthM: 60, eaveM: 4.5, ridgeM: 7.2, cover: "polyethylene", screen: true, crop: "pepper", system: "substrate", lai: 3.1, beds: 4, cooling: "fan_and_pad", heating: "none", ventilation: "forced_exhaust" },
