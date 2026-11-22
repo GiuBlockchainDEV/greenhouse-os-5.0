@@ -16,7 +16,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- **Vertical cultivation lines** — Beds and NFT/gutter GLB modules run along Z across each bay (stacked parallel along X), perpendicular to pad→fan airflow.
+- **Vertical cultivation lines** — Beds and NFT/gutter GLB modules run along Z across each bay (stacked parallel along X), perpendicular to pad→fan airflow; GLB scale maps module length to world Z and lines use equal edge gaps across the full greenhouse length (no center cluster).
 
 - **High-detail 3D viewport** — Semicircular roof arc 64 segments, cylindrical frame posts (24-seg), GLB instances with smooth normals and higher `devicePixelRatio`, 4096 shadow maps, 1024 contact shadows, and denser procedural plant tessellation.
 

@@ -135,13 +135,11 @@ function computeBedZonesForBay(
     return [];
   }
 
-  const isFixedWidthSystem = FIXED_LINE_WIDTH_SYSTEMS.has(system);
-  const blockSpan = isFixedWidthSystem
-    ? lineCount * resolvedLineWidth + (lineCount - 1) * pathwayWidthM
-    : usableLength;
-  let xCursor = isFixedWidthSystem
-    ? xMinBound + (usableLength - blockSpan) / 2
-    : xMinBound;
+  const blockSpan =
+    lineCount * resolvedLineWidth + Math.max(0, lineCount - 1) * pathwayWidthM;
+  const slack = Math.max(0, usableLength - blockSpan);
+  const edgeGap = slack / (lineCount + 1);
+  let xCursor = xMinBound + edgeGap;
 
   const elevationM = SYSTEM_BED_ELEVATION_M[system];
   const depthM = SYSTEM_BED_DEPTH_M[system];
@@ -158,7 +156,7 @@ function computeBedZonesForBay(
       elevationM,
       depthM,
     });
-    xCursor += resolvedLineWidth + pathwayWidthM;
+    xCursor += resolvedLineWidth + pathwayWidthM + edgeGap;
   }
 
   return beds;

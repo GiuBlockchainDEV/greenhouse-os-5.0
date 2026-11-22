@@ -29,9 +29,9 @@ function CultivationBedMesh({ bed, system }: { bed: BedZone; system: Cultivation
         <GltfPart
           key={`${system}-${bed.bayIndex}-${bed.bedIndex}-${index}`}
           file={module.file}
-          position={[x, bed.elevationM, bed.zMin + index * step]}
+          position={[x, bed.elevationM, bed.zMin + index * step + step / 2]}
           rotation={[0, Math.PI / 2, 0]}
-          scale={[lineW / module.width, 1, step / module.length]}
+          scale={[step / module.length, 1, lineW / module.width]}
         />
       ))}
     </group>
