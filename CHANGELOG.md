@@ -28,6 +28,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Market greenhouse catalog** — 24 selectable commercial models (Venlo, semi-closed, gothic multispan, tunnels) load structure, covering, crop, and typical HVAC so GAIA can analyze a built product as well as a custom design.
 
+### Fixed
+
+- **Twin scenario clock (React #185)** — `setClimateScenario` no longer mutates `twinRuntime` baselines; diurnal clock reads baselines via `getState()`; weather sliders in `HeatmapControls` update baselines explicitly.
+
 ### Changed
 
 - **Commercial cultivation walkways** — Twin bed blocks with central aisle, gutter paths, head/cross aisles; 3D pathway slabs; market presets and defaults use `marketCultivationLayout` with realistic line counts.
