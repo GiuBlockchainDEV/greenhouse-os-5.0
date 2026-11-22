@@ -31,6 +31,9 @@
   "frame": {
     "title": "Jumeau digital fertilisation Growa"
   },
+  "viewport": {
+    "badge": "Usine GLB d'ingénierie"
+  },
   "templates": {
     "nftDual": {
       "name": "NFT · double réservoir",

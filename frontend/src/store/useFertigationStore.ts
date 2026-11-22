@@ -19,6 +19,7 @@ interface FertigationState {
   templateId: FertigationTemplateId;
   syncWithGreenhouse: boolean;
   projectRevision: number;
+  activeProject: FertigationProject | null;
   applyMarketPreset: (presetId: string) => void;
   applyTemplate: (templateId: FertigationTemplateId) => void;
   setSyncWithGreenhouse: (value: boolean) => void;
@@ -52,11 +53,15 @@ export const useFertigationStore = create<FertigationState>()(
       templateId: "nft-dual",
       syncWithGreenhouse: true,
       projectRevision: 0,
+      activeProject: null,
 
       pushProjectToTwin: () => {
-        buildAndPersist(get().templateId, get().syncWithGreenhouse);
+        const project = buildAndPersist(get().templateId, get().syncWithGreenhouse);
         set(
-          (state) => ({ projectRevision: state.projectRevision + 1 }),
+          (state) => ({
+            activeProject: project,
+            projectRevision: state.projectRevision + 1,
+          }),
           false,
           "pushProjectToTwin",
         );

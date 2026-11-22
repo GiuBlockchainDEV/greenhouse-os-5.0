@@ -31,6 +31,9 @@
   "frame": {
     "title": "Gemelo digital de fertirrigación Growa"
   },
+  "viewport": {
+    "badge": "Planta GLB de ingeniería"
+  },
   "templates": {
     "nftDual": {
       "name": "NFT · doble depósito",

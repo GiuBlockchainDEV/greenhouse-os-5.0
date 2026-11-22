@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Fertigation engineering viewport (GLB)** — `FertigationPlantViewport` reuses GreenhouseOS R3F atmosphere and `growa_greenhouse_glb_library` assets for 3D plant layout; iframe twin runs in `embed=greenhouse-os` engineering mode (no voxel game shell).
+
 - **Fertigation market presets & typed catalog** — Commercial fertigation presets (Priva, Ridder, Netafim, Hoogendoorn, Van der Hoeven, Growa), five process templates (`nft-dual`, `nft-shared`, `dwc-recirc`, `substrate-drip`, `inline-drip`), P&ID component library, `useFertigationStore`, greenhouse metric sync, and 3-column studio UI (`fertigation` i18n namespace).
 
 - **Growa Digital Twin v20 (fertigation studio)** — Static twin at `frontend/public/growa-digital-twin-simulato-v20.html` embedded via header workspace switch (`Greenhouse twin` / `Fertigation studio`), Zustand `useWorkspaceStore`, and `FertigationTwinFrame` iframe shell with i18n labels (`common.workspace.*`).

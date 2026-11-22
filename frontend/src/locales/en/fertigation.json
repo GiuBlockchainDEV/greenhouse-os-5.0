@@ -31,6 +31,9 @@
   "frame": {
     "title": "Growa fertigation digital twin"
   },
+  "viewport": {
+    "badge": "Engineering GLB plant"
+  },
   "templates": {
     "nftDual": {
       "name": "NFT · dual reservoir",

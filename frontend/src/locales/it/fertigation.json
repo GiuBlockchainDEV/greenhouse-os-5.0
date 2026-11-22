@@ -31,6 +31,9 @@
   "frame": {
     "title": "Digital twin fertirrigazione Growa"
   },
+  "viewport": {
+    "badge": "Impianto GLB ingegneristico"
+  },
   "templates": {
     "nftDual": {
       "name": "NFT · doppio serbatoio",

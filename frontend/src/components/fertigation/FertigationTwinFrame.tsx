@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next";
 
 import { useFertigationStore } from "@/store/useFertigationStore";
 
-const TWIN_ASSET = "/growa-digital-twin-simulato-v20.html";
+const TWIN_ASSET =
+  "/growa-digital-twin-simulato-v20.html?embed=greenhouse-os&mode=design";
 
 export function FertigationTwinFrame() {
   const { t } = useTranslation("fertigation");

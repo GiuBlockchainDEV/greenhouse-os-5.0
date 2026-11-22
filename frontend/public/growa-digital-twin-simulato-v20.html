@@ -1051,9 +1051,9 @@ function addEquipment(g,n,sim,chosen){const [x,_,z]=pos(n),p=n.params||{},metal=
   g.cylinder([x,.53,z],[x,.92,z],.055,frame,12);g.box(x,1.02,z,.35,.24,.27,metal);g.box(x,1.06,z+.14,.23,.12,.025,color.sage);break;}
  case 'manifold':{base(.86,.76);g.cylinder([x-.45,.47,z],[x+.45,.47,z],.17,color.source,14);
   for(let j=0;j<5;j++){const xx=x-.33+j*.165;g.cylinder([xx,.49,z],[xx,.44,z+.43],.052,color.mix,10);g.box(xx,.45,z+.45,.10,.11,.10,frame);}break;}
- case 'crop':{base(1.55,1.11);const rows=Math.max(2,Math.min(8,Math.round((Number(p.channels)||24)/4)));for(let j=0;j<rows;j++){const zz=z-.43+j*(.86/Math.max(1,rows-1));g.box(x,.41,zz,1.55,.12,.095,j%2?metal:'#DDE8D6');
-  for(let k=0;k<6;k++){const xx=x-.62+k*.25;g.sphere([xx,.55,zz],.075,k%3===0?'#58884D':'#7AA267',7,4);}}
-  for(let dx of [-.74,.74])for(let dz of [-.48,.48])g.box(x+dx,.28,z+dz,.035,.32,.035,frame);break;}
+ case 'crop':{const rows=Math.max(2,Math.min(10,Math.round((Number(p.channels)||24)/3)));const run=1.58,line=.11;for(let j=0;j<rows;j++){const zz=z-.45+j*(.9/Math.max(1,rows-1));
+  g.box(x,.34,zz,run,.06,line,j%2?'#e5e7eb':'#d1d5db');g.box(x,.40,zz,run,.03,.08,'#9ca3af');
+  g.cylinder([x-run/2+.08,.46,zz],[x+run/2-.08,.46,zz],.035,'#64748b',22);}break;}
  case 'return':{base(.73,.73);g.cylinder([x-.43,.74,z],[x,.74,z],.095,color.return,12);g.cylinder([x,.74,z],[x,.34,z],.095,color.return,12);g.cylinder([x,.34,z],[x+.43,.34,z],.095,color.return,12);break;}
  default:{base(.68,.65);g.sphere([x,.45,z],.23,steel,10,7);g.cylinder([x-.38,.45,z],[x+.38,.45,z],.09,color.source,12);}
  }
@@ -1125,8 +1125,8 @@ function addFarmEnvironment(g,p,sim){
  }
 }
 
-function makeGeometry(p,sim,selected,game=false){const g=new Geom();if(game)addFarmEnvironment(g,p,sim);else g.box(0,-.075,0,13,.07,7.3,color.ground);
- if(!game){for(let x=-6.3;x<=6.3;x+=.5)g.box(x,-.035,0,.008,.014,7.1,color.grid);for(let z=-3.4;z<=3.4;z+=.5)g.box(0,-.035,z,12.7,.014,.008,color.grid);}
+function makeGeometry(p,sim,selected,game=false){const g=new Geom();if(game)addFarmEnvironment(g,p,sim);else{g.box(0,-.08,0,26,.07,15,G.embedGreenhouseOs?'#F3F4F6':color.ground);g.box(0,-.045,0,24.5,.04,13.8,'#ffffff');}
+ if(!game&&!G.embedGreenhouseOs){for(let x=-6.3;x<=6.3;x+=.5)g.box(x,-.035,0,.008,.014,7.1,color.grid);for(let z=-3.4;z<=3.4;z+=.5)g.box(0,-.035,z,12.7,.014,.008,color.grid);}
  const nodes=new Map(p.nodes.map(n=>[n.id,n]));for(const e of p.edges)addPipe(g,e,nodes,sim);
  for(const n of p.nodes)addEquipment(g,n,sim,selected===n.id);
  return new Float32Array(g.a);
@@ -1441,7 +1441,13 @@ function handleGameAction(btn){const a=btn.dataset.action,s=app.sim,p=app.projec
 }
 
 /* v19 usability layer: one job at a time, using the original validated model. */
-app.mode='simulate';
+const __gsEmbedParams=new URLSearchParams(location.search);
+G.embedGreenhouseOs=__gsEmbedParams.get('embed')==='greenhouse-os';
+if(G.embedGreenhouseOs){
+ document.body.dataset.embed='greenhouse-os';
+ document.body.style.background='#F3F4F6';
+}
+app.mode=G.embedGreenhouseOs?(__gsEmbedParams.get('mode')||'design'):'simulate';
 app.lessonPhase='start';
 app.p19TemplateSnapshot=JSON.stringify(app.project);
 app.showManual=false;
@@ -1604,7 +1610,7 @@ handleChange=function(ev){
  return p19LegacyChange(ev);
 };
 
-function renderRail(){const items=[['design','Design','design'],['pid','P&ID','pid'],['model3d','3D Plant','plant3d'],['simulate','Play','simulate'],['validate','Validate','validate'],['deliver','Documents','deliver']];return `<nav class="rail" aria-label="Main workspace"><div class="rail-heading">TOOLS</div>${items.map(([mode,label,ic])=>`<button class="rail-item ${app.mode===mode?'active':''}" data-action="nav" data-mode="${mode}" title="${label}" aria-current="${app.mode===mode?'page':'false'}">${ico(ic)}<span>${label}</span></button>`).join('')}<div class="rail-spacer"></div><div class="rail-foot"><span class="dot"></span><span>v18<br>LOCAL</span></div></nav>`}
+function renderRail(){const items=[['design','Design','design'],['pid','P&ID','pid'],['model3d','3D Plant','plant3d'],['simulate','Play','simulate'],['validate','Validate','validate'],['deliver','Documents','deliver']].filter(([mode])=>!(G.embedGreenhouseOs&&mode==='simulate'));return `<nav class="rail" aria-label="Main workspace"><div class="rail-heading">TOOLS</div>${items.map(([mode,label,ic])=>`<button class="rail-item ${app.mode===mode?'active':''}" data-action="nav" data-mode="${mode}" title="${label}" aria-current="${app.mode===mode?'page':'false'}">${ico(ic)}<span>${label}</span></button>`).join('')}<div class="rail-spacer"></div><div class="rail-foot"><span class="dot"></span><span>v18<br>LOCAL</span></div></nav>`}
 function renderStageHeader(){const texts={design:['Plant designer','Build the plant from verified components. Every connection and equipment rating feeds the same simulation model.'],pid:['Piping & instrumentation','Tagged equipment, pipeline diameters, instruments and live flows. Generated directly from the editable plant graph.'],model3d:['3D plant review','Orbit, inspect and compare the physical equipment arrangement linked to design parameters and live process values.'],simulate:['Digital twin','Control virtual equipment and compare process behavior using your configured hydraulic circuit.'],validate:['Engineering checks','Structural topology, duty-point screening and process permissives. Fix blocking issues before running.'],deliver:['Project deliverables','Export traceable design data, an equipment schedule and an audit snapshot.']};
  const [title,description]=texts[app.mode],p=app.project,v=currentValidation();return `<div class="stage-header"><div style="min-width:0"><div class="section-kicker">GROWA / SYSTEM ENGINEERING <span style="color:#a6b3a3">•</span> ${h(p.meta.reference)}</div><h2>${h(title)}</h2><p class="subtitle">${h(description)}</p></div><div class="stage-h-actions"><div class="step-indicator"><span>01</span><strong>DESIGN</strong><span>02</span><strong>VERIFY</strong><span>03</span><strong>RUN</strong></div>${templateSelect()}</div></div>`}
 function kpi(label,value,unit,foot,state=''){return `<div class="kpi ${state}"><div class="k-label">${label}</div><div class="k-value">${value} <small>${unit||''}</small></div><div class="k-foot">${foot}</div></div>`}
@@ -1685,7 +1691,8 @@ function reviewToolbar(){const pid=app.mode==='pid';return `<div class="graph-to
 function reviewArea(){const pid=app.mode==='pid';return `<div class="center-pane review-center">${reviewToolbar()}<div class="review-scene ${pid?'pid-area':'model3d-area'}" id="${pid?'pid-area':'model3d-area'}">${pid?`<div class="pid-canvas" id="pid-container" aria-label="Interactive technical P and ID"></div>`:`<canvas id="plant3d-canvas" aria-label="Interactive 3D plant model. Drag to orbit, wheel to zoom"></canvas><div class="plant3d-labels" id="plant3d-labels"></div><div class="plant3d-error" id="plant3d-error" hidden></div><div id="plant3d-compatibility" class="plant3d-compatibility" hidden>SOFTWARE 3D · COMPATIBILITY MODE</div><div class="scene-overlay 3d-scene-caption"><div class="scene-eyebrow">3D EQUIPMENT & PIPE ARRANGEMENT</div><div class="scene-hint">Drag to orbit · scroll to zoom · Shift+drag to pan</div></div><div class="plant3d-legend"><span><i style="background:${paletteColors.source}"></i>Intake</span><span><i style="background:${paletteColors.mix}"></i>Mixing</span><span><i style="background:${paletteColors.crop}"></i>Crop</span><span><i style="background:${paletteColors.transfer}"></i>Transfer</span></div>`}<div class="scene-status">${ico('info','small')} PRELIMINARY MODEL · NO LIVE PLC CONNECTION</div></div>${renderDock()}</div>`;}
 function renderMainArea(){if(app.mode==='pid'||app.mode==='model3d')return reviewArea();if(app.mode==='deliver')return `<div class="center-pane"><div class="mobile-document-actions"><button class="soft-btn" data-action="sheet" data-sheet="library">${ico('folder','small')} Project tools &amp; import</button></div>${renderReport()}</div>`;return `<div class="center-pane">${renderToolbar()}${renderGraphArea()}${renderDock()}</div>`;}
 function render(){if(G.plant3d)G.plant3d.cleanup();const left=document.querySelector('#leftPane'),right=document.querySelector('#rightPane');const sl=left?.scrollTop||0,sr=right?.scrollTop||0;const root=document.getElementById('app');if(!root)return;
- if(app.mode==='simulate'){root.innerHTML=renderGameMode();G.plant3d.mount(root,app.project,app.sim,id=>{app.gameFocus=id;updateGameHUD();G.plant3d.refresh(app.project,app.sim);});return;}
+ if(app.mode==='simulate'&&!G.embedGreenhouseOs){root.innerHTML=renderGameMode();G.plant3d.mount(root,app.project,app.sim,id=>{app.gameFocus=id;updateGameHUD();G.plant3d.refresh(app.project,app.sim);});return;}
+ if(app.mode==='simulate'&&G.embedGreenhouseOs){app.mode='design';}
  root.innerHTML=renderTop()+`<div class="shell">${renderRail()}<main class="stage">${renderStageHeader()}${renderKPIs()}<div class="workspace ${!app.inspectorOpen&&app.sheet!=='inspector'?'inspector-closed':''} ${app.sheet==='library'?'show-library':app.sheet==='inspector'?'show-inspector':''}">${renderLeft()}${renderMainArea()}${renderRight()}</div></main></div><div id="toast-placeholder"></div>`;
  const l=document.querySelector('#leftPane'),r=document.querySelector('#rightPane');if(l)l.scrollTop=sl;if(r)r.scrollTop=sr;
  if(app.mode==='pid')G.pid.mount(root,app.project,app.sim);else if(app.mode==='model3d')G.plant3d.mount(root,app.project,app.sim,id=>select('node',id));else if(app.mode!=='deliver'){drawGraph();}
@@ -1704,7 +1711,7 @@ function select(type,id){app.selected={type,id};app.inspectorOpen=true;render();
 function resetRuntime(reason){app.sim.playing=false;app.sim=S.create(app.project);if(reason)S.log(app.sim,reason);}
 function changeModel(fn,reason){if(app.sim.playing){toast('Pause the simulator before modifying plant geometry','error');return false;}const changed=store.mutate(fn);if(changed){app.project=store.project;resetRuntime(reason||'Design changed · simulation reset');render();}return changed;}
 function toast(message,kind=''){let t=document.getElementById('gs-toast');if(t)t.remove();t=document.createElement('div');t.id='gs-toast';t.className=`toast ${kind}`;t.setAttribute('role','status');t.textContent=message;document.body.appendChild(t);clearTimeout(app.toastTimer);app.toastTimer=setTimeout(()=>t.remove(),3600);}
-function selectMode(mode){if(G.plant3d)G.plant3d.cleanup();if(mode==='simulate'&&app.mode!=='simulate'){app.gameFocus=null;app.gameDrawer='';}if(mode==='pid')G.pid.mobileFocus();app.mode=mode;app.sheet='';app.dockExpanded=mode==='simulate'||mode==='validate';if(mode==='simulate'&&!currentValidation().ready)toast('Fix the blocking topology issues before running the model','error');render();}
+function selectMode(mode){if(G.plant3d)G.plant3d.cleanup();if(G.embedGreenhouseOs&&mode==='simulate'){toast('Use the GreenhouseOS 3D viewport above for plant review');mode='design';}if(mode==='simulate'&&app.mode!=='simulate'){app.gameFocus=null;app.gameDrawer='';}if(mode==='pid')G.pid.mobileFocus();app.mode=mode;app.sheet='';app.dockExpanded=mode==='simulate'||mode==='validate';if(mode==='simulate'&&!currentValidation().ready)toast('Fix the blocking topology issues before running the model','error');render();}
 function downloadSvg(){const text=G.pid.render(app.project,app.sim,false);X.download(`${app.project.meta.reference||'GROWA'}_schematic_PID_preliminary.svg`,text,'image/svg+xml');}
 function exportAction(action){const p=app.project,s=app.sim,b=p.meta.reference||'GROWA';const actions={
  'export-project':()=>X.download(`${b}_design_v16.json`,X.project(p),'application/json'),
