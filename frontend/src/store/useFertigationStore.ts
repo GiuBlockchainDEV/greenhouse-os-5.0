@@ -14,12 +14,16 @@ import { marketPresetById, marketPresetLabel } from "@/lib/marketGreenhousePrese
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 import type { FertigationProject, FertigationTemplateId } from "@/types/fertigation";
 
+export type FertigationStudioView = "plant3d" | "pid";
+
 interface FertigationState {
   marketPresetId: string;
   templateId: FertigationTemplateId;
   syncWithGreenhouse: boolean;
   projectRevision: number;
   activeProject: FertigationProject | null;
+  studioView: FertigationStudioView;
+  setStudioView: (view: FertigationStudioView) => void;
   applyMarketPreset: (presetId: string) => void;
   applyTemplate: (templateId: FertigationTemplateId) => void;
   setSyncWithGreenhouse: (value: boolean) => void;
@@ -54,6 +58,9 @@ export const useFertigationStore = create<FertigationState>()(
       syncWithGreenhouse: true,
       projectRevision: 0,
       activeProject: null,
+      studioView: "plant3d",
+
+      setStudioView: (view) => set({ studioView: view }, false, "setStudioView"),
 
       pushProjectToTwin: () => {
         const project = buildAndPersist(get().templateId, get().syncWithGreenhouse);

@@ -3,10 +3,9 @@ import { useTranslation } from "react-i18next";
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
-import { FertigationPlantViewport } from "@/components/fertigation/FertigationPlantViewport";
 import { FertigationPresetControls } from "@/components/fertigation/FertigationPresetControls";
+import { FertigationStudioCenter } from "@/components/fertigation/FertigationStudioCenter";
 import { FertigationSummaryPanel } from "@/components/fertigation/FertigationSummaryPanel";
-import { FertigationTwinFrame } from "@/components/fertigation/FertigationTwinFrame";
 import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
@@ -56,14 +55,7 @@ export function AppShell() {
       ) : (
         <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">
           <FertigationPresetControls />
-          <div className="relative flex min-h-0 flex-col gap-3">
-            <div className="min-h-0 flex-[1.15]">
-              <FertigationPlantViewport />
-            </div>
-            <div className="min-h-0 flex-1">
-              <FertigationTwinFrame />
-            </div>
-          </div>
+          <FertigationStudioCenter />
           <FertigationSummaryPanel />
         </main>
       )}

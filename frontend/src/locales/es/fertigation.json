@@ -1,7 +1,33 @@
 {
   "panel": {
-    "title": "Estudio de fertirrigación",
-    "hint": "Cargue una topología comercial o mantenga un P&ID personalizado. Las tipologías coinciden con el catálogo de simulación."
+    "title": "Impianto de fertirrigación",
+    "hint": "Cargue una topología comercial o mantenga un P&ID personalizado. Las tipologías coinciden con el catálogo de simulación.",
+    "hintShort": "Elija un sistema comercial; la vista 3D y el P&ID se actualizan solos."
+  },
+  "steps": {
+    "choosePreset": "Elija el impianto en la lista.",
+    "open3d": "Abra la pestaña «Vista 3D».",
+    "openPid": "Abra «P&ID y simulación» para el esquema y la simulación."
+  },
+  "guide": {
+    "headline": "¿Qué quiere ver?",
+    "lead": "Una pantalla cada vez, como en el invernadero.",
+    "plant3dHint": "Vista 3D con los mismos modelos GLB del invernadero.",
+    "pidHint": "Esquema técnico y simulador hidráulico."
+  },
+  "views": {
+    "aria": "Vista del estudio",
+    "plant3d": "Vista 3D",
+    "pid": "P&ID y simulación"
+  },
+  "help": {
+    "title": "Guía rápida",
+    "intro": "A la izquierda elige el impianto; al centro ves el resultado.",
+    "nowPlant3d": "Está en vista 3D",
+    "nowPid": "Está en P&ID y simulación",
+    "plant3dBody": "Disposición física con modelos de la serra.",
+    "pidBody": "Edite tuberías y ejecute la simulación virtual.",
+    "footer": "Cambie de pestaña si necesita más detalle."
   },
   "presets": {
     "title": "Sistemas comerciales",
@@ -14,6 +40,7 @@
   },
   "sync": {
     "greenhouse": "Escalar el circuito de cultivo desde métricas del invernadero",
+    "greenhouseShort": "Usar área y líneas del gemelo del invernadero",
     "linked": "Vinculado al gemelo del invernadero"
   },
   "catalog": {
@@ -23,7 +50,13 @@
   "summary": {
     "title": "Configuración activa",
     "hint": "Lo que GreenhouseOS envía al gemelo digital antes de simular.",
-    "activePreset": "Preset comercial",
+    "activePreset": "Impianto seleccionado",
+    "schematic": "Esquema cargado",
+    "assets": "equipos",
+    "pipes": "tuberías",
+    "greenhouseCrop": "Cultivo en serra",
+    "greenhouseArea": "Área cultivada",
+    "lines": "líneas",
     "category": "Clase hidráulica",
     "plants": "plantas mapeadas",
     "footer": "Edite tuberías y consignas en el twin. El cambio de preset recarga el proyecto desde el catálogo tipado."

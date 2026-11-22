@@ -1,7 +1,33 @@
 {
   "panel": {
-    "title": "Fertigation studio",
-    "hint": "Load a commercial fertigation topology or keep a custom P&ID. Component types match the engineering catalog used in simulation."
+    "title": "Fertigation plant",
+    "hint": "Load a commercial fertigation topology or keep a custom P&ID. Component types match the engineering catalog used in simulation.",
+    "hintShort": "Pick a commercial-style skid (Priva, Netafim, etc.): 3D and P&ID update automatically."
+  },
+  "steps": {
+    "choosePreset": "Choose a plant from the list (e.g. dual-tank NFT or multi-sector drip).",
+    "open3d": "Open the «3D plant» tab to see tanks, pumps and crop lines with greenhouse GLBs.",
+    "openPid": "Open «P&ID & simulation» to edit piping, run hydraulics and read EC/pH."
+  },
+  "guide": {
+    "headline": "What do you want to see?",
+    "lead": "One screen at a time — same idea as the greenhouse twin.",
+    "plant3dHint": "Orbit with the mouse: tanks, pumps, pipes and crop lines in greenhouse-quality 3D.",
+    "pidHint": "Technical schematic and simulator: wiring, controls and validation."
+  },
+  "views": {
+    "aria": "Studio view",
+    "plant3d": "3D plant view",
+    "pid": "P&ID & simulation"
+  },
+  "help": {
+    "title": "Quick guide",
+    "intro": "Choose the plant type on the left; the center shows the result. Data can follow your greenhouse crop and area.",
+    "nowPlant3d": "You are viewing 3D",
+    "nowPid": "You are viewing P&ID & simulation",
+    "plant3dBody": "Physical layout: same GLB style as the greenhouse. Large tanks, compact pumps, color-coded pipe circuits.",
+    "pidBody": "Edit the schematic, run the virtual simulator and check flows, EC and pH inside the twin.",
+    "footer": "If something is unclear, switch back to «3D plant»: each machine maps to a P&ID symbol."
   },
   "presets": {
     "title": "Market systems",
@@ -14,6 +40,7 @@
   },
   "sync": {
     "greenhouse": "Scale crop circuit from greenhouse metrics (area, lines, plants)",
+    "greenhouseShort": "Use area, bed lines and plant count from your greenhouse twin",
     "linked": "Linked to greenhouse twin"
   },
   "catalog": {
@@ -23,7 +50,13 @@
   "summary": {
     "title": "Active configuration",
     "hint": "What GreenhouseOS pushes into the digital twin before simulation.",
-    "activePreset": "Commercial preset",
+    "activePreset": "Selected plant",
+    "schematic": "Loaded schematic",
+    "assets": "assets",
+    "pipes": "pipes",
+    "greenhouseCrop": "Greenhouse crop",
+    "greenhouseArea": "Cultivation area",
+    "lines": "lines",
     "category": "Hydraulic class",
     "plants": "plants mapped",
     "footer": "Edit pipes and setpoints inside the twin. Preset changes reload the project from the typed catalog (no placeholder graphs)."
@@ -32,7 +65,7 @@
     "title": "Growa fertigation digital twin"
   },
   "viewport": {
-    "badge": "Engineering GLB plant"
+    "badge": "3D view — greenhouse style"
   },
   "templates": {
     "nftDual": {

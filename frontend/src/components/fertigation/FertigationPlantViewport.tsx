@@ -6,7 +6,13 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 import { FertigationPlantScene } from "@/components/fertigation/FertigationPlantScene";
 import { SceneLook, SiteGround } from "@/components/3d/sceneAtmosphere";
+import {
+  CUSTOM_FERTIGATION_PRESET_ID,
+  fertigationPresetById,
+  fertigationPresetLabel,
+} from "@/lib/fertigation/fertigationPresets";
 import { freshFertigationProject } from "@/lib/fertigation/projectFactory";
+import { FERTIGATION_TEMPLATES } from "@/lib/fertigation/templates";
 import { useFertigationStore } from "@/store/useFertigationStore";
 
 function FertigationCanvasInner() {
@@ -49,11 +55,24 @@ function FertigationCanvasInner() {
 export function FertigationPlantViewport() {
   const { t } = useTranslation("fertigation");
   const projectRevision = useFertigationStore((s) => s.projectRevision);
+  const marketPresetId = useFertigationStore((s) => s.marketPresetId);
+  const templateId = useFertigationStore((s) => s.templateId);
+  const preset =
+    marketPresetId !== CUSTOM_FERTIGATION_PRESET_ID
+      ? fertigationPresetById(marketPresetId)
+      : undefined;
+  const template = FERTIGATION_TEMPLATES[templateId];
 
   return (
     <div className="relative h-full min-h-[220px] w-full overflow-hidden rounded-2xl border border-border bg-gray-100 shadow-card">
-      <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-lg border border-border bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-label backdrop-blur-sm">
-        {t("viewport.badge")}
+      <div className="pointer-events-none absolute left-3 right-3 top-3 z-10 flex flex-col gap-1 rounded-lg border border-border bg-white/95 px-3 py-2 backdrop-blur-sm">
+        <span className="text-[10px] font-bold uppercase tracking-wide text-status-optimalDark">
+          {t("viewport.badge")}
+        </span>
+        <span className="text-sm font-semibold text-gray-900">
+          {preset ? fertigationPresetLabel(preset) : t("presets.custom")}
+        </span>
+        <span className="text-[11px] text-label">{t(template.nameKey)}</span>
       </div>
       <Canvas
         key={`fertigation-canvas-${projectRevision}`}

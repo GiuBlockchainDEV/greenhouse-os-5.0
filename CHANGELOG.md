@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Fertigation studio UX simplification** — Single center area with tabs (`Vista 3D` / `P&ID e simulazione`), numbered steps in the sidebar, plain-language help panel, centered GLB layout; removed stacked dual views and catalog clutter.
+
 - **Fertigation engineering viewport (GLB)** — `FertigationPlantViewport` reuses GreenhouseOS R3F atmosphere and `growa_greenhouse_glb_library` assets for 3D plant layout; iframe twin runs in `embed=greenhouse-os` engineering mode (no voxel game shell).
 
 - **Fertigation market presets & typed catalog** — Commercial fertigation presets (Priva, Ridder, Netafim, Hoogendoorn, Van der Hoeven, Growa), five process templates (`nft-dual`, `nft-shared`, `dwc-recirc`, `substrate-drip`, `inline-drip`), P&ID component library, `useFertigationStore`, greenhouse metric sync, and 3-column studio UI (`fertigation` i18n namespace).

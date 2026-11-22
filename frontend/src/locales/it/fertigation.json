@@ -1,7 +1,33 @@
 {
   "panel": {
-    "title": "Studio fertirrigazione",
-    "hint": "Carica una topologia commerciale o mantieni un P&ID personalizzato. Le tipologie componenti coincidono con il catalogo di simulazione."
+    "title": "Impianto fertirrigazione",
+    "hint": "Carica una topologia commerciale o mantieni un P&ID personalizzato. Le tipologie componenti coincidono con il catalogo di simulazione.",
+    "hintShort": "Scegli un impianto tipo quelli commerciali (Priva, Netafim, ecc.): la 3D e il P&ID si aggiornano da soli."
+  },
+  "steps": {
+    "choosePreset": "Scegli l’impianto dal menu (es. NFT doppio serbatoio o goccia a settori).",
+    "open3d": "Apri la scheda «Vista 3D» per vedere pompe, serbatoi e colture con i modelli della serra.",
+    "openPid": "Apri «P&ID e simulazione» per modificare tubi, avviare la simulazione idraulica e leggere EC/pH."
+  },
+  "guide": {
+    "headline": "Cosa vuoi vedere adesso?",
+    "lead": "Non mostriamo due mondi insieme: una schermata alla volta, come nella serra.",
+    "plant3dHint": "Ruota con il mouse: vedi serbatoi, pompe, tubazioni e linee di coltura in 3D (stessi GLB della serra).",
+    "pidHint": "Schema tecnico e simulator: collega componenti, controlli e validazione."
+  },
+  "views": {
+    "aria": "Vista studio",
+    "plant3d": "Vista 3D impianto",
+    "pid": "P&ID e simulazione"
+  },
+  "help": {
+    "title": "Guida rapida",
+    "intro": "A sinistra scegli il tipo di impianto; al centro guardi il risultato. I dati possono seguire serra e coltura selezionate nel gemello 3D.",
+    "nowPlant3d": "Stai guardando la vista 3D",
+    "nowPid": "Stai guardando P&ID e simulazione",
+    "plant3dBody": "È il layout fisico: stessa resa dei modelli serra. Serbatoi grandi, pompe compatte, tubi colorati per circuito (miscelazione, coltura, ritorno).",
+    "pidBody": "Qui edichi lo schema, avvii la simulazione virtuale e controlli portate, EC e pH. Usa la colonna a sinistra nel twin per componenti e controlli.",
+    "footer": "Se non riconosci un elemento, torna alla «Vista 3D»: ogni macchina corrisponde a un simbolo nel P&ID."
   },
   "presets": {
     "title": "Impianti commerciali",
@@ -14,6 +40,7 @@
   },
   "sync": {
     "greenhouse": "Scala il circuito coltura dai dati serra (area, linee, piante)",
+    "greenhouseShort": "Usa area, linee e piante dalla serra che hai configurato nel gemello 3D",
     "linked": "Collegato al gemello serra"
   },
   "catalog": {
@@ -23,7 +50,13 @@
   "summary": {
     "title": "Configurazione attiva",
     "hint": "Cosa GreenhouseOS invia al digital twin prima della simulazione.",
-    "activePreset": "Preset commerciale",
+    "activePreset": "Impianto selezionato",
+    "schematic": "Schema caricato",
+    "assets": "macchine",
+    "pipes": "tubazioni",
+    "greenhouseCrop": "Coltura in serra",
+    "greenhouseArea": "Superficie coltivata",
+    "lines": "linee",
     "category": "Classe idraulica",
     "plants": "piante mappate",
     "footer": "Modifica tubazioni e setpoint nel twin. Il cambio preset ricarica il progetto dal catalogo tipizzato."
@@ -32,7 +65,7 @@
     "title": "Digital twin fertirrigazione Growa"
   },
   "viewport": {
-    "badge": "Impianto GLB ingegneristico"
+    "badge": "Vista 3D — stile serra"
   },
   "templates": {
     "nftDual": {

@@ -1,7 +1,33 @@
 {
   "panel": {
-    "title": "Studio fertilisation",
-    "hint": "Chargez une topologie commerciale ou gardez un P&ID personnalisé. Les typologies correspondent au catalogue de simulation."
+    "title": "Installation de fertilisation",
+    "hint": "Chargez une topologie commerciale ou gardez un P&ID personnalisé. Les typologies correspondent au catalogue de simulation.",
+    "hintShort": "Choisissez un skid commercial : la 3D et le P&ID se mettent à jour."
+  },
+  "steps": {
+    "choosePreset": "Choisissez l'installation dans la liste.",
+    "open3d": "Onglet « Vue 3D ».",
+    "openPid": "Onglet « P&ID et simulation »."
+  },
+  "guide": {
+    "headline": "Que voulez-vous voir ?",
+    "lead": "Un écran à la fois, comme pour la serre.",
+    "plant3dHint": "Vue 3D avec les mêmes GLB que la serre.",
+    "pidHint": "Schéma technique et simulateur."
+  },
+  "views": {
+    "aria": "Vue studio",
+    "plant3d": "Vue 3D",
+    "pid": "P&ID et simulation"
+  },
+  "help": {
+    "title": "Guide rapide",
+    "intro": "À gauche : type d'installation ; au centre : le résultat.",
+    "nowPlant3d": "Vue 3D active",
+    "nowPid": "P&ID et simulation actifs",
+    "plant3dBody": "Mise en page physique style serre.",
+    "pidBody": "Éditez les tuyauteries et lancez la simulation.",
+    "footer": "Changez d'onglet pour plus de détail."
   },
   "presets": {
     "title": "Systèmes commerciaux",
@@ -14,6 +40,7 @@
   },
   "sync": {
     "greenhouse": "Adapter le circuit culture aux métriques serre",
+    "greenhouseShort": "Utiliser la surface et les lignes du jumeau serre",
     "linked": "Lié au jumeau serre"
   },
   "catalog": {
@@ -23,7 +50,13 @@
   "summary": {
     "title": "Configuration active",
     "hint": "Ce que GreenhouseOS envoie au jumeau digital avant simulation.",
-    "activePreset": "Preset commercial",
+    "activePreset": "Installation choisie",
+    "schematic": "Schéma chargé",
+    "assets": "équipements",
+    "pipes": "tuyaux",
+    "greenhouseCrop": "Culture en serre",
+    "greenhouseArea": "Surface cultivée",
+    "lines": "lignes",
     "category": "Classe hydraulique",
     "plants": "plantes mappées",
     "footer": "Modifiez tuyauterie et consignes dans le twin. Le changement de preset recharge le projet typé."

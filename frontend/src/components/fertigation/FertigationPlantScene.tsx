@@ -3,7 +3,7 @@ import * as THREE from "three";
 
 import { GltfPart } from "@/components/3d/GltfPart";
 import { glbPlacementForNode } from "@/lib/fertigation/fertigationGlbMap";
-import { pidNodeToWorld } from "@/lib/fertigation/pidToWorld";
+import { pidLayoutCenter, pidNodeToWorld } from "@/lib/fertigation/pidToWorld";
 import type { FertigationProject } from "@/types/fertigation";
 
 const PIPE_Y = 0.42;
@@ -66,8 +66,10 @@ export function FertigationPlantScene({ project }: { project: FertigationProject
     return map;
   }, [project.nodes]);
 
+  const [centerX, centerZ] = useMemo(() => pidLayoutCenter(project.nodes), [project.nodes]);
+
   return (
-    <group>
+    <group position={[-centerX, 0, -centerZ]}>
       {project.edges.map((edge) => {
         const a = worldById.get(edge.from);
         const b = worldById.get(edge.to);

@@ -8,10 +8,10 @@ export interface FertigationGlbPlacement {
 }
 
 const BASE: Record<FertigationComponentKind, FertigationGlbPlacement> = {
-  source: { file: "pad-module.glb", scale: [0.45, 0.5, 0.55], yOffset: 0 },
-  filter: { file: "side-louver.glb", scale: [0.35, 0.55, 0.4], yOffset: 0 },
-  tank: { file: "dwc-raft.glb", scale: [0.55, 0.5, 0.55], yOffset: 0.05 },
-  pump: { file: "heat-pipe.glb", scale: [0.5, 0.55, 0.5], yOffset: 0.05 },
+  source: { file: "pad-module.glb", scale: [0.7, 0.75, 0.8], yOffset: 0 },
+  filter: { file: "side-louver.glb", scale: [0.55, 0.7, 0.55], yOffset: 0 },
+  tank: { file: "dwc-raft.glb", scale: [0.85, 0.8, 0.85], yOffset: 0.05 },
+  pump: { file: "heat-pipe.glb", scale: [0.75, 0.8, 0.75], yOffset: 0.05 },
   valve: { file: "roof-vent.glb", scale: [0.22, 0.28, 0.22], yOffset: 0.35 },
   injector: { file: "fog-nozzle.glb", scale: [0.65, 0.7, 0.65], yOffset: 0.1 },
   sensor: { file: "duct-diffuser.glb", scale: [0.25, 0.35, 0.25], yOffset: 0.45 },
