@@ -21,6 +21,12 @@
     "botrytisRisk": "Botrytis risk",
     "botrytisHint": "Lower is safer"
   },
+  "advisor": {
+    "title": "Twin advisor",
+    "subtitle": "Deterministic rules on your model — no cloud API.",
+    "empty": "No changes suggested. Adjust scenario or wait for physics results.",
+    "apply": "Apply to twin"
+  },
   "twin": {
     "title": "Virtual twin",
     "subtitle": "Synthetic sensors from physics model — no external telemetry.",

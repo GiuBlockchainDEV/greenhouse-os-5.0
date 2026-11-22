@@ -17,6 +17,12 @@
     "botrytisHint": "Más bajo es más seguro",
     "dliAdequacy": "DLI vs cultivo"
   },
+  "advisor": {
+    "title": "Asesor del gemelo",
+    "subtitle": "Reglas determinísticas en el modelo — sin API en la nube.",
+    "empty": "Sin cambios sugeridos. Ajusta el escenario o espera resultados de física.",
+    "apply": "Aplicar al gemelo"
+  },
   "twin": {
     "title": "Gemelo virtual",
     "subtitle": "Sensores sintéticos del modelo físico — sin telemetría externa.",

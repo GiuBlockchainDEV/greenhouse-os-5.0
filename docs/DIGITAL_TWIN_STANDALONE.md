@@ -36,4 +36,5 @@ Legacy keys (`greenhouseos-twin-design-v1`, fertigation project key) are still w
 1. ~~Unified `TwinProject` bundle~~ (shipped).
 2. Map WebSocket `heatmap_matrix` to shaders (today: equipment-aware preview field, labeled honestly).
 3. Replace iframe process twin with native React simulator or formal `postMessage` bridge.
-4. Offline deterministic setpoint recommendations (no cloud API keys).
+4. ~~Offline deterministic setpoint recommendations~~ — **Twin advisor** panel (rules on VPD, temperature, Botrytis, DLI) with one-click apply.
+5. P&ID iframe receives `GREENHOUSE_OS_CLIMATE` postMessage for operator log context.

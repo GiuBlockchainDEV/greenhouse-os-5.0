@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
+import { OfflineTwinAdvisor } from "@/components/ui/OfflineTwinAdvisor";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
 import { FertigationPresetControls } from "@/components/fertigation/FertigationPresetControls";
@@ -58,7 +59,12 @@ export function AppShell() {
             <HUDOverlay />
             <ClimateDashboard onReconnect={reconnect} />
           </div>
-          <AICopilotPanel />
+          <div className="flex min-h-0 flex-col gap-3">
+            <OfflineTwinAdvisor />
+            <div className="min-h-0 flex-1">
+              <AICopilotPanel />
+            </div>
+          </div>
         </main>
       ) : (
         <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">

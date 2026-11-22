@@ -1446,6 +1446,21 @@ G.embedGreenhouseOs=__gsEmbedParams.get('embed')==='greenhouse-os';
 if(G.embedGreenhouseOs){
  document.body.dataset.embed='greenhouse-os';
  document.body.style.background='#F3F4F6';
+ G.greenhouseOs={vpdKpa:null,internalTempC:null,internalRhPct:null,transpirationWm2:null,crop:'',system:'',floorAreaM2:0};
+ window.addEventListener('message',function(ev){
+  if(ev.origin!==window.location.origin)return;
+  const d=ev.data;
+  if(!d||d.type!=='GREENHOUSE_OS_CLIMATE')return;
+  G.greenhouseOs={vpdKpa:d.vpdKpa,internalTempC:d.internalTempC,internalRhPct:d.internalRhPct,transpirationWm2:d.transpirationWm2,crop:d.crop||'',system:d.system||'',floorAreaM2:Number(d.floorAreaM2)||0};
+  try{
+   if(typeof log==='function'&&app&&app.sim){
+    const vpd=d.vpdKpa!=null?Number(d.vpdKpa).toFixed(2):'—';
+    log(app.sim,'GreenhouseOS · VPD '+vpd+' kPa · '+ (d.crop||'crop'),'info');
+    app.sim.revision++;
+   }
+  }catch(_){}
+  try{if(typeof render==='function')render();}catch(_){}
+ });
 }
 app.mode=G.embedGreenhouseOs?(__gsEmbedParams.get('mode')||'design'):'simulate';
 app.lessonPhase='start';

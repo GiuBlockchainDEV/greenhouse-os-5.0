@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Offline twin advisor** — Deterministic VPD/temperature/Botrytis/DLI recommendations with apply-to-twin actions; P&ID iframe `postMessage` climate bridge.
+
 - **Unified twin project** — Single `greenhouseos-twin-project-v1` bundle (greenhouse + fertigation + workspace); live greenhouse→fertigation sync on VPD/transpiration; twin link badge in header; honest heatmap preview label.
 
 - **Standalone twin runtime** — Climate dashboard mounted on viewport; virtual day clock with diurnal weather; synthetic sensor panel; greenhouse design `localStorage` persist; WS agronomic fields (DLI, Botrytis risk); `docs/DIGITAL_TWIN_STANDALONE.md`.

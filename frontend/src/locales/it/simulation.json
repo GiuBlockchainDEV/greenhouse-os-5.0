@@ -21,6 +21,12 @@
     "botrytisRisk": "Rischio Botrytis",
     "botrytisHint": "Più basso è più sicuro"
   },
+  "advisor": {
+    "title": "Advisor gemello",
+    "subtitle": "Regole deterministiche sul modello — senza API cloud.",
+    "empty": "Nessuna modifica suggerita. Regola lo scenario o attendi la fisica.",
+    "apply": "Applica al gemello"
+  },
   "twin": {
     "title": "Gemello virtuale",
     "subtitle": "Sensori sintetici dal modello fisico — senza telemetria esterna.",

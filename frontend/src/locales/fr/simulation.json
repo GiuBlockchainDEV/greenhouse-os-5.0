@@ -17,6 +17,12 @@
     "botrytisHint": "Plus bas est plus sûr",
     "dliAdequacy": "DLI vs culture"
   },
+  "advisor": {
+    "title": "Conseiller jumeau",
+    "subtitle": "Règles déterministes sur le modèle — sans API cloud.",
+    "empty": "Aucun changement suggéré. Ajustez le scénario ou attendez la physique.",
+    "apply": "Appliquer au jumeau"
+  },
   "twin": {
     "title": "Jumeau virtuel",
     "subtitle": "Capteurs synthétiques du modèle physique — sans télémétrie externe.",
