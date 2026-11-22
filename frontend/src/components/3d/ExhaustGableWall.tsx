@@ -3,6 +3,7 @@ import * as THREE from "three";
 
 import { claddingLook } from "@/components/3d/claddingMaterials";
 import { computeClimateEquipmentLayout } from "@/lib/climateEquipmentLayout";
+import { exhaustFanOpeningSpanM } from "@/lib/exhaustFanGable";
 import type { ClimateEquipment, CoveringMaterial, GreenhouseDimensions, GreenhouseStructure } from "@/types/greenhouse";
 
 interface Rect {
@@ -76,7 +77,7 @@ export function ExhaustGableWall({
   const cutouts = useMemo(
     () =>
       layout.exhaustFans.map((fan) => {
-        const span = fan.diameterM + 0.28;
+        const span = exhaustFanOpeningSpanM(fan.diameterM);
         return {
           zMin: fan.z - span / 2,
           zMax: fan.z + span / 2,

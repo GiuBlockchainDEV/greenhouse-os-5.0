@@ -12,6 +12,7 @@ import type {
   RoofExhaustFanPlacement,
   VentPlacement,
 } from "@/lib/climateEquipmentLayout";
+import { exhaustFanOpeningSpanM } from "@/lib/exhaustFanGable";
 
 function repeats(span: number, moduleLength: number, cap: number): { count: number; step: number } {
   const count = Math.min(cap, Math.max(1, Math.round(span / moduleLength)));
@@ -28,13 +29,14 @@ function EastGableExhaustFanModel({
   fan: FanPlacement;
   wallInsetM: number;
 }) {
-  const scale = fan.diameterM / EXHAUST_FAN_FACE_M;
+  const openingSpanM = exhaustFanOpeningSpanM(fan.diameterM);
+  const scale = openingSpanM / EXHAUST_FAN_FACE_M;
   /** East gable glazing plane matches `fan.x + wallInset` (see `ExhaustGableWall`). */
   const wallX = fan.x + wallInsetM;
   const openingCenterY = fan.y;
   const openingCenterZ = fan.z;
   /** Asset origin is floor-center; opening cutout is geometric center at `(y, z)`. */
-  const y = openingCenterY - (EXHAUST_FAN_FACE_M / 2) * scale;
+  const y = openingCenterY - openingSpanM / 2;
   return (
     <GltfPart
       file="exhaust-fan.glb"
