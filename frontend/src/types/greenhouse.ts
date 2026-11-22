@@ -75,6 +75,14 @@ export interface CultivationLayout {
   pathwayWidthM: number;
   /** Clearance from gable walls (X run) and bay gutters (Z stacking). */
   sideClearanceM: number;
+  /** Central pipe-rail / service aisle along the bay (Z). */
+  centerAisleM: number;
+  /** Walk margin at outer gutter and facade (Z, each side). */
+  gutterWalkM: number;
+  /** Cross paths along greenhouse length (X); 0 disables. */
+  crossPathIntervalM: number;
+  /** Width of each cross path along X. */
+  crossPathWidthM: number;
 }
 
 export type CoolingSystem =

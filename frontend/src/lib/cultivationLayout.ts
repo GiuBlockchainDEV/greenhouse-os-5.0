@@ -71,6 +71,17 @@ export interface BedZone {
   depthM: number;
 }
 
+export type PathwayKind = "center" | "between_lines" | "gutter" | "head" | "cross";
+
+export interface PathwayZone {
+  bayIndex: number;
+  kind: PathwayKind;
+  xMin: number;
+  xMax: number;
+  zMin: number;
+  zMax: number;
+}
+
 export interface PlantSlot {
   x: number;
   y: number;
@@ -82,6 +93,7 @@ export interface PlantSlot {
 
 export interface CultivationLayoutResult {
   beds: BedZone[];
+  pathways: PathwayZone[];
   plants: PlantSlot[];
   cultivationAreaM2: number;
   pathwayAreaM2: number;
@@ -90,16 +102,140 @@ export interface CultivationLayoutResult {
   bedLineCount: number;
 }
 
+function crossPathCenters(length: number, intervalM: number, sideClearanceM: number): number[] {
+  if (intervalM <= 0) {
+    return [];
+  }
+  const halfLength = length / 2;
+  const margin = sideClearanceM;
+  const centers: number[] = [];
+  let x = -halfLength + margin + intervalM;
+  const xMax = halfLength - margin - 2;
+  while (x <= xMax) {
+    centers.push(x);
+    x += intervalM;
+  }
+  return centers;
+}
+
+function splitBedAroundCrossPaths(
+  bed: BedZone,
+  centers: number[],
+  crossPathWidthM: number,
+): BedZone[] {
+  if (centers.length === 0 || crossPathWidthM <= 0) {
+    return [bed];
+  }
+  const segments: BedZone[] = [];
+  let cursor = bed.xMin;
+  for (const centerX of centers) {
+    const gapMin = centerX - crossPathWidthM / 2;
+    const gapMax = centerX + crossPathWidthM / 2;
+    if (gapMax <= bed.xMin || gapMin >= bed.xMax) {
+      continue;
+    }
+    const cutEnd = Math.max(bed.xMin, gapMin);
+    if (cutEnd - cursor >= 0.45) {
+      segments.push({ ...bed, xMin: cursor, xMax: Math.min(cutEnd, bed.xMax) });
+    }
+    cursor = Math.min(bed.xMax, gapMax);
+  }
+  if (bed.xMax - cursor >= 0.45) {
+    segments.push({ ...bed, xMin: cursor, xMax: bed.xMax });
+  }
+  return segments.length > 0 ? segments : [bed];
+}
+
+function layoutLinesInZBlock(
+  xMin: number,
+  xMax: number,
+  zBlockMin: number,
+  zBlockMax: number,
+  bayIndex: number,
+  bedIndexStart: number,
+  pathwayWidthM: number,
+  system: CultivationSystem,
+  lineCount: number,
+): { beds: BedZone[]; pathways: PathwayZone[]; nextBedIndex: number } {
+  const beds: BedZone[] = [];
+  const pathways: PathwayZone[] = [];
+  const usableWidth = zBlockMax - zBlockMin;
+  if (lineCount <= 0 || usableWidth < 0.45) {
+    return { beds, pathways, nextBedIndex: bedIndexStart };
+  }
+
+  const maxLines = maxBedLinesForSystem(system, usableWidth, pathwayWidthM);
+  const resolvedCount = Math.min(lineCount, maxLines);
+  if (resolvedCount === 0) {
+    return { beds, pathways, nextBedIndex: bedIndexStart };
+  }
+
+  const resolvedLineWidth = bedLineWidthForSystem(
+    system,
+    usableWidth,
+    resolvedCount,
+    pathwayWidthM,
+  );
+  const minLineWidth = FIXED_LINE_WIDTH_SYSTEMS.has(system)
+    ? SYSTEM_LINE_WIDTH_M[system]
+    : MIN_FIELD_LINE_WIDTH_M;
+  if (resolvedLineWidth < minLineWidth) {
+    return { beds, pathways, nextBedIndex: bedIndexStart };
+  }
+
+  const blockSpan =
+    resolvedCount * resolvedLineWidth + Math.max(0, resolvedCount - 1) * pathwayWidthM;
+  const slack = Math.max(0, usableWidth - blockSpan);
+  const edgeGap = slack / (resolvedCount + 1);
+  let zCursor = zBlockMin + edgeGap;
+
+  const elevationM = SYSTEM_BED_ELEVATION_M[system];
+  const depthM = SYSTEM_BED_DEPTH_M[system];
+  let bedIndex = bedIndexStart;
+
+  for (let i = 0; i < resolvedCount; i++) {
+    const zMin = zCursor;
+    const zMax = zCursor + resolvedLineWidth;
+    beds.push({
+      bayIndex,
+      bedIndex,
+      xMin,
+      xMax,
+      zMin,
+      zMax,
+      elevationM,
+      depthM,
+    });
+    if (i < resolvedCount - 1) {
+      const pathZMin = zMax;
+      const pathZMax = zMax + pathwayWidthM;
+      pathways.push({
+        bayIndex,
+        kind: "between_lines",
+        xMin,
+        xMax,
+        zMin: pathZMin,
+        zMax: pathZMax,
+      });
+    }
+    zCursor = zMax + pathwayWidthM + edgeGap;
+    bedIndex += 1;
+  }
+
+  return { beds, pathways, nextBedIndex: bedIndex };
+}
+
 function computeBedZonesForBay(
   length: number,
   bayIndex: number,
   bayWidthM: number,
   totalWidth: number,
-  sideClearanceM: number,
-  pathwayWidthM: number,
+  layout: CultivationLayout,
   system: CultivationSystem,
   requestedLineCount: number,
-): BedZone[] {
+  crossPathCentersX: number[],
+): { beds: BedZone[]; pathways: PathwayZone[] } {
+  const { sideClearanceM, pathwayWidthM, centerAisleM, gutterWalkM } = layout;
   const bayCenter = bayCenterZ(bayIndex, bayWidthM, totalWidth);
   const bayZMin = bayCenter - bayWidthM / 2;
   const bayZMax = bayCenter + bayWidthM / 2;
@@ -108,58 +244,117 @@ function computeBedZonesForBay(
   const xMax = length / 2 - sideClearanceM;
   const runLength = xMax - xMin;
 
-  const zMinBound = bayZMin + sideClearanceM;
-  const zMaxBound = bayZMax - sideClearanceM;
+  const zMinBound = bayZMin + sideClearanceM + gutterWalkM;
+  const zMaxBound = bayZMax - sideClearanceM - gutterWalkM;
   const usableWidth = zMaxBound - zMinBound;
 
-  if (runLength < 1.0 || usableWidth < 0.5) {
-    return [];
+  const pathways: PathwayZone[] = [];
+
+  if (runLength < 1.0 || usableWidth < 0.8 || requestedLineCount <= 0) {
+    return { beds: [], pathways };
   }
 
-  const maxLines = maxBedLinesForSystem(system, usableWidth, pathwayWidthM);
-  if (requestedLineCount <= 0 || maxLines === 0) {
-    return [];
-  }
-
-  const lineCount = Math.min(Math.max(1, requestedLineCount), maxLines);
-  const resolvedLineWidth = bedLineWidthForSystem(
-    system,
-    usableWidth,
-    lineCount,
-    pathwayWidthM,
-  );
-  const minLineWidth = FIXED_LINE_WIDTH_SYSTEMS.has(system)
-    ? SYSTEM_LINE_WIDTH_M[system]
-    : MIN_FIELD_LINE_WIDTH_M;
-  if (resolvedLineWidth < minLineWidth) {
-    return [];
-  }
-
-  const blockSpan =
-    lineCount * resolvedLineWidth + Math.max(0, lineCount - 1) * pathwayWidthM;
-  const slack = Math.max(0, usableWidth - blockSpan);
-  const edgeGap = slack / (lineCount + 1);
-  let zCursor = zMinBound + edgeGap;
-
-  const elevationM = SYSTEM_BED_ELEVATION_M[system];
-  const depthM = SYSTEM_BED_DEPTH_M[system];
-  const beds: BedZone[] = [];
-
-  for (let i = 0; i < lineCount; i++) {
-    beds.push({
+  if (gutterWalkM > 0.15) {
+    pathways.push({
       bayIndex,
-      bedIndex: i,
+      kind: "gutter",
       xMin,
       xMax,
-      zMin: zCursor,
-      zMax: zCursor + resolvedLineWidth,
-      elevationM,
-      depthM,
+      zMin: bayZMin + sideClearanceM,
+      zMax: zMinBound,
     });
-    zCursor += resolvedLineWidth + pathwayWidthM + edgeGap;
+    pathways.push({
+      bayIndex,
+      kind: "gutter",
+      xMin,
+      xMax,
+      zMin: zMaxBound,
+      zMax: bayZMax - sideClearanceM,
+    });
   }
 
-  return beds;
+  pathways.push({
+    bayIndex,
+    kind: "head",
+    xMin: -length / 2,
+    xMax: xMin,
+    zMin: bayZMin + sideClearanceM,
+    zMax: bayZMax - sideClearanceM,
+  });
+  pathways.push({
+    bayIndex,
+    kind: "head",
+    xMin: xMax,
+    xMax: length / 2,
+    zMin: bayZMin + sideClearanceM,
+    zMax: bayZMax - sideClearanceM,
+  });
+
+  const aisle = Math.min(Math.max(0, centerAisleM), usableWidth * 0.45);
+  const blockWidth = (usableWidth - aisle) / 2;
+  if (blockWidth < 0.5) {
+    return { beds: [], pathways };
+  }
+
+  const westZMax = zMinBound + blockWidth;
+  const eastZMin = zMaxBound - blockWidth;
+
+  if (aisle >= 0.8) {
+    pathways.push({
+      bayIndex,
+      kind: "center",
+      xMin,
+      xMax,
+      zMin: westZMax,
+      zMax: eastZMin,
+    });
+  }
+
+  const westLines = Math.ceil(requestedLineCount / 2);
+  const eastLines = Math.floor(requestedLineCount / 2);
+
+  const west = layoutLinesInZBlock(
+    xMin,
+    xMax,
+    zMinBound,
+    westZMax,
+    bayIndex,
+    0,
+    pathwayWidthM,
+    system,
+    westLines,
+  );
+  const east = layoutLinesInZBlock(
+    xMin,
+    xMax,
+    eastZMin,
+    zMaxBound,
+    bayIndex,
+    west.nextBedIndex,
+    pathwayWidthM,
+    system,
+    eastLines,
+  );
+
+  pathways.push(...west.pathways, ...east.pathways);
+
+  for (const centerX of crossPathCentersX) {
+    const halfW = layout.crossPathWidthM / 2;
+    pathways.push({
+      bayIndex,
+      kind: "cross",
+      xMin: centerX - halfW,
+      xMax: centerX + halfW,
+      zMin: bayZMin + sideClearanceM,
+      zMax: bayZMax - sideClearanceM,
+    });
+  }
+
+  const mergedBeds = [...west.beds, ...east.beds].flatMap((bed) =>
+    splitBedAroundCrossPaths(bed, crossPathCentersX, layout.crossPathWidthM),
+  );
+
+  return { beds: mergedBeds, pathways };
 }
 
 function plantY(bed: BedZone, system: CultivationSystem, tier: number, tierStep: number): number {
@@ -280,9 +475,12 @@ export function computeCultivationLayout(params: {
     growthStage,
   } = params;
 
-  const sideClearanceM = layout.sideClearanceM;
-  const pathwayWidthM = layout.pathwayWidthM;
   const tierCount = Math.max(layout.tierCount, 1);
+  const crossCenters = crossPathCenters(
+    length,
+    layout.crossPathIntervalM,
+    layout.sideClearanceM,
+  );
   const density = layout.plantDensity * SYSTEM_DEFAULT_DENSITY[system];
   const spacing =
     (SYSTEM_PLANT_SPACING_M[system] * CROP_SPACING_FACTOR[cropType]) / density;
@@ -300,19 +498,20 @@ export function computeCultivationLayout(params: {
   const baseScale = (0.35 + lai * 0.1) * (stageScale[growthStage] ?? 1.0);
 
   const beds: BedZone[] = [];
+  const pathways: PathwayZone[] = [];
   for (let bayIndex = 0; bayIndex < bayCount; bayIndex++) {
-    beds.push(
-      ...computeBedZonesForBay(
-        length,
-        bayIndex,
-        bayWidthM,
-        totalWidth,
-        sideClearanceM,
-        pathwayWidthM,
-        system,
-        layout.bedLineCount,
-      ),
+    const bayLayout = computeBedZonesForBay(
+      length,
+      bayIndex,
+      bayWidthM,
+      totalWidth,
+      layout,
+      system,
+      layout.bedLineCount,
+      crossCenters,
     );
+    beds.push(...bayLayout.beds);
+    pathways.push(...bayLayout.pathways);
   }
 
   const bedLineCount = bayCount > 0 ? Math.round(beds.length / bayCount) : 0;
@@ -347,6 +546,7 @@ export function computeCultivationLayout(params: {
 
   return {
     beds,
+    pathways,
     plants,
     cultivationAreaM2,
     pathwayAreaM2,

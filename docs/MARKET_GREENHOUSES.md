@@ -28,3 +28,7 @@ cd frontend && npx tsx -e "import { validateMarketGreenhousePresets } from './sr
 ## Geometry
 
 `marketGreenhouseGeometry.ts` clamps catalog ridge height to plausible rise per arch type (Venlo vs tunnel) so entered OEM dimensions stay within renderer expectations.
+
+## Cultivation aisles
+
+Market presets use `marketCultivationLayout.ts`: twin bed blocks per bay, central pipe-rail aisle (1.2–1.8 m), 1.5 m between-line pathways, gutter walk margins, and cross paths every 48 m on houses longer than 60 m. Pathways are rendered in 3D (`cultivationPathwayModels.tsx`).

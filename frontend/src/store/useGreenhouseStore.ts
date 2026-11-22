@@ -3,7 +3,13 @@ import { devtools } from "zustand/middleware";
 
 import { roofRiseM } from "@/lib/structureUtils";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
-import { defaultSystemForCrop } from "@/lib/cultivationConstants";
+import {
+  defaultCenterAisleM,
+  defaultCrossPathIntervalM,
+  defaultSystemForCrop,
+  recommendBedLinesPerBay,
+} from "@/lib/cultivationConstants";
+import { marketCultivationLayoutDefaults } from "@/lib/marketCultivationLayout";
 import {
   DEFAULT_CLIMATE_SIZING,
   applyCoolingSystemDefaults,
@@ -22,6 +28,7 @@ import type {
   CoveringMaterial,
   CropConfig,
   CultivationLayout,
+  CultivationSystem,
   CropType,
   DimensionUpdate,
   GeoLocation,
@@ -65,22 +72,36 @@ const DEFAULT_SHADING_SCREEN: ShadingScreen = {
   deploymentPct: 0,
 };
 
-const DEFAULT_LAYOUT: CultivationLayout = {
+const DEFAULT_LAYOUT_BASE = {
   tierCount: 1,
   gutterLengthM: 28.8,
   plantsPerTier: 0,
   plantDensity: 1.0,
-  bedLineCount: 0,
-  pathwayWidthM: 1.2,
-  sideClearanceM: 0.6,
-};
+  pathwayWidthM: 1.5,
+  sideClearanceM: 1.2,
+  centerAisleM: defaultCenterAisleM(10),
+  gutterWalkM: 0.55,
+  crossPathIntervalM: defaultCrossPathIntervalM(30),
+  crossPathWidthM: 2.5,
+} satisfies Omit<CultivationLayout, "bedLineCount">;
+
+function defaultLayoutForStructure(structure: GreenhouseStructure, lengthM: number, system: CultivationSystem): CultivationLayout {
+  const bedLineCount = recommendBedLinesPerBay(structure.bayWidthM, system, DEFAULT_LAYOUT_BASE);
+  return {
+    ...DEFAULT_LAYOUT_BASE,
+    bedLineCount,
+    gutterLengthM: Math.max(1, lengthM - 2 * DEFAULT_LAYOUT_BASE.sideClearanceM),
+    centerAisleM: defaultCenterAisleM(structure.bayWidthM),
+    crossPathIntervalM: defaultCrossPathIntervalM(lengthM),
+  };
+}
 
 const DEFAULT_CROP: CropConfig = {
   type: "tomato",
   system: "substrate",
   lai: 3.2,
   growthStage: "mid_season",
-  layout: DEFAULT_LAYOUT,
+  layout: defaultLayoutForStructure(DEFAULT_STRUCTURE, DEFAULT_DIMENSIONS.length, "substrate"),
 };
 
 const DEFAULT_CLIMATE_EQUIPMENT: ClimateEquipment = {
@@ -219,6 +240,27 @@ function buildCropUpdate(
   if (patch.type && !patch.system) {
     next.system = defaultSystemForCrop(patch.type as CropType);
   }
+
+  const geometryLayout = {
+    centerAisleM: defaultCenterAisleM(structure.bayWidthM),
+    crossPathIntervalM: defaultCrossPathIntervalM(dimensions.length),
+    gutterLengthM: Number(
+      Math.max(1, dimensions.length - 2 * next.layout.sideClearanceM).toFixed(1),
+    ),
+  };
+  const recommendedLines = recommendBedLinesPerBay(structure.bayWidthM, next.system, {
+    ...next.layout,
+    ...geometryLayout,
+  });
+  const bedLineCount =
+    next.layout.bedLineCount <= 0
+      ? recommendedLines
+      : Math.min(next.layout.bedLineCount, recommendedLines);
+
+  next = {
+    ...next,
+    layout: { ...next.layout, ...geometryLayout, bedLineCount },
+  };
 
   const synced = syncCropFromLayout(structure, dimensions, next);
   return {
@@ -469,9 +511,13 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           lai: presetItem.lai,
           growthStage: "mid_season",
           layout: {
-            ...DEFAULT_LAYOUT,
-            bedLineCount: presetItem.bedsPerBay,
-            tierCount: presetItem.crop === "strawberry" ? 2 : 1,
+            ...marketCultivationLayoutDefaults({
+              lengthM: presetItem.lengthM,
+              bayWidthM: presetItem.structure.bayWidthM,
+              system: presetItem.system,
+              crop: presetItem.crop,
+              maxBedLinesPerBay: presetItem.bedsPerBay,
+            }),
           },
         });
         const cooling = presetItem.equipment.cooling;

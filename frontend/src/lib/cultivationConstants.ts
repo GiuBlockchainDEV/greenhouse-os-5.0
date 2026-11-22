@@ -1,6 +1,6 @@
 /** Shared layout constants — beds and plant slots use the same values. */
 
-import type { CropType, CultivationSystem } from "@/types/greenhouse";
+import type { CropType, CultivationLayout, CultivationSystem } from "@/types/greenhouse";
 
 export const DWC_HOLE_SPACING_M = 0.5;
 export const SUBSTRATE_SLAB_SPACING_M = 1.0;
@@ -88,4 +88,36 @@ export function bedLineWidthForSystem(
   }
   if (lineCount <= 0) return 0;
   return (usableWidthM - (lineCount - 1) * pathwayWidthM) / lineCount;
+}
+
+export function defaultCenterAisleM(bayWidthM: number): number {
+  if (bayWidthM >= 12) return 1.8;
+  if (bayWidthM >= 9) return 1.6;
+  if (bayWidthM >= 7) return 1.5;
+  return 1.2;
+}
+
+export function defaultCrossPathIntervalM(lengthM: number): number {
+  return lengthM >= 60 ? 48 : 0;
+}
+
+/** Commercial layout: twin bed blocks + central aisle; lines split left/right. */
+export function recommendBedLinesPerBay(
+  bayWidthM: number,
+  system: CultivationSystem,
+  layout: Pick<
+    CultivationLayout,
+    "pathwayWidthM" | "sideClearanceM" | "centerAisleM" | "gutterWalkM"
+  >,
+): number {
+  const gutterWalk = layout.gutterWalkM ?? 0;
+  const centerAisle = layout.centerAisleM ?? 0;
+  const usable =
+    bayWidthM - 2 * layout.sideClearanceM - 2 * gutterWalk - centerAisle;
+  const blockWidth = usable / 2;
+  if (blockWidth < MIN_FIELD_LINE_WIDTH_M) {
+    return 0;
+  }
+  const perSide = maxBedLinesForSystem(system, blockWidth, layout.pathwayWidthM);
+  return Math.max(0, perSide * 2);
 }

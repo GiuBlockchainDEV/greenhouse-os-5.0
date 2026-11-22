@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { CultivationBedsGroup } from "@/lib/cultivationBedModels";
+import { CultivationPathwaysGroup } from "@/lib/cultivationPathwayModels";
 import { computeCultivationLayout } from "@/lib/cultivationLayout";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
@@ -38,9 +39,14 @@ export function CropGridMesh() {
     ],
   );
 
-  if (layoutResult.beds.length === 0) {
+  if (layoutResult.beds.length === 0 && layoutResult.pathways.length === 0) {
     return null;
   }
 
-  return <CultivationBedsGroup beds={layoutResult.beds} system={crop.system} />;
+  return (
+    <group>
+      <CultivationPathwaysGroup pathways={layoutResult.pathways} />
+      <CultivationBedsGroup beds={layoutResult.beds} system={crop.system} />
+    </group>
+  );
 }
