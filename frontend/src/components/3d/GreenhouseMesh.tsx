@@ -48,7 +48,7 @@ function createSemicircularBayRoof(
   eaveHeight: number,
   ridgeHeight: number,
   zCenter: number,
-  segments = 24,
+  segments = 64,
 ): THREE.BufferGeometry {
   const rise = roofRiseM(eaveHeight, ridgeHeight);
   const halfBay = bayWidth / 2;

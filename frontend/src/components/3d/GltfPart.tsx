@@ -1,4 +1,6 @@
-import { Clone, useGLTF } from "@react-three/drei";
+import { useMemo } from "react";
+import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
 const LIBRARY = "/models";
 
@@ -13,18 +15,50 @@ interface GltfPartProps {
   scale?: [number, number, number];
 }
 
+function tuneLoadedScene(root: THREE.Object3D): void {
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) {
+      return;
+    }
+    const mesh = child;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    const geometry = mesh.geometry;
+    if (!geometry.getAttribute("normal")) {
+      geometry.computeVertexNormals();
+    }
+    const material = mesh.material;
+    const tune = (entry: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial) => {
+      entry.flatShading = false;
+      entry.envMapIntensity = 1.15;
+    };
+    if (Array.isArray(material)) {
+      material.forEach((entry) => {
+        if (entry instanceof THREE.MeshStandardMaterial || entry instanceof THREE.MeshPhysicalMaterial) {
+          tune(entry);
+        }
+      });
+      return;
+    }
+    if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
+      tune(material);
+    }
+  });
+}
+
 /** One authored greenhouse component. The scene is cloned so the same file can repeat. */
 export function GltfPart({ file, position, rotation, scale }: GltfPartProps) {
   const { scene } = useGLTF(modelUrl(file));
+  const object = useMemo(() => {
+    const root = scene.clone(true);
+    tuneLoadedScene(root);
+    return root;
+  }, [scene]);
+
   return (
-    <Clone
-      object={scene}
-      position={position}
-      rotation={rotation}
-      scale={scale}
-      castShadow
-      receiveShadow
-    />
+    <group position={position} rotation={rotation} scale={scale}>
+      <primitive object={object} />
+    </group>
   );
 }
 

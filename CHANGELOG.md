@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **awesome-3d-skills integration** — Installed Three.js geometry, asset-pipeline, pipes, greenhouse, and metal agent skills (from [awesome-3d-skills](https://github.com/zhuyansen/awesome-3d-skills)) under `.cursor/skills/` and added `growa_greenhouse_glb_library/scripts/build_library.py` to regenerate equipment/cultivation GLBs with U-channel trays, duct stiffeners, corrugated pads, and PBR materials.
+
 - **Qatar-corrected thermal physics engine** — Flow-based ventilation (mechanical/wind/stack/infiltration), humidity-ratio moisture balance, kW-rated AC/heating with high-ambient derating, HAF mixing-only, energy-conserving spatial heatmap, hot-water pipe 3D layout. Spec: `docs/THERMAL_EQUIPMENT_AUDIT.csv`.
 
 - **Equipment rated capacity UI** — Explicit m³/h, kW, COP, SHR, pad/fog efficiency, and leakage ACH fields in climate controls; wired through WebSocket and backend solver.
@@ -13,6 +15,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Market greenhouse catalog** — 24 selectable commercial models (Venlo, semi-closed, gothic multispan, tunnels) load structure, covering, crop, and typical HVAC so GAIA can analyze a built product as well as a custom design.
 
 ### Changed
+
+- **High-detail 3D viewport** — Semicircular roof arc 64 segments, cylindrical frame posts (24-seg), GLB instances with smooth normals and higher `devicePixelRatio`, 4096 shadow maps, 1024 contact shadows, and denser procedural plant tessellation.
 
 - **Greenhouse frame** — Restored the procedural aluminum posts, gutters, and eave trusses instead of repeating `venlo-bay.glb` / `gothic-arch.glb` for structure.
 

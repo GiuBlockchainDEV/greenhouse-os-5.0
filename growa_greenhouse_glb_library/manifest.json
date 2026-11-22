@@ -81,7 +81,7 @@
       ],
       "origin": "fan_axis",
       "y_up": true,
-      "triangles": 2800,
+      "triangles": 6336,
       "file": "exhaust-fan.glb",
       "mesh_names": [
         "HousingTop",
@@ -142,7 +142,7 @@
       ],
       "origin": "roof_base_center",
       "y_up": true,
-      "triangles": 328,
+      "triangles": 884,
       "file": "roof-exhaust-fan.glb",
       "mesh_names": [
         "exhaust_stack",
@@ -166,7 +166,7 @@
       ],
       "origin": "hanger_mount",
       "y_up": true,
-      "triangles": 256,
+      "triangles": 3604,
       "file": "haf-fan.glb",
       "mesh_names": [
         "fan_blade_1",
@@ -189,7 +189,7 @@
       ],
       "origin": "floor_center",
       "y_up": true,
-      "triangles": 60,
+      "triangles": 304,
       "file": "pad-module.glb",
       "mesh_names": [
         "cellulose_pad",
@@ -209,7 +209,7 @@
       ],
       "origin": "floor_center",
       "y_up": true,
-      "triangles": 136,
+      "triangles": 560,
       "file": "ac-unit.glb",
       "mesh_names": [
         "ac_cabinet",
@@ -227,7 +227,7 @@
       ],
       "origin": "inlet_center_bottom",
       "y_up": true,
-      "triangles": 12,
+      "triangles": 120,
       "file": "duct-straight.glb",
       "mesh_names": [
         "rectangular_duct"
@@ -261,7 +261,7 @@
       ],
       "origin": "duct_connection_center",
       "y_up": true,
-      "triangles": 72,
+      "triangles": 380,
       "file": "duct-diffuser.glb",
       "mesh_names": [
         "diffuser_frame",
@@ -300,7 +300,7 @@
       ],
       "origin": "bottom_center",
       "y_up": true,
-      "triangles": 120,
+      "triangles": 144,
       "file": "side-louver.glb",
       "mesh_names": [
         "louver_blade_1",
@@ -325,7 +325,7 @@
       ],
       "origin": "bottom_center",
       "y_up": true,
-      "triangles": 120,
+      "triangles": 144,
       "file": "gable-louver.glb",
       "mesh_names": [
         "louver_blade_1",
@@ -350,7 +350,7 @@
       ],
       "origin": "ceiling_mount_plane",
       "y_up": true,
-      "triangles": 132,
+      "triangles": 356,
       "file": "unit-heater.glb",
       "mesh_names": [
         "hanger_left",
@@ -369,7 +369,7 @@
       ],
       "origin": "floor_center",
       "y_up": true,
-      "triangles": 156,
+      "triangles": 652,
       "file": "air-heater.glb",
       "mesh_names": [
         "chimney",
@@ -387,7 +387,7 @@
       ],
       "origin": "support_base_center",
       "y_up": true,
-      "triangles": 124,
+      "triangles": 652,
       "file": "heat-pipe.glb",
       "mesh_names": [
         "pipe_support",
@@ -405,7 +405,7 @@
       ],
       "origin": "floor_loop_start",
       "y_up": true,
-      "triangles": 336,
+      "triangles": 1792,
       "file": "floor-loop.glb",
       "mesh_names": [
         "floor_pipe_1",
@@ -427,7 +427,7 @@
       ],
       "origin": "pipe_segment_start",
       "y_up": true,
-      "triangles": 136,
+      "triangles": 1792,
       "file": "fog-nozzle.glb",
       "mesh_names": [
         "nozzle_body",
@@ -445,7 +445,7 @@
       ],
       "origin": "support_base_start",
       "y_up": true,
-      "triangles": 36,
+      "triangles": 96,
       "file": "substrate-gutter.glb",
       "mesh_names": [
         "gutter_support",
@@ -463,7 +463,7 @@
       ],
       "origin": "channel_start_bottom",
       "y_up": true,
-      "triangles": 268,
+      "triangles": 1060,
       "file": "nft-channel.glb",
       "mesh_names": [
         "nft_channel",
@@ -483,7 +483,7 @@
       ],
       "origin": "bed_start_floor_center",
       "y_up": true,
-      "triangles": 36,
+      "triangles": 48,
       "file": "soil-bed.glb",
       "mesh_names": [
         "bed_edge_left",
@@ -519,7 +519,7 @@
       ],
       "origin": "line_start_ground",
       "y_up": true,
-      "triangles": 112,
+      "triangles": 1200,
       "file": "drip-line.glb",
       "mesh_names": [
         "drip_line",
@@ -576,7 +576,7 @@
       ],
       "origin": "channel_start_floor_center",
       "y_up": true,
-      "triangles": 332,
+      "triangles": 2316,
       "file": "aeroponic-channel.glb",
       "mesh_names": [
         "aeroponic_channel",

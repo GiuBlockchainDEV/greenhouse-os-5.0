@@ -82,7 +82,7 @@ function leafBlade(
   yaw: number,
   roll = 0,
 ): THREE.BufferGeometry {
-  const g = new THREE.PlaneGeometry(width, length, 1, 2);
+  const g = new THREE.PlaneGeometry(width, length, 2, 4);
   g.rotateX(-Math.PI / 2 + tiltX);
   g.rotateY(yaw);
   g.rotateZ(roll);
@@ -101,7 +101,7 @@ function compoundLeaf(
   const dark = LEAF[crop];
   const light = LEAF_LIGHT[crop];
   const parts: THREE.BufferGeometry[] = [];
-  const petiole = new THREE.CylinderGeometry(0.004, 0.006, size * 0.35, 5);
+  const petiole = new THREE.CylinderGeometry(0.004, 0.006, size * 0.35, 12);
   petiole.translate(x, y + size * 0.12, z);
   petiole.rotateZ(yaw);
   parts.push(paint(petiole, STEM_DARK));
@@ -142,12 +142,12 @@ function buildMount(system: CultivationSystem): THREE.BufferGeometry | null {
     case "nft":
     case "dwc":
     case "aeroponic": {
-      const pot = new THREE.CylinderGeometry(0.048, 0.038, 0.075, 12);
+      const pot = new THREE.CylinderGeometry(0.048, 0.038, 0.075, 24);
       pot.translate(0, 0.038, 0);
       parts.push(paint(pot, NET_POT));
       for (let i = 0; i < 5; i++) {
         const a = (i / 5) * Math.PI * 2;
-        const root = new THREE.CylinderGeometry(0.004, 0.002, 0.06 + (i % 2) * 0.02, 4);
+        const root = new THREE.CylinderGeometry(0.004, 0.002, 0.06 + (i % 2) * 0.02, 8);
         root.translate(Math.cos(a) * 0.02, -0.01, Math.sin(a) * 0.02);
         root.rotateX(0.4 + (i % 3) * 0.15);
         root.rotateZ(a);
@@ -204,7 +204,7 @@ function buildLettuce(stage: GrowthStage, compact: boolean): THREE.BufferGeometr
     }
   }
 
-  const core = new THREE.SphereGeometry(0.035 * scale, 8, 6);
+  const core = new THREE.SphereGeometry(0.035 * scale, 16, 12);
   core.translate(0, 0.05 * scale, 0);
   parts.push(paint(core, LEAF_LIGHT.lettuce));
 
@@ -233,7 +233,7 @@ function buildStrawberry(stage: GrowthStage, compact: boolean): THREE.BufferGeom
     );
   }
 
-  const crown = new THREE.CylinderGeometry(0.015 * scale, 0.022 * scale, 0.04 * scale, 8);
+  const crown = new THREE.CylinderGeometry(0.015 * scale, 0.022 * scale, 0.04 * scale, 16);
   crown.translate(0, 0.04 * scale, 0);
   parts.push(paint(crown, STEM));
 
@@ -259,12 +259,12 @@ function buildVineCrop(
           ? 0.14 * scale
           : 0.42 * scale;
 
-  const stem = new THREE.CylinderGeometry(0.012, 0.018, stemH, 8);
+  const stem = new THREE.CylinderGeometry(0.012, 0.018, stemH, 20);
   stem.translate(0, 0.06 + stemH / 2, 0);
   parts.push(paint(stem, STEM));
 
   if (hydro && (crop === "tomato" || crop === "cucumber" || crop === "pepper")) {
-    const wire = new THREE.CylinderGeometry(0.003, 0.003, stemH * 1.1, 6);
+    const wire = new THREE.CylinderGeometry(0.003, 0.003, stemH * 1.1, 12);
     wire.translate(0.04, 0.06 + stemH / 2, 0);
     parts.push(paint(wire, new THREE.Color("#78909c")));
   }
@@ -329,16 +329,16 @@ function buildFruit(crop: CropType, stage: GrowthStage, system: CultivationSyste
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
     if (crop === "cucumber") {
-      const cyl = new THREE.CylinderGeometry(0.018, 0.022, 0.1 + (i % 2) * 0.03, 8);
+      const cyl = new THREE.CylinderGeometry(0.018, 0.022, 0.1 + (i % 2) * 0.03, 16);
       cyl.rotateZ(Math.PI / 2);
       cyl.translate(Math.cos(a) * 0.06, baseY + (i % 2) * 0.04, Math.sin(a) * 0.06);
       parts.push(paint(cyl, color));
     } else if (crop === "strawberry") {
-      const sph = new THREE.SphereGeometry(0.024, 8, 8);
+      const sph = new THREE.SphereGeometry(0.024, 16, 12);
       sph.translate(Math.cos(a) * 0.05, 0.1, Math.sin(a) * 0.05);
       parts.push(paint(sph, color));
     } else {
-      const sph = new THREE.SphereGeometry(0.028 + (i % 2) * 0.006, 10, 10);
+      const sph = new THREE.SphereGeometry(0.028 + (i % 2) * 0.006, 20, 16);
       sph.translate(Math.cos(a) * 0.065, baseY + (i % 3) * 0.035, Math.sin(a) * 0.065);
       parts.push(paint(sph, color));
     }
@@ -355,7 +355,7 @@ export function createPlantLayers(
   system: CultivationSystem,
   growthStage: GrowthStage,
 ): PlantMeshLayers {
-  const key = `${cropType}:${system}:${growthStage}`;
+  const key = `${cropType}:${system}:${growthStage}:geo-v2`;
   const hit = cache.get(key);
   if (hit) return hit;
 

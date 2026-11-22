@@ -46,8 +46,8 @@ export function Viewport3D() {
     <div className="relative h-full w-full overflow-hidden rounded-2xl border border-border bg-gray-100 shadow-card">
       <Canvas
         shadows
-        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: false, powerPreference: "high-performance", logarithmicDepthBuffer: true }}
+        dpr={[1, Math.min(2.5, typeof window !== "undefined" ? window.devicePixelRatio : 2)]}
       >
         <Suspense fallback={<CanvasLoader />}>
           <SceneContent />

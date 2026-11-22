@@ -57,8 +57,8 @@ function InstancedPosts({
 
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]} castShadow receiveShadow>
-      <boxGeometry args={[0.08, eaveHeight, 0.08]} />
-      <meshStandardMaterial color={ALUMINUM} metalness={0.82} roughness={0.28} />
+      <cylinderGeometry args={[0.045, 0.05, eaveHeight, 24, 1]} />
+      <meshStandardMaterial color={ALUMINUM} metalness={0.84} roughness={0.26} />
     </instancedMesh>
   );
 }

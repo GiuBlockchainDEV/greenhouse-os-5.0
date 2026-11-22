@@ -44,7 +44,7 @@ export function SceneLook() {
         intensity={2.4}
         color="#fff4e0"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[4096, 4096]}
         shadow-bias={-0.00025}
         shadow-normalBias={0.04}
         shadow-camera-near={1}
@@ -73,7 +73,7 @@ export function SiteGround({ span }: { span: number }) {
         scale={Math.max(40, span * 1.8)}
         blur={2.4}
         far={Math.max(12, span * 0.35)}
-        resolution={512}
+        resolution={1024}
         color="#1c2418"
       />
     </group>
