@@ -193,7 +193,7 @@ function syncCropFromLayout(
       ...crop.layout,
       plantsPerTier: cultivation.plantsPerTier,
       gutterLengthM: Number(
-        Math.max(1, dimensions.length - 2 * crop.layout.sideClearanceM).toFixed(1),
+        Math.max(1, structure.bayWidthM - 2 * crop.layout.sideClearanceM).toFixed(1),
       ),
     },
   };
