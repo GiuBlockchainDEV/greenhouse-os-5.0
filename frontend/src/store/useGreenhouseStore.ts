@@ -10,6 +10,7 @@ import {
   normalizeHafFanCount,
 } from "@/lib/climateEquipmentLayout";
 import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
+import { resyncMarketEquipmentSizing } from "@/lib/marketGreenhouseEquipment";
 import {
   CUSTOM_GREENHOUSE_PRESET_ID,
   marketPresetById,
@@ -310,7 +311,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           climateEquipment.sizing.circulationFanCount,
           structure.bayCount,
         ).total;
-        const nextEquipment =
+        let nextEquipment =
           normalizedCount === climateEquipment.sizing.circulationFanCount
             ? climateEquipment
             : {
@@ -320,6 +321,13 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
                   circulationFanCount: normalizedCount,
                 },
               };
+        nextEquipment = applyMarketPresetEquipmentRescale({
+          marketPresetId: get().marketPresetId,
+          structure,
+          dimensions,
+          covering: get().covering,
+          climateEquipment: nextEquipment,
+        });
         set(
           {
             structure,
@@ -327,7 +335,6 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             crop,
             metrics,
             climateEquipment: nextEquipment,
-            marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
           },
           false,
           "setStructure",
@@ -341,11 +348,14 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
           ...update,
         });
         const { crop, metrics } = buildCropUpdate(structure, dimensions, get().crop, {});
-        set(
-          { dimensions, crop, metrics, marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID },
-          false,
-          "setDimensions",
-        );
+        const climateEquipment = applyMarketPresetEquipmentRescale({
+          marketPresetId: get().marketPresetId,
+          structure,
+          dimensions,
+          covering: get().covering,
+          climateEquipment: get().climateEquipment,
+        });
+        set({ dimensions, crop, metrics, climateEquipment }, false, "setDimensions");
       },
 
       setCovering: (covering) =>
@@ -520,5 +530,31 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
     { name: "greenhouse-store" },
   ),
 );
+
+function applyMarketPresetEquipmentRescale(state: {
+  marketPresetId: string;
+  structure: GreenhouseStructure;
+  dimensions: GreenhouseDimensions;
+  covering: CoveringMaterial;
+  climateEquipment: ClimateEquipment;
+}): ClimateEquipment {
+  if (state.marketPresetId === CUSTOM_GREENHOUSE_PRESET_ID) {
+    return state.climateEquipment;
+  }
+  return {
+    ...state.climateEquipment,
+    sizing: resyncMarketEquipmentSizing({
+      structure: state.structure,
+      dimensions: state.dimensions,
+      coveringType: state.covering.type,
+      equipment: {
+        cooling: state.climateEquipment.cooling,
+        heating: state.climateEquipment.heating,
+        ventilation: state.climateEquipment.ventilation,
+      },
+      existingSizing: state.climateEquipment.sizing,
+    }),
+  };
+}
 
 export { computeVolumeMetrics, syncDimensionsFromStructure };

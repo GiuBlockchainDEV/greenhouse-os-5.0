@@ -171,16 +171,35 @@ function needsPadWall(cooling: ClimateEquipment["cooling"]): boolean {
   return cooling === "fan_and_pad" || cooling === "evaporative";
 }
 
-function needsExhaustFans(
+/** Gable-mounted exhaust row (pad/evap, forced exhaust, or semi-closed bleed). */
+export function usesGableExhaustFans(
   cooling: ClimateEquipment["cooling"],
   ventilation: ClimateEquipment["ventilation"],
 ): boolean {
+  if (cooling === "high_pressure_fog" && (ventilation === "roof_vents" || ventilation === "natural_ridge")) {
+    return false;
+  }
   return (
     cooling === "fan_and_pad" ||
     cooling === "evaporative" ||
     ventilation === "forced_exhaust" ||
     ventilation === "combined"
   );
+}
+
+function needsExhaustFans(
+  cooling: ClimateEquipment["cooling"],
+  ventilation: ClimateEquipment["ventilation"],
+): boolean {
+  return usesGableExhaustFans(cooling, ventilation);
+}
+
+function roofVentsPerBay(totalCount: number, bayCount: number): number[] {
+  const bays = Math.max(1, bayCount);
+  const total = Math.max(0, Math.floor(totalCount));
+  const base = Math.floor(total / bays);
+  const remainder = total % bays;
+  return Array.from({ length: bays }, (_, index) => base + (index < remainder ? 1 : 0));
 }
 
 function gableFanCenterY(
@@ -503,9 +522,10 @@ export function computeClimateEquipmentLayout(params: {
     equipment.ventilation === "natural_ridge";
 
   if (showRoofVents && sizing.roofVentCount > 0) {
-    const ventCount = sizing.roofVentCount;
+    const ventsPerBay = roofVentsPerBay(sizing.roofVentCount, bayCount);
     for (let bayIndex = 0; bayIndex < bayCount; bayIndex++) {
-      const perBay = Math.ceil(ventCount / bayCount);
+      const perBay = ventsPerBay[bayIndex] ?? 0;
+      if (perBay <= 0) continue;
       const zCenter = bayCenterZ(bayIndex, bayWidthM, width);
       const ventXs = spreadAlongAxis(perBay, length * 0.75, length * 0.12);
       ventXs.forEach((offsetX) => {

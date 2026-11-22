@@ -24,7 +24,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- **Market greenhouse preset audit** — Refactored equipment sizing into `marketGreenhouseEquipment.ts` (WS caps, semi-closed exhaust/HAF rules, pad wall only for evaporative modes); ridge-height normalization; Alweco Cabrio lettuce NFT preset without hot-water heating; validation helper and `docs/MARKET_GREENHOUSES.md`.
+- **Market greenhouse preset audit** — Refactored equipment sizing into `marketGreenhouseEquipment.ts` (WS caps, semi-closed exhaust/HAF rules, pad wall only for evaporative modes); ridge-height normalization; Alweco Cabrio lettuce NFT preset without hot-water heating; validation helper and `docs/MARKET_GREENHOUSES.md`. Preset-linked rescale on structure/dimension edits; roof vent 3D instance count matches stored `roofVentCount`.
 
 - **Fertigation 3D plant layout** — Replaced misleading greenhouse HVAC GLBs with engineering primitives (tanks, pumps, valves, injectors) on a three-row skid layout aligned with P&ID flow; pipe elevations per circuit; equipment tags in-scene; crop zones still use cultivation GLBs.
 

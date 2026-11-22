@@ -191,3 +191,25 @@ export function buildClimateEquipmentForMarketSpec(spec: MarketGreenhouseSpecSli
     sizing: equipmentSizingForMarketSpec(spec),
   };
 }
+
+/** Recompute preset-derived equipment counts after the user edits bays or dimensions. */
+export function resyncMarketEquipmentSizing(input: {
+  structure: { bayCount: number; bayWidthM: number };
+  dimensions: { length: number; eaveHeight: number; ridgeHeight: number };
+  coveringType: MarketGreenhouseSpecSlice["cover"];
+  equipment: Pick<ClimateEquipment, "cooling" | "heating" | "ventilation">;
+  existingSizing: ClimateEquipment["sizing"];
+}) {
+  const fresh = equipmentSizingForMarketSpec({
+    bays: input.structure.bayCount,
+    bayM: input.structure.bayWidthM,
+    lengthM: input.dimensions.length,
+    eaveM: input.dimensions.eaveHeight,
+    ridgeM: input.dimensions.ridgeHeight,
+    cover: input.coveringType,
+    cooling: input.equipment.cooling,
+    heating: input.equipment.heating,
+    ventilation: input.equipment.ventilation,
+  });
+  return { ...input.existingSizing, ...fresh };
+}
