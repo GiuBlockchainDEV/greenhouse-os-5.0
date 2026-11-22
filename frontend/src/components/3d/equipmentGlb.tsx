@@ -18,10 +18,8 @@ function repeats(span: number, moduleLength: number, cap: number): { count: numb
   return { count, step: span / count };
 }
 
-/** Native horizontal span of `exhaust-fan.glb` (author fanex asset, meters). */
-const EXHAUST_FAN_REF_M = 0.978;
-/** Mount face depth from origin toward gable plane (asset Y-up, back face ≈ −Z). */
-const EXHAUST_FAN_MOUNT_Z_M = 0.199;
+/** Author fanex asset size (m): square face width and height. */
+const EXHAUST_FAN_FACE_M = 0.978;
 
 function EastGableExhaustFanModel({
   fan,
@@ -30,14 +28,18 @@ function EastGableExhaustFanModel({
   fan: FanPlacement;
   wallInsetM: number;
 }) {
-  const scale = fan.diameterM / EXHAUST_FAN_REF_M;
+  const scale = fan.diameterM / EXHAUST_FAN_FACE_M;
+  /** East gable glazing plane matches `fan.x + wallInset` (see `ExhaustGableWall`). */
   const wallX = fan.x + wallInsetM;
-  const x = wallX + EXHAUST_FAN_MOUNT_Z_M * scale;
+  const openingCenterY = fan.y;
+  const openingCenterZ = fan.z;
+  /** Asset origin is floor-center; opening cutout is geometric center at `(y, z)`. */
+  const y = openingCenterY - (EXHAUST_FAN_FACE_M / 2) * scale;
   return (
     <GltfPart
       file="exhaust-fan.glb"
-      position={[x, fan.y, fan.z]}
-      rotation={[0, -Math.PI / 2, 0]}
+      position={[wallX, y, openingCenterZ]}
+      rotation={[0, Math.PI / 2, 0]}
       scale={[scale, scale, scale]}
     />
   );

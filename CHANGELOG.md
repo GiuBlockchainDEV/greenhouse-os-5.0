@@ -32,6 +32,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Exhaust fan GLB (fanex)** — Replaced `exhaust-fan.glb` / `roof-exhaust-fan.glb` with author `fanex` model; updated gable mount reference diameter and inset in `equipmentGlb.tsx`.
 
+- **Exhaust fan gable alignment** — Flip fan orientation (π/2 Y), center on east gable opening (vertical offset for floor-origin GLB), mount on wall plane not outside offset.
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.
