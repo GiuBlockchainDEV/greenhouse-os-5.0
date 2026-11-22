@@ -22,15 +22,7 @@ function FertigationCanvasInner() {
 
   const project = activeProject ?? freshFertigationProject(templateId);
 
-  const span = useMemo(() => {
-    let maxR = 8;
-    for (const node of project.nodes) {
-      const x = Math.abs((node.x - 448) / 14);
-      const z = Math.abs((node.y - 247) / 14);
-      maxR = Math.max(maxR, x + 3, z + 3);
-    }
-    return maxR;
-  }, [project]);
+  const span = useMemo(() => Math.max(9, 14 * 0.55 + 5), []);
 
   return (
     <>
@@ -65,6 +57,27 @@ export function FertigationPlantViewport() {
 
   return (
     <div className="relative h-full min-h-[220px] w-full overflow-hidden rounded-2xl border border-border bg-gray-100 shadow-card">
+      <div className="pointer-events-none absolute bottom-3 right-3 z-10 flex flex-col gap-1 rounded-lg border border-border bg-white/95 px-3 py-2 text-[10px] backdrop-blur-sm">
+        <span className="font-semibold text-gray-800">{t("viewport.flowLegend")}</span>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-label">
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-[#4A90A4]" />
+            {t("viewport.circuitSource")}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-[#64748b]" />
+            {t("viewport.circuitMix")}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-[#059669]" />
+            {t("viewport.circuitCrop")}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-[#2F7A6C]" />
+            {t("viewport.circuitReturn")}
+          </span>
+        </div>
+      </div>
       <div className="pointer-events-none absolute left-3 right-3 top-3 z-10 flex flex-col gap-1 rounded-lg border border-border bg-white/95 px-3 py-2 backdrop-blur-sm">
         <span className="text-[10px] font-bold uppercase tracking-wide text-status-optimalDark">
           {t("viewport.badge")}

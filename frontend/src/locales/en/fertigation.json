@@ -6,13 +6,13 @@
   },
   "steps": {
     "choosePreset": "Choose a plant from the list (e.g. dual-tank NFT or multi-sector drip).",
-    "open3d": "Open the «3D plant» tab to see tanks, pumps and crop lines with greenhouse GLBs.",
+    "open3d": "Open the «3D plant» tab: water flows left to right (make-up, mixing, crop). Tags match the P&ID.",
     "openPid": "Open «P&ID & simulation» to edit piping, run hydraulics and read EC/pH."
   },
   "guide": {
     "headline": "What do you want to see?",
     "lead": "One screen at a time — same idea as the greenhouse twin.",
-    "plant3dHint": "Orbit with the mouse: tanks, pumps, pipes and crop lines in greenhouse-quality 3D.",
+    "plant3dHint": "Orbit with the mouse. Cylinders are tanks, pumps have a motor block — same tags as the schematic (e.g. TK-301).",
     "pidHint": "Technical schematic and simulator: wiring, controls and validation."
   },
   "views": {
@@ -25,7 +25,7 @@
     "intro": "Choose the plant type on the left; the center shows the result. Data can follow your greenhouse crop and area.",
     "nowPlant3d": "You are viewing 3D",
     "nowPid": "You are viewing P&ID & simulation",
-    "plant3dBody": "Physical layout: same GLB style as the greenhouse. Large tanks, compact pumps, color-coded pipe circuits.",
+    "plant3dBody": "Engineering layout: three rows (make-up, conditioning, crop). Pipe colours follow circuit type; crop beds use greenhouse crop models.",
     "pidBody": "Edit the schematic, run the virtual simulator and check flows, EC and pH inside the twin.",
     "footer": "If something is unclear, switch back to «3D plant»: each machine maps to a P&ID symbol."
   },
@@ -65,7 +65,12 @@
     "title": "Growa fertigation digital twin"
   },
   "viewport": {
-    "badge": "3D view — greenhouse style"
+    "badge": "3D plant layout",
+    "flowLegend": "Pipe colour",
+    "circuitSource": "Make-up",
+    "circuitMix": "Mixing",
+    "circuitCrop": "Crop",
+    "circuitReturn": "Return"
   },
   "templates": {
     "nftDual": {

@@ -6,13 +6,13 @@
   },
   "steps": {
     "choosePreset": "Scegli l’impianto dal menu (es. NFT doppio serbatoio o goccia a settori).",
-    "open3d": "Apri la scheda «Vista 3D» per vedere pompe, serbatoi e colture con i modelli della serra.",
+    "open3d": "Apri «Vista 3D»: l’acqua va da sinistra a destra (adduzione, miscelazione, coltura). Le sigle coincidono col P&ID.",
     "openPid": "Apri «P&ID e simulazione» per modificare tubi, avviare la simulazione idraulica e leggere EC/pH."
   },
   "guide": {
     "headline": "Cosa vuoi vedere adesso?",
     "lead": "Non mostriamo due mondi insieme: una schermata alla volta, come nella serra.",
-    "plant3dHint": "Ruota con il mouse: vedi serbatoi, pompe, tubazioni e linee di coltura in 3D (stessi GLB della serra).",
+    "plant3dHint": "Ruota con il mouse. I cilindri sono i serbatoi, le pompe hanno il motore — stesse sigle dello schema (es. TK-301).",
     "pidHint": "Schema tecnico e simulator: collega componenti, controlli e validazione."
   },
   "views": {
@@ -25,7 +25,7 @@
     "intro": "A sinistra scegli il tipo di impianto; al centro guardi il risultato. I dati possono seguire serra e coltura selezionate nel gemello 3D.",
     "nowPlant3d": "Stai guardando la vista 3D",
     "nowPid": "Stai guardando P&ID e simulazione",
-    "plant3dBody": "È il layout fisico: stessa resa dei modelli serra. Serbatoi grandi, pompe compatte, tubi colorati per circuito (miscelazione, coltura, ritorno).",
+    "plant3dBody": "Layout ingegneristico in tre file (adduzione, condizionamento, coltura). Colori tubi = tipo di circuito; le colture usano i modelli colturali della serra.",
     "pidBody": "Qui edichi lo schema, avvii la simulazione virtuale e controlli portate, EC e pH. Usa la colonna a sinistra nel twin per componenti e controlli.",
     "footer": "Se non riconosci un elemento, torna alla «Vista 3D»: ogni macchina corrisponde a un simbolo nel P&ID."
   },
@@ -65,7 +65,12 @@
     "title": "Digital twin fertirrigazione Growa"
   },
   "viewport": {
-    "badge": "Vista 3D — stile serra"
+    "badge": "Layout 3D impianto",
+    "flowLegend": "Colore tubi",
+    "circuitSource": "Adduzione",
+    "circuitMix": "Miscelazione",
+    "circuitCrop": "Coltura",
+    "circuitReturn": "Ritorno"
   },
   "templates": {
     "nftDual": {

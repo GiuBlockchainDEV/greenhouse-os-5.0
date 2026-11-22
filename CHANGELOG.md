@@ -24,6 +24,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Fertigation 3D plant layout** — Replaced misleading greenhouse HVAC GLBs with engineering primitives (tanks, pumps, valves, injectors) on a three-row skid layout aligned with P&ID flow; pipe elevations per circuit; equipment tags in-scene; crop zones still use cultivation GLBs.
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.

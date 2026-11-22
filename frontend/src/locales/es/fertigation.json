@@ -6,13 +6,13 @@
   },
   "steps": {
     "choosePreset": "Elija el impianto en la lista.",
-    "open3d": "Abra la pestaña «Vista 3D».",
+    "open3d": "Abra «Vista 3D»: el agua va de izquierda a derecha (alimentación, mezcla, cultivo). Las etiquetas coinciden con el P&ID.",
     "openPid": "Abra «P&ID y simulación» para el esquema y la simulación."
   },
   "guide": {
     "headline": "¿Qué quiere ver?",
     "lead": "Una pantalla cada vez, como en el invernadero.",
-    "plant3dHint": "Vista 3D con los mismos modelos GLB del invernadero.",
+    "plant3dHint": "Gire con el ratón. Los cilindros son depósitos, las bombas llevan motor — mismas siglas que el esquema (p. ej. TK-301).",
     "pidHint": "Esquema técnico y simulador hidráulico."
   },
   "views": {
@@ -25,7 +25,7 @@
     "intro": "A la izquierda elige el impianto; al centro ves el resultado.",
     "nowPlant3d": "Está en vista 3D",
     "nowPid": "Está en P&ID y simulación",
-    "plant3dBody": "Disposición física con modelos de la serra.",
+    "plant3dBody": "Disposición en tres filas (alimentación, acondicionamiento, cultivo). Colores de tubería por circuito; cultivo con modelos de cama.",
     "pidBody": "Edite tuberías y ejecute la simulación virtual.",
     "footer": "Cambie de pestaña si necesita más detalle."
   },
@@ -65,7 +65,12 @@
     "title": "Gemelo digital de fertirrigación Growa"
   },
   "viewport": {
-    "badge": "Planta GLB de ingeniería"
+    "badge": "Disposición 3D del impianto",
+    "flowLegend": "Color de tubería",
+    "circuitSource": "Alimentación",
+    "circuitMix": "Mezcla",
+    "circuitCrop": "Cultivo",
+    "circuitReturn": "Retorno"
   },
   "templates": {
     "nftDual": {

@@ -1,13 +1,16 @@
+import { Text } from "@react-three/drei";
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { GltfPart } from "@/components/3d/GltfPart";
-import { glbPlacementForNode } from "@/lib/fertigation/fertigationGlbMap";
-import { pidLayoutCenter, pidNodeToWorld } from "@/lib/fertigation/pidToWorld";
-import type { FertigationProject } from "@/types/fertigation";
+import { FertigationPlantPart } from "@/components/fertigation/FertigationPlantPart";
+import {
+  computePlantLayout,
+  connectionHeightY,
+  plantLayoutCenter,
+} from "@/lib/fertigation/plantLayoutEngine";
+import type { FertigationNode, FertigationProject } from "@/types/fertigation";
 
-const PIPE_Y = 0.42;
-const PIPE_RADIUS = 0.028;
+const PIPE_RADIUS = 0.03;
 
 function FertigationPipe({
   from,
@@ -19,8 +22,8 @@ function FertigationPipe({
   tint: string;
 }) {
   const { position, rotation, length } = useMemo(() => {
-    const a = new THREE.Vector3(from[0], PIPE_Y, from[2]);
-    const b = new THREE.Vector3(to[0], PIPE_Y, to[2]);
+    const a = new THREE.Vector3(...from);
+    const b = new THREE.Vector3(...to);
     const dir = new THREE.Vector3().subVectors(b, a);
     const len = dir.length();
     const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
@@ -34,68 +37,105 @@ function FertigationPipe({
     };
   }, [from, to]);
 
-  if (length < 0.05) {
+  if (length < 0.04) {
     return null;
   }
 
   return (
     <mesh position={position} rotation={rotation} castShadow receiveShadow>
-      <cylinderGeometry args={[PIPE_RADIUS, PIPE_RADIUS, length, 20]} />
+      <cylinderGeometry args={[PIPE_RADIUS, PIPE_RADIUS, length, 18]} />
       <meshStandardMaterial color={tint} metalness={0.72} roughness={0.28} />
     </mesh>
   );
 }
 
 const CIRCUIT_COLOR: Record<string, string> = {
-  source: "#608FA2",
-  mix: "#94a3b8",
-  transfer: "#a8b4c0",
+  source: "#4A90A4",
+  mix: "#64748b",
+  transfer: "#94a3b8",
   crop: "#059669",
-  return: "#5D988C",
-  inline: "#64748b",
+  return: "#2F7A6C",
+  inline: "#475569",
   bypass: "#9ca3af",
   custom: "#94a3b8",
 };
 
+function nodeKindById(nodes: FertigationNode[]): Map<string, FertigationNode["kind"]> {
+  const map = new Map<string, FertigationNode["kind"]>();
+  for (const node of nodes) {
+    map.set(node.id, node.kind);
+  }
+  return map;
+}
+
 export function FertigationPlantScene({ project }: { project: FertigationProject }) {
+  const poses = useMemo(() => computePlantLayout(project.nodes), [project.nodes]);
+  const kinds = useMemo(() => nodeKindById(project.nodes), [project.nodes]);
+  const [centerX, centerZ] = useMemo(() => plantLayoutCenter(poses), [poses]);
+
   const worldById = useMemo(() => {
     const map = new Map<string, [number, number, number]>();
-    for (const node of project.nodes) {
-      map.set(node.id, pidNodeToWorld(node));
+    for (const [id, pose] of poses.entries()) {
+      map.set(id, pose.position);
     }
     return map;
-  }, [project.nodes]);
-
-  const [centerX, centerZ] = useMemo(() => pidLayoutCenter(project.nodes), [project.nodes]);
+  }, [poses]);
 
   return (
     <group position={[-centerX, 0, -centerZ]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
+        <planeGeometry args={[24, 16]} />
+        <meshStandardMaterial color="#f1f5f9" roughness={0.92} metalness={0.05} />
+      </mesh>
+
       {project.edges.map((edge) => {
-        const a = worldById.get(edge.from);
-        const b = worldById.get(edge.to);
-        if (!a || !b || edge.enabled === false) {
+        const aXY = worldById.get(edge.from);
+        const bXY = worldById.get(edge.to);
+        if (!aXY || !bXY || edge.enabled === false) {
           return null;
         }
+        const kindA = kinds.get(edge.from) ?? "junction";
+        const kindB = kinds.get(edge.to) ?? "junction";
+        const yA = connectionHeightY(kindA, edge.circuit);
+        const yB = connectionHeightY(kindB, edge.circuit);
         return (
           <FertigationPipe
             key={edge.id}
-            from={a}
-            to={b}
+            from={[aXY[0], yA, aXY[2]]}
+            to={[bXY[0], yB, bXY[2]]}
             tint={CIRCUIT_COLOR[edge.circuit] ?? "#94a3b8"}
           />
         );
       })}
+
       {project.nodes.map((node) => {
-        const placement = glbPlacementForNode(node);
-        const [x, , z] = worldById.get(node.id) ?? [0, 0, 0];
+        const base = worldById.get(node.id);
+        if (!base) {
+          return null;
+        }
+        const labelY =
+          node.kind === "tank"
+            ? 1.55
+            : node.kind === "crop"
+              ? 0.72
+              : node.kind === "pump"
+                ? 0.62
+                : 0.95;
         return (
-          <GltfPart
-            key={node.id}
-            file={placement.file}
-            position={[x, placement.yOffset, z]}
-            rotation={[0, placement.rotationY ?? 0, 0]}
-            scale={placement.scale}
-          />
+          <group key={node.id}>
+            <FertigationPlantPart node={node} position={base} />
+            <Text
+              position={[base[0], labelY, base[2]]}
+              fontSize={0.16}
+              color="#0f172a"
+              anchorX="center"
+              anchorY="bottom"
+              outlineWidth={0.015}
+              outlineColor="#ffffff"
+            >
+              {node.tag}
+            </Text>
+          </group>
         );
       })}
     </group>

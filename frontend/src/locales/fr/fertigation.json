@@ -6,13 +6,13 @@
   },
   "steps": {
     "choosePreset": "Choisissez l'installation dans la liste.",
-    "open3d": "Onglet « Vue 3D ».",
+    "open3d": "Onglet « Vue 3D » : l'eau va de gauche à droite (appoint, mélange, culture). Les repères correspondent au P&ID.",
     "openPid": "Onglet « P&ID et simulation »."
   },
   "guide": {
     "headline": "Que voulez-vous voir ?",
     "lead": "Un écran à la fois, comme pour la serre.",
-    "plant3dHint": "Vue 3D avec les mêmes GLB que la serre.",
+    "plant3dHint": "Rotation à la souris. Les cylindres sont les réservoirs, les pompes ont un bloc moteur — mêmes repères que le schéma (ex. TK-301).",
     "pidHint": "Schéma technique et simulateur."
   },
   "views": {
@@ -25,7 +25,7 @@
     "intro": "À gauche : type d'installation ; au centre : le résultat.",
     "nowPlant3d": "Vue 3D active",
     "nowPid": "P&ID et simulation actifs",
-    "plant3dBody": "Mise en page physique style serre.",
+    "plant3dBody": "Plan en trois files (appoint, conditionnement, culture). Couleurs des tuyaux par circuit ; lits de culture en modèles dédiés.",
     "pidBody": "Éditez les tuyauteries et lancez la simulation.",
     "footer": "Changez d'onglet pour plus de détail."
   },
@@ -65,7 +65,12 @@
     "title": "Jumeau digital fertilisation Growa"
   },
   "viewport": {
-    "badge": "Usine GLB d'ingénierie"
+    "badge": "Plan 3D de l'installation",
+    "flowLegend": "Couleur des tuyaux",
+    "circuitSource": "Appoint",
+    "circuitMix": "Mélange",
+    "circuitCrop": "Culture",
+    "circuitReturn": "Retour"
   },
   "templates": {
     "nftDual": {
