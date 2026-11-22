@@ -177,7 +177,7 @@ The header **workspace switch** (`WorkspaceModeSwitch`) toggles `useWorkspaceSto
 | `greenhouse` | 3-column R3F viewport + GAIA copilot | WebGL simulation pipeline |
 | `fertigation` | Full-width sandboxed iframe | `frontend/public/growa-digital-twin-simulato-v20.html` (Growa P&ID / fertigation twin v20, localStorage projects) |
 
-Fertigation mode keeps auth and language controls in the header; the twin runs same-origin for `localStorage` without bundling its legacy monolith into Vite.
+Fertigation mode mirrors the greenhouse **3-column shell**: `FertigationPresetControls` (market systems + process templates + component catalog), embedded twin iframe, and `FertigationSummaryPanel`. Typed presets live in `frontend/src/lib/fertigation/` (`fertigationPresets.ts`, `templates/`, `componentCatalog.ts`, `projectFactory.ts`). `useFertigationStore` builds a versioned project graph and persists to the twin's `localStorage` key before iframe reload. Optional `syncFromGreenhouse.ts` maps cultivation area, bed lines, and plant counts onto the crop circuit node.
 
 ### Frontend Module Map
 

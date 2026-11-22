@@ -29,7 +29,7 @@
     "greenhouse": "Greenhouse twin",
     "fertigation": "Fertigation studio",
     "fertigationTitle": "Growa Digital Twin — fertigation and P&ID simulator",
-    "fertigationHint": "P&ID graph, 3D fertigation scene, and local project storage run inside this embedded studio."
+    "fertigationHint": "Market fertigation presets, typed component catalog, and P&ID simulation — same preset pattern as the greenhouse twin."
   },
   "units": {
     "meters": "m",

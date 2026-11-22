@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Fertigation market presets & typed catalog** — Commercial fertigation presets (Priva, Ridder, Netafim, Hoogendoorn, Van der Hoeven, Growa), five process templates (`nft-dual`, `nft-shared`, `dwc-recirc`, `substrate-drip`, `inline-drip`), P&ID component library, `useFertigationStore`, greenhouse metric sync, and 3-column studio UI (`fertigation` i18n namespace).
+
 - **Growa Digital Twin v20 (fertigation studio)** — Static twin at `frontend/public/growa-digital-twin-simulato-v20.html` embedded via header workspace switch (`Greenhouse twin` / `Fertigation studio`), Zustand `useWorkspaceStore`, and `FertigationTwinFrame` iframe shell with i18n labels (`common.workspace.*`).
 
 - **awesome-3d-skills integration** — Installed Three.js geometry, asset-pipeline, pipes, greenhouse, and metal agent skills (from [awesome-3d-skills](https://github.com/zhuyansen/awesome-3d-skills)) under `.cursor/skills/` and added `growa_greenhouse_glb_library/scripts/build_library.py` to regenerate equipment/cultivation GLBs with U-channel trays, duct stiffeners, corrugated pads, and PBR materials.

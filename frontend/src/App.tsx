@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
+import { FertigationPresetControls } from "@/components/fertigation/FertigationPresetControls";
+import { FertigationSummaryPanel } from "@/components/fertigation/FertigationSummaryPanel";
 import { FertigationTwinFrame } from "@/components/fertigation/FertigationTwinFrame";
 import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
@@ -51,11 +53,12 @@ export function AppShell() {
           <AICopilotPanel />
         </main>
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-          <p className="mb-2 shrink-0 text-xs text-label">{t("workspace.fertigationHint")}</p>
-          <div className="min-h-0 flex-1">
+        <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">
+          <FertigationPresetControls />
+          <div className="relative min-h-0">
             <FertigationTwinFrame />
           </div>
+          <FertigationSummaryPanel />
         </main>
       )}
     </div>

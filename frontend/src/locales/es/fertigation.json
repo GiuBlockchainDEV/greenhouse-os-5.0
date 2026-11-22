@@ -1,0 +1,70 @@
+{
+  "panel": {
+    "title": "Estudio de fertirrigación",
+    "hint": "Cargue una topología comercial o mantenga un P&ID personalizado. Las tipologías coinciden con el catálogo de simulación."
+  },
+  "presets": {
+    "title": "Sistemas comerciales",
+    "hint": "Skids tipo Priva / Ridder / Netafim con P&ID y roles hidráulicos precablesados.",
+    "custom": "Topología personalizada",
+    "matchCrop": "Alinear al sistema de cultivo actual"
+  },
+  "topology": {
+    "title": "Plantilla de proceso"
+  },
+  "sync": {
+    "greenhouse": "Escalar el circuito de cultivo desde métricas del invernadero",
+    "linked": "Vinculado al gemelo del invernadero"
+  },
+  "catalog": {
+    "title": "Biblioteca de componentes",
+    "hint": "Vocabulario de símbolos P&ID para el editor twin."
+  },
+  "summary": {
+    "title": "Configuración activa",
+    "hint": "Lo que GreenhouseOS envía al gemelo digital antes de simular.",
+    "activePreset": "Preset comercial",
+    "category": "Clase hidráulica",
+    "plants": "plantas mapeadas",
+    "footer": "Edite tuberías y consignas en el twin. El cambio de preset recarga el proyecto desde el catálogo tipado."
+  },
+  "frame": {
+    "title": "Gemelo digital de fertirrigación Growa"
+  },
+  "templates": {
+    "nftDual": {
+      "name": "NFT · doble depósito",
+      "subtitle": "Acondicionamiento TK-301 / cultivo TK-302"
+    },
+    "nftShared": {
+      "name": "NFT · depósito compartido",
+      "subtitle": "Bombas de mezcla y cultivo independientes"
+    },
+    "inlineDrip": {
+      "name": "Inline · goteo multisector",
+      "subtitle": "Inyección, manifold, entrega a campo"
+    },
+    "substrateDrip": {
+      "name": "Sustrato · goteo en losa",
+      "subtitle": "Seis sectores, drenaje a desecho"
+    },
+    "dwcRecirc": {
+      "name": "DWC · recirculación",
+      "subtitle": "Sump común y circuito de balsas"
+    }
+  },
+  "components": {
+    "source": { "name": "Fuente de agua", "category": "Suministro", "description": "Pozo, red u osmosis presurizada." },
+    "filter": { "name": "Filtro", "category": "Suministro", "description": "Filtro mecánico con diferencial." },
+    "tank": { "name": "Depósito", "category": "Almacenamiento", "description": "Nivel y calidad nutritiva." },
+    "pump": { "name": "Bomba", "category": "Hidráulica", "description": "Bomba con curva de altura." },
+    "valve": { "name": "Válvula", "category": "Hidráulica", "description": "Aislamiento o control." },
+    "injector": { "name": "Inyector Venturi", "category": "Dosificación", "description": "Nutrientes y ácido multicanal." },
+    "sensor": { "name": "Analizador CE/pH", "category": "Instrumentación", "description": "Medición en línea." },
+    "flowmeter": { "name": "Caudalímetro", "category": "Instrumentación", "description": "Caudal en rama." },
+    "manifold": { "name": "Colector de sectores", "category": "Distribución", "description": "Válvulas por sector." },
+    "crop": { "name": "Circuito de cultivo", "category": "Distribución", "description": "Demanda NFT, DWC o goteo." },
+    "return": { "name": "Retorno", "category": "Distribución", "description": "Retorno por gravedad." },
+    "junction": { "name": "Unión", "category": "Hidráulica", "description": "Derivación o bypass." }
+  }
+}

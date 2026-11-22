@@ -1,0 +1,118 @@
+{
+  "panel": {
+    "title": "Studio fertirrigazione",
+    "hint": "Carica una topologia commerciale o mantieni un P&ID personalizzato. Le tipologie componenti coincidono con il catalogo di simulazione."
+  },
+  "presets": {
+    "title": "Impianti commerciali",
+    "hint": "Skid tipo Priva / Ridder / Netafim con P&ID e ruoli idraulici precostruiti.",
+    "custom": "Topologia personalizzata",
+    "matchCrop": "Allinea al sistema di coltivazione attuale"
+  },
+  "topology": {
+    "title": "Template di processo"
+  },
+  "sync": {
+    "greenhouse": "Scala il circuito coltura dai dati serra (area, linee, piante)",
+    "linked": "Collegato al gemello serra"
+  },
+  "catalog": {
+    "title": "Libreria componenti",
+    "hint": "Vocabolario simboli P&ID inseribili nel twin."
+  },
+  "summary": {
+    "title": "Configurazione attiva",
+    "hint": "Cosa GreenhouseOS invia al digital twin prima della simulazione.",
+    "activePreset": "Preset commerciale",
+    "category": "Classe idraulica",
+    "plants": "piante mappate",
+    "footer": "Modifica tubazioni e setpoint nel twin. Il cambio preset ricarica il progetto dal catalogo tipizzato."
+  },
+  "frame": {
+    "title": "Digital twin fertirrigazione Growa"
+  },
+  "templates": {
+    "nftDual": {
+      "name": "NFT · doppio serbatoio",
+      "subtitle": "Condizionamento TK-301 / coltura TK-302"
+    },
+    "nftShared": {
+      "name": "NFT · serbatoio unico",
+      "subtitle": "Pompe miscelazione e coltura indipendenti"
+    },
+    "inlineDrip": {
+      "name": "Inline · gocciolamento multi-settore",
+      "subtitle": "Iniezione, collettore, consegna a campo"
+    },
+    "substrateDrip": {
+      "name": "Substrato · goccia su zolla",
+      "subtitle": "Sei settori gutter, scarico a vista"
+    },
+    "dwcRecirc": {
+      "name": "DWC · ricircolo zattere",
+      "subtitle": "Vasca comune e loop raft"
+    }
+  },
+  "components": {
+    "source": {
+      "name": "Fonte acqua",
+      "category": "Alimentazione",
+      "description": "Pozzo, rete o osmosi con pressione."
+    },
+    "filter": {
+      "name": "Filtro",
+      "category": "Alimentazione",
+      "description": "Filtro meccanico con deltaP."
+    },
+    "tank": {
+      "name": "Serbatoio",
+      "category": "Accumulo",
+      "description": "Livello e qualità nutriente."
+    },
+    "pump": {
+      "name": "Pompa",
+      "category": "Idraulica",
+      "description": "Pompa di servizio con curva prevalenza."
+    },
+    "valve": {
+      "name": "Valvola",
+      "category": "Idraulica",
+      "description": "Valvola di comando o isolamento."
+    },
+    "injector": {
+      "name": "Iniettore Venturi",
+      "category": "Dosaggio",
+      "description": "Nutrienti e acido multicanale."
+    },
+    "sensor": {
+      "name": "Analizzatore EC/pH",
+      "category": "Strumentazione",
+      "description": "Misura in linea con ritardo."
+    },
+    "flowmeter": {
+      "name": "Misuratore portata",
+      "category": "Strumentazione",
+      "description": "Portata su ramo idraulico."
+    },
+    "manifold": {
+      "name": "Collettore settori",
+      "category": "Distribuzione",
+      "description": "Valvole settore indipendenti."
+    },
+    "crop": {
+      "name": "Circuito coltura",
+      "category": "Distribuzione",
+      "description": "Nodo domanda NFT, DWC, goccia o substrato."
+    },
+    "return": {
+      "name": "Ritorno",
+      "category": "Distribuzione",
+      "description": "Ritorno gravitazionale al serbatoio."
+    },
+    "junction": {
+      "name": "Giunzione",
+      "category": "Idraulica",
+      "description": "Diramazione o bypass."
+    }
+  }
+}

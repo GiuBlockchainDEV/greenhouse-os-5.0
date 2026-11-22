@@ -5,24 +5,28 @@ import aiCopilotEn from "@/locales/en/ai_copilot.json";
 import controls3dEn from "@/locales/en/3d_controls.json";
 import commonEn from "@/locales/en/common.json";
 import cropsEn from "@/locales/en/crops.json";
+import fertigationEn from "@/locales/en/fertigation.json";
 import simulationEn from "@/locales/en/simulation.json";
 
 import aiCopilotEs from "@/locales/es/ai_copilot.json";
 import controls3dEs from "@/locales/es/3d_controls.json";
 import commonEs from "@/locales/es/common.json";
 import cropsEs from "@/locales/es/crops.json";
+import fertigationEs from "@/locales/es/fertigation.json";
 import simulationEs from "@/locales/es/simulation.json";
 
 import aiCopilotFr from "@/locales/fr/ai_copilot.json";
 import controls3dFr from "@/locales/fr/3d_controls.json";
 import commonFr from "@/locales/fr/common.json";
 import cropsFr from "@/locales/fr/crops.json";
+import fertigationFr from "@/locales/fr/fertigation.json";
 import simulationFr from "@/locales/fr/simulation.json";
 
 import aiCopilotIt from "@/locales/it/ai_copilot.json";
 import controls3dIt from "@/locales/it/3d_controls.json";
 import commonIt from "@/locales/it/common.json";
 import cropsIt from "@/locales/it/crops.json";
+import fertigationIt from "@/locales/it/fertigation.json";
 import simulationIt from "@/locales/it/simulation.json";
 
 import type { SupportedLocale } from "@/types/greenhouse";
@@ -42,6 +46,7 @@ void i18n.use(initReactI18next).init({
       common: commonEn,
       simulation: simulationEn,
       crops: cropsEn,
+      fertigation: fertigationEn,
       "3d_controls": controls3dEn,
       ai_copilot: aiCopilotEn,
     },
@@ -49,6 +54,7 @@ void i18n.use(initReactI18next).init({
       common: commonIt,
       simulation: simulationIt,
       crops: cropsIt,
+      fertigation: fertigationIt,
       "3d_controls": controls3dIt,
       ai_copilot: aiCopilotIt,
     },
@@ -56,6 +62,7 @@ void i18n.use(initReactI18next).init({
       common: commonEs,
       simulation: simulationEs,
       crops: cropsEs,
+      fertigation: fertigationEs,
       "3d_controls": controls3dEs,
       ai_copilot: aiCopilotEs,
     },
@@ -63,6 +70,7 @@ void i18n.use(initReactI18next).init({
       common: commonFr,
       simulation: simulationFr,
       crops: cropsFr,
+      fertigation: fertigationFr,
       "3d_controls": controls3dFr,
       ai_copilot: aiCopilotFr,
     },
@@ -70,7 +78,7 @@ void i18n.use(initReactI18next).init({
   lng: "en",
   fallbackLng: "en",
   defaultNS: "common",
-  ns: ["common", "simulation", "crops", "3d_controls", "ai_copilot"],
+  ns: ["common", "simulation", "crops", "fertigation", "3d_controls", "ai_copilot"],
   interpolation: { escapeValue: false },
 });
 

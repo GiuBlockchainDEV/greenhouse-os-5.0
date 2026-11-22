@@ -363,7 +363,9 @@ body:has(.play19) #gs-toast{top:97px!important;bottom:auto!important;left:50%!im
       edge('e05','ait-101','fit-101','inline',40,5,{route:'loop-down'}),edge('e06','fit-101','xv-103','inline',40,4,{route:'loop-down'}),edge('e07','xv-103','xv-101','inline',40,3,{route:'loop-up'}),edge('e08','xv-101','xv-104','inline',40,3,{route:'loop-down'}),
       edge('e09','xv-104','man-101','inline',40,5,{route:'loop-up'}),edge('e10','man-101','drip-101','inline',40,25),
       edge('e11','fit-101','xv-102','bypass',40,5,{route:'loop-down'}),edge('e12','xv-102','man-101','bypass',40,6,{route:'loop-up'})
-    ]}
+    ]},
+    'substrate-drip':{name:'Substrate drip · slab gutters',subtitle:'Drain-to-waste sector delivery (GreenhouseOS)',category:'Once-through',project:{name:'Substrate drip · slab gutters',site:'GreenhouseOS reference',reference:'GR-FRT-004'},settings:{...baseSettings,ecSet:2,phSet:5.6},nodes:[],edges:[]},
+    'dwc-recirc':{name:'DWC deep-flow recirculating',subtitle:'Shared sump · raft circulation (GreenhouseOS)',category:'Recirculating',project:{name:'DWC deep-flow',site:'GreenhouseOS reference',reference:'GR-FRT-005'},settings:{...baseSettings,ecSet:1.65,phSet:6},nodes:[],edges:[]}
   };
   function fresh(id){const template=templates[id]||templates['nft-dual'];return {version:16,id:'growa-'+Date.now(),template:id||'nft-dual',meta:{...template.project,author:'Engineering team',revision:'A',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()},settings:clone(template.settings),nodes:clone(template.nodes),edges:clone(template.edges)};}
   G.catalog={items:ITEMS,templates,fresh,node,edge,clone,baseSettings};

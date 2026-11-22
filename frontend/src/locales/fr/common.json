@@ -29,7 +29,7 @@
     "greenhouse": "Jumeau serre",
     "fertigation": "Studio fertilisation",
     "fertigationTitle": "Growa Digital Twin — simulateur fertilisation et P&ID",
-    "fertigationHint": "Graphe P&ID, scène 3D de fertilisation et projets locaux s'exécutent dans ce studio intégré."
+    "fertigationHint": "Presets commerciaux, catalogue typé et simulation P&ID — même logique que le jumeau serre."
   },
   "units": {
     "meters": "m",

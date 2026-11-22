@@ -1,0 +1,70 @@
+{
+  "panel": {
+    "title": "Studio fertilisation",
+    "hint": "Chargez une topologie commerciale ou gardez un P&ID personnalisé. Les typologies correspondent au catalogue de simulation."
+  },
+  "presets": {
+    "title": "Systèmes commerciaux",
+    "hint": "Skids type Priva / Ridder / Netafim avec P&ID et rôles hydrauliques prédéfinis.",
+    "custom": "Topologie personnalisée",
+    "matchCrop": "Aligner sur le système de culture actuel"
+  },
+  "topology": {
+    "title": "Modèle de procédé"
+  },
+  "sync": {
+    "greenhouse": "Adapter le circuit culture aux métriques serre",
+    "linked": "Lié au jumeau serre"
+  },
+  "catalog": {
+    "title": "Bibliothèque composants",
+    "hint": "Symboles P&ID pour l'éditeur twin."
+  },
+  "summary": {
+    "title": "Configuration active",
+    "hint": "Ce que GreenhouseOS envoie au jumeau digital avant simulation.",
+    "activePreset": "Preset commercial",
+    "category": "Classe hydraulique",
+    "plants": "plantes mappées",
+    "footer": "Modifiez tuyauterie et consignes dans le twin. Le changement de preset recharge le projet typé."
+  },
+  "frame": {
+    "title": "Jumeau digital fertilisation Growa"
+  },
+  "templates": {
+    "nftDual": {
+      "name": "NFT · double réservoir",
+      "subtitle": "Conditionnement TK-301 / culture TK-302"
+    },
+    "nftShared": {
+      "name": "NFT · réservoir commun",
+      "subtitle": "Pompes mélange et culture indépendantes"
+    },
+    "inlineDrip": {
+      "name": "Inline · goutte-à-goutte multisecteur",
+      "subtitle": "Injection, collecteur, distribution"
+    },
+    "substrateDrip": {
+      "name": "Substrat · goutte sur laine",
+      "subtitle": "Six secteurs, drainage sans recirculation"
+    },
+    "dwcRecirc": {
+      "name": "DWC · recirculation",
+      "subtitle": "Bassin commun et boucle radeaux"
+    }
+  },
+  "components": {
+    "source": { "name": "Source d'eau", "category": "Alimentation", "description": "Puits, réseau ou osmose." },
+    "filter": { "name": "Filtre", "category": "Alimentation", "description": "Filtre mécanique." },
+    "tank": { "name": "Réservoir", "category": "Stockage", "description": "Niveau et qualité nutritive." },
+    "pump": { "name": "Pompe", "category": "Hydraulique", "description": "Pompe avec courbe de hauteur." },
+    "valve": { "name": "Vanne", "category": "Hydraulique", "description": "Isolement ou régulation." },
+    "injector": { "name": "Injecteur Venturi", "category": "Dosage", "description": "Nutriments et acide multivoies." },
+    "sensor": { "name": "Analyseur CE/pH", "category": "Instrumentation", "description": "Mesure en ligne." },
+    "flowmeter": { "name": "Débitmètre", "category": "Instrumentation", "description": "Débit sur branche." },
+    "manifold": { "name": "Collecteur secteurs", "category": "Distribution", "description": "Vannes par secteur." },
+    "crop": { "name": "Circuit culture", "category": "Distribution", "description": "Demande NFT, DWC ou goutte-à-goutte." },
+    "return": { "name": "Retour", "category": "Distribution", "description": "Retour gravitaire." },
+    "junction": { "name": "Jonction", "category": "Hydraulique", "description": "Dérivation ou bypass." }
+  }
+}

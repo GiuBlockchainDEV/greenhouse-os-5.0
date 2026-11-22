@@ -1,0 +1,118 @@
+{
+  "panel": {
+    "title": "Fertigation studio",
+    "hint": "Load a commercial fertigation topology or keep a custom P&ID. Component types match the engineering catalog used in simulation."
+  },
+  "presets": {
+    "title": "Market systems",
+    "hint": "Typical Priva / Ridder / Netafim style skids with pre-wired P&ID and hydraulic roles.",
+    "custom": "Custom topology",
+    "matchCrop": "Match current cultivation system"
+  },
+  "topology": {
+    "title": "Process template"
+  },
+  "sync": {
+    "greenhouse": "Scale crop circuit from greenhouse metrics (area, lines, plants)",
+    "linked": "Linked to greenhouse twin"
+  },
+  "catalog": {
+    "title": "Component library",
+    "hint": "Insert-only equipment vocabulary (P&ID symbols in the twin editor)."
+  },
+  "summary": {
+    "title": "Active configuration",
+    "hint": "What GreenhouseOS pushes into the digital twin before simulation.",
+    "activePreset": "Commercial preset",
+    "category": "Hydraulic class",
+    "plants": "plants mapped",
+    "footer": "Edit pipes and setpoints inside the twin. Preset changes reload the project from the typed catalog (no placeholder graphs)."
+  },
+  "frame": {
+    "title": "Growa fertigation digital twin"
+  },
+  "templates": {
+    "nftDual": {
+      "name": "NFT · dual reservoir",
+      "subtitle": "Conditioning TK-301 / crop TK-302"
+    },
+    "nftShared": {
+      "name": "NFT · shared reservoir",
+      "subtitle": "Independent mix and crop pumps"
+    },
+    "inlineDrip": {
+      "name": "Inline · multi-sector drip",
+      "subtitle": "Injection, manifold, field delivery"
+    },
+    "substrateDrip": {
+      "name": "Substrate · slab drip",
+      "subtitle": "Six gutter sectors, drain-to-waste"
+    },
+    "dwcRecirc": {
+      "name": "DWC · recirculating rafts",
+      "subtitle": "Shared sump and raft loop"
+    }
+  },
+  "components": {
+    "source": {
+      "name": "Water source",
+      "category": "Water supply",
+      "description": "Pressure-regulated supply, well, tank or RO water."
+    },
+    "filter": {
+      "name": "Water filter",
+      "category": "Water supply",
+      "description": "Mechanical filter with differential pressure."
+    },
+    "tank": {
+      "name": "Storage tank",
+      "category": "Storage",
+      "description": "Reservoir with level and quality states."
+    },
+    "pump": {
+      "name": "Centrifugal pump",
+      "category": "Hydraulics",
+      "description": "Duty pump with head curve."
+    },
+    "valve": {
+      "name": "Control valve",
+      "category": "Hydraulics",
+      "description": "Isolation or control valve with fail mode."
+    },
+    "injector": {
+      "name": "Venturi injector",
+      "category": "Dosing",
+      "description": "Multi-channel nutrient and acid dosing."
+    },
+    "sensor": {
+      "name": "EC / pH analyzer",
+      "category": "Instrumentation",
+      "description": "Inline quality sensor with delay."
+    },
+    "flowmeter": {
+      "name": "Flow transmitter",
+      "category": "Instrumentation",
+      "description": "Branch flow measurement."
+    },
+    "manifold": {
+      "name": "Sector manifold",
+      "category": "Distribution",
+      "description": "Independent sector valves."
+    },
+    "crop": {
+      "name": "Cultivation circuit",
+      "category": "Distribution",
+      "description": "NFT, DWC, drip or substrate demand node."
+    },
+    "return": {
+      "name": "Return leg",
+      "category": "Distribution",
+      "description": "Gravity return to reservoir."
+    },
+    "junction": {
+      "name": "Pipe junction",
+      "category": "Hydraulics",
+      "description": "Branch or bypass connection."
+    }
+  }
+}
