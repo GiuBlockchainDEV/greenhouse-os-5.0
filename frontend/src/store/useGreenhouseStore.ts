@@ -490,23 +490,8 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       },
 
       setClimateScenario: (scenario) => {
-        const next = { ...get().climateScenario, ...scenario };
-        const twin = get().twinRuntime;
-        const baselinePatch: Partial<TwinRuntimeState> = {};
-        if (scenario.externalTempC !== undefined) {
-          baselinePatch.baselineTempC = next.externalTempC;
-        }
-        if (scenario.externalRhPct !== undefined) {
-          baselinePatch.baselineRhPct = next.externalRhPct;
-        }
-        if (scenario.windSpeedMS !== undefined) {
-          baselinePatch.baselineWindMS = next.windSpeedMS;
-        }
         set(
-          {
-            climateScenario: next,
-            twinRuntime: { ...twin, ...baselinePatch },
-          },
+          { climateScenario: { ...get().climateScenario, ...scenario } },
           false,
           "setClimateScenario",
         );

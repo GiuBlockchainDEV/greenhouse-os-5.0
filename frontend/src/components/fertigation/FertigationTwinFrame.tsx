@@ -49,11 +49,28 @@ export function FertigationTwinFrame() {
     iframe?.addEventListener("load", onLoad);
     postClimate();
 
-    const unsub = useGreenhouseStore.subscribe(postClimate);
+    let debounce: ReturnType<typeof setTimeout> | null = null;
+    const unsub = useGreenhouseStore.subscribe((state, prev) => {
+      if (
+        state.climateScenario === prev.climateScenario &&
+        state.simulationResults === prev.simulationResults &&
+        state.crop === prev.crop &&
+        state.metrics === prev.metrics
+      ) {
+        return;
+      }
+      if (debounce) {
+        clearTimeout(debounce);
+      }
+      debounce = setTimeout(postClimate, 120);
+    });
 
     return () => {
       iframe?.removeEventListener("load", onLoad);
       unsub();
+      if (debounce) {
+        clearTimeout(debounce);
+      }
     };
   }, [projectRevision]);
 

@@ -10,6 +10,7 @@ import {
 } from "@/lib/heatmapData";
 import { HeatmapScaleLegend } from "@/components/ui/HeatmapScaleLegend";
 import { solarAzimuthLabel } from "@/lib/solarIrradiance";
+import { climateScenarioFromClock } from "@/lib/twinScenarioClock";
 import { isHeatmapAvailable } from "@/lib/heatmapInfluence";
 import { resolveHeatmapField } from "@/lib/previewMicroclimate";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
@@ -89,6 +90,26 @@ export function HeatmapControls() {
   const setHeatmapMode = useGreenhouseStore((s) => s.setHeatmapMode);
   const climateScenario = useGreenhouseStore((s) => s.climateScenario);
   const setClimateScenario = useGreenhouseStore((s) => s.setClimateScenario);
+  const setTwinRuntime = useGreenhouseStore((s) => s.setTwinRuntime);
+
+  const setWeatherBaseline = (
+    patch: Partial<{
+      baselineTempC: number;
+      baselineRhPct: number;
+      baselineWindMS: number;
+    }>,
+  ) => {
+    const state = useGreenhouseStore.getState();
+    const twin = { ...state.twinRuntime, ...patch };
+    setTwinRuntime(patch);
+    setClimateScenario(
+      climateScenarioFromClock(twin.clockMin, {
+        externalTempC: twin.baselineTempC,
+        externalRhPct: twin.baselineRhPct,
+        windSpeedMS: twin.baselineWindMS,
+      }),
+    );
+  };
   const simulationResults = useGreenhouseStore((s) => s.simulationResults);
   const simulationStatus = useGreenhouseStore((s) => s.simulationStatus);
   const dimensions = useGreenhouseStore((s) => s.dimensions);
@@ -185,7 +206,7 @@ export function HeatmapControls() {
                 min={5}
                 max={50}
                 step={0.5}
-                onChange={(value) => setClimateScenario({ externalTempC: value })}
+                onChange={(value) => setWeatherBaseline({ baselineTempC: value })}
               />
               <SliderRow
                 label={t("heatmap.externalRh")}
@@ -194,7 +215,7 @@ export function HeatmapControls() {
                 min={20}
                 max={95}
                 step={1}
-                onChange={(value) => setClimateScenario({ externalRhPct: value })}
+                onChange={(value) => setWeatherBaseline({ baselineRhPct: value })}
               />
               <SliderRow
                 label={t("heatmap.windSpeed")}
@@ -203,7 +224,7 @@ export function HeatmapControls() {
                 min={0}
                 max={12}
                 step={0.5}
-                onChange={(value) => setClimateScenario({ windSpeedMS: value })}
+                onChange={(value) => setWeatherBaseline({ baselineWindMS: value })}
               />
             </div>
           </div>
