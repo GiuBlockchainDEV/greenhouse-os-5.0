@@ -23,7 +23,7 @@
     "jspdf": "^2.5.2",
     "html2canvas": "^1.4.1",
     "marked": "^15.0.7",
-    "katex": "^0.16.11",
+    "katex": "^0.18.2",
     "three": "^0.171.0",
     "zustand": "^5.0.2",
     "@supabase/supabase-js": "^2.49.1"
