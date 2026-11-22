@@ -6,7 +6,7 @@ export const DWC_HOLE_SPACING_M = 0.5;
 export const SUBSTRATE_SLAB_SPACING_M = 1.0;
 export const NFT_CHANNEL_WIDTH_M = 0.32;
 
-/** Width of one cultivation line along X (stacked along greenhouse length). Beds run along Z across each bay. */
+/** Width of one cultivation line along Z (stacked across bay width). Beds run along X toward exhaust fans. */
 export const SYSTEM_LINE_WIDTH_M: Record<CultivationSystem, number> = {
   soil: 1.2,
   substrate: 1.0,
