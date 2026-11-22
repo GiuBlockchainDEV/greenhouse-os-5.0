@@ -15,7 +15,7 @@ const MODULES: Record<CultivationSystem, { file: string; length: number; width: 
   ebb_flow: { file: "ebb-flow-bench.glb", length: 2, width: 1.2 },
 };
 
-/** GLB modules are authored +X long; rotate Y 90° so scaled local Z maps to world +X (toward fans). */
+/** GLB modules are authored with run length along +X; scale X/Z to bed run and line width (pad → exhaust on +X). */
 function CultivationBedMesh({ bed, system }: { bed: BedZone; system: CultivationSystem }) {
   const module = MODULES[system] ?? MODULES.soil;
   const runLen = Math.max(module.length, bed.xMax - bed.xMin);
@@ -31,8 +31,8 @@ function CultivationBedMesh({ bed, system }: { bed: BedZone; system: Cultivation
           key={`${system}-${bed.bayIndex}-${bed.bedIndex}-${index}`}
           file={module.file}
           position={[bed.xMin + index * step + step / 2, bed.elevationM, z]}
-          rotation={[0, Math.PI / 2, 0]}
-          scale={[lineW / module.width, 1, step / module.length]}
+          rotation={[0, 0, 0]}
+          scale={[step / module.length, 1, lineW / module.width]}
         />
       ))}
     </group>

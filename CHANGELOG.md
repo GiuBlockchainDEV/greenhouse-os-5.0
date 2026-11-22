@@ -18,7 +18,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- **Cultivation row orientation** — Beds run along X toward the exhaust gable (like commercial pad-to-fan benches); parallel lines stack across bay width with equal edge gaps (no center cluster). GLB length maps to world +X via Y-rotation.
+- **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.
+
+- **Cultivation row orientation** — Beds run along X toward the exhaust gable (like commercial pad-to-fan benches); parallel lines stack across bay width with equal edge gaps (no center cluster).
 
 - **High-detail 3D viewport** — Semicircular roof arc 64 segments, cylindrical frame posts (24-seg), GLB instances with smooth normals and higher `devicePixelRatio`, 4096 shadow maps, 1024 contact shadows, and denser procedural plant tessellation.
 
