@@ -28,6 +28,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Fertigation OEM canonical skids** — Per-template `plantSkids/*` blueprints (Priva/Grow-Tek dual NFT headwall, Netafim inline gallery, substrate hut) with stock tanks, zone shells, and `resolvePlantLayout()` decoupled from P&ID coordinates; `docs/FERTIGATION_PLANT_REFERENCES.md`.
 
+- **Fertigation filter GLB** — Author-provided `fertigation-filter-system.glb` (Tripo) wired for all `filter` nodes in the fertigation plant 3D view.
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.

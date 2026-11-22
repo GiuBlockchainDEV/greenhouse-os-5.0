@@ -49,20 +49,7 @@ function WaterSource({ position }: PartProps) {
   );
 }
 
-function FilterHousing({ position }: PartProps) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.32, 0.32, 0.85, 24]} />
-        <meshStandardMaterial color={BODY} metalness={0.4} roughness={0.45} />
-      </mesh>
-      <mesh position={[0, 0.92, 0]} castShadow>
-        <cylinderGeometry args={[0.2, 0.22, 0.12, 16]} />
-        <meshStandardMaterial color={STEEL} metalness={0.65} roughness={0.3} />
-      </mesh>
-    </group>
-  );
-}
+const FERTIGATION_FILTER_GLB = "fertigation-filter-system.glb";
 
 function TankVessel({ position, capacityL }: PartProps & { capacityL: number }) {
   const radius = useMemo(() => Math.min(0.75, 0.38 + Math.sqrt(capacityL) / 120), [capacityL]);
@@ -206,7 +193,14 @@ function renderPart(node: FertigationNode, position: [number, number, number]) {
     case "source":
       return <WaterSource position={position} />;
     case "filter":
-      return <FilterHousing position={position} />;
+      return (
+        <GltfPart
+          file={FERTIGATION_FILTER_GLB}
+          position={[position[0], position[1] + 0.02, position[2]]}
+          rotation={[0, 0, 0]}
+          scale={[1, 1, 1]}
+        />
+      );
     case "tank":
       return (
         <TankVessel

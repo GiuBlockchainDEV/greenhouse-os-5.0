@@ -591,6 +591,24 @@
       ],
       "triangle_budget": 15000,
       "within_budget": true
+    },
+    {
+      "dimensions_m": [
+        0.98,
+        0.73,
+        0.56
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 0,
+      "file": "fertigation-filter-system.glb",
+      "mesh_names": [
+        "fertigation_filter_system"
+      ],
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_tripo_convert",
+      "category": "fertigation"
     }
   ]
 }
