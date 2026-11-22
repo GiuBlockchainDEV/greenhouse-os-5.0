@@ -540,6 +540,24 @@
     },
     {
       "dimensions_m": [
+        0.5,
+        0.56,
+        0.98
+      ],
+      "origin": "floor_center",
+      "y_up": true,
+      "triangles": 0,
+      "file": "fertigation-water-tank.glb",
+      "mesh_names": [
+        "fertigation_water_tank"
+      ],
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_watertank",
+      "category": "fertigation"
+    },
+    {
+      "dimensions_m": [
         0.98,
         0.73,
         0.56

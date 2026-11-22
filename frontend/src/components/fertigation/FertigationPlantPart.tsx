@@ -50,26 +50,17 @@ function WaterSource({ position }: PartProps) {
 }
 
 const FERTIGATION_FILTER_GLB = "fertigation-filter-system.glb";
+const FERTIGATION_WATER_TANK_GLB = "fertigation-water-tank.glb";
+/** Native height of `fertigation-water-tank.glb` at reference capacity (m). */
+const TANK_REF_HEIGHT_M = 0.5551;
 
-function TankVessel({ position, capacityL }: PartProps & { capacityL: number }) {
-  const radius = useMemo(() => Math.min(0.75, 0.38 + Math.sqrt(capacityL) / 120), [capacityL]);
-  const height = useMemo(() => Math.min(1.65, 0.95 + capacityL / 4500), [capacityL]);
-  return (
-    <group position={position}>
-      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[radius, radius * 1.02, height, 32]} />
-        <meshStandardMaterial color={STEEL} metalness={0.72} roughness={0.28} />
-      </mesh>
-      <mesh position={[0, height * 0.55, 0]} castShadow>
-        <cylinderGeometry args={[radius * 0.92, radius * 0.92, height * 0.82, 32]} />
-        <meshStandardMaterial color={LIQUID} metalness={0.15} roughness={0.35} transparent opacity={0.55} />
-      </mesh>
-      <mesh position={[0, height + 0.08, 0]} castShadow>
-        <torusGeometry args={[radius * 0.45, 0.04, 12, 24]} />
-        <meshStandardMaterial color={MOTOR} metalness={0.5} roughness={0.4} />
-      </mesh>
-    </group>
-  );
+/** Scales tank mesh from `capacityL` in project (engineering correlation preserved). */
+export function fertigationTankHeightM(capacityL: number): number {
+  return Math.min(1.65, 0.95 + capacityL / 4500);
+}
+
+function tankGlbScale(capacityL: number): number {
+  return fertigationTankHeightM(capacityL) / TANK_REF_HEIGHT_M;
 }
 
 function CentrifugalPump({ position }: PartProps) {
@@ -201,13 +192,18 @@ function renderPart(node: FertigationNode, position: [number, number, number]) {
           scale={[1, 1, 1]}
         />
       );
-    case "tank":
+    case "tank": {
+      const capacityL = Math.max(500, Number(node.params.capacityL) || 2000);
+      const s = tankGlbScale(capacityL);
       return (
-        <TankVessel
+        <GltfPart
+          file={FERTIGATION_WATER_TANK_GLB}
           position={position}
-          capacityL={Math.max(500, Number(node.params.capacityL) || 2000)}
+          rotation={[0, 0, 0]}
+          scale={[s, s, s]}
         />
       );
+    }
     case "pump":
       return <CentrifugalPump position={position} />;
     case "valve":

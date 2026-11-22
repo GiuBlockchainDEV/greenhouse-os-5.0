@@ -2,7 +2,7 @@ import { Text } from "@react-three/drei";
 import { useMemo } from "react";
 import * as THREE from "three";
 
-import { FertigationPlantPart } from "@/components/fertigation/FertigationPlantPart";
+import { FertigationPlantPart, fertigationTankHeightM } from "@/components/fertigation/FertigationPlantPart";
 import { FertigationSkidStructure } from "@/components/fertigation/FertigationSkidStructure";
 import {
   connectionHeightY,
@@ -121,11 +121,11 @@ export function FertigationPlantScene({ project }: { project: FertigationProject
           return null;
         }
         const base = partPosition(pose);
+        const tankCapacityL =
+          node.kind === "tank" ? Math.max(500, Number(node.params.capacityL) || 2000) : 2000;
         const labelY =
           node.kind === "tank"
-            ? pose.belowGrade
-              ? 0.85
-              : 1.55
+            ? base[1] + fertigationTankHeightM(tankCapacityL) + 0.14
             : node.kind === "crop"
               ? base[1] + 0.72
               : node.kind === "pump"

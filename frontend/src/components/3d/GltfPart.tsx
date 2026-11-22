@@ -90,6 +90,7 @@ const FILES = [
   "ebb-flow-bench.glb",
   "aeroponic-channel.glb",
   "fertigation-filter-system.glb",
+  "fertigation-water-tank.glb",
 ];
 
 FILES.forEach((file) => {
