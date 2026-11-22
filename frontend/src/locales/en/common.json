@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "GreenhouseOS 5.0",
-    "subtitle": "Design, stress-test, and operate before you build"
+    "subtitle": "Design, stress-test, and operate before you build",
+    "openGreenhouseDesign": "Greenhouse design"
   },
   "nav": {
     "viewport": "3D Viewport",

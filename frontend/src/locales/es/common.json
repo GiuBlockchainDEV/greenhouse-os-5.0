@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "GreenhouseOS 5.0",
-    "subtitle": "Diseña, prueba y opera antes de construir"
+    "subtitle": "Diseña, prueba y opera antes de construir",
+    "openGreenhouseDesign": "Diseño del invernadero"
   },
   "nav": {
     "viewport": "Viewport 3D",

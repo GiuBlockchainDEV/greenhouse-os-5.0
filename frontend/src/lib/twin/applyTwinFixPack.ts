@@ -1,15 +1,23 @@
 import { applyTwinRecommendation } from "@/lib/twin/applyTwinRecommendation";
 import type { TwinRecommendation } from "@/lib/twin/offlineTwinAdvisor";
+import { isFixPackTwinRecommendation } from "@/lib/twin/twinRecommendationUtils";
 
-/** Apply every high-priority advisor action in one engineering pass. */
-export function applyTwinFixPack(recommendations: TwinRecommendation[]): number {
+export interface TwinFixPackResult {
+  applied: number;
+  labels: string[];
+}
+
+/** Apply high/medium advisor actions in one pass (skips low-priority what-if only). */
+export function applyTwinFixPack(recommendations: TwinRecommendation[]): TwinFixPackResult {
+  const labels: string[] = [];
   let applied = 0;
   for (const rec of recommendations) {
-    if (rec.priority !== "high" || rec.id === "stable-ok") {
+    if (!isFixPackTwinRecommendation(rec)) {
       continue;
     }
     applyTwinRecommendation(rec);
     applied += 1;
+    labels.push(rec.parameter);
   }
-  return applied;
+  return { applied, labels };
 }

@@ -41,6 +41,8 @@
     "insightPrefix": "Prossimo passo:"
   },
   "insightColumn": {
+    "tabDesign": "Progetta serra",
+    "designHint": "Preset OEM, campate, coltura, HVAC e slider meteo.",
     "tabAdvisor": "Azioni",
     "tabCopilot": "Copilot GAIA",
     "advisorHint": "Correzioni in un clic sul gemello — esportabili ai climate computer."
@@ -64,11 +66,14 @@
     "savings": "Risparmia fino a",
     "applyFixPack": "Applica {{count}} fix critici",
     "exportBrief": "Esporta brief",
-    "fixPackDone": "{{count}} fix applicati — controlla 3D e dashboard",
+    "fixPackDone": "{{count}} fix applicati ({{items}}) — guarda 3D e dashboard",
+    "fixPackNone": "Nessun fix automatico — taratura da tab Design o singole Azioni",
+    "whereToConfigure": "Configura tutto nel pannello a destra → Progetta serra",
     "loadStressDemo": "Carica demo stress Golfo"
   },
   "design": {
-    "open": "Design e preset",
+    "open": "Apri progetto serra",
+    "focusAdvisor": "Mostra azioni",
     "close": "Chiudi pannello design",
     "title": "Struttura, coltura e impianti"
   },

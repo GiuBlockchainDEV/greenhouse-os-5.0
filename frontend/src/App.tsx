@@ -10,9 +10,8 @@ import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
-import { TwinInsightColumn } from "@/components/ui/TwinInsightColumn";
+import { TwinInsightColumn, type TwinInsightTab } from "@/components/ui/TwinInsightColumn";
 import { TwinLaunchExperience } from "@/components/ui/TwinLaunchExperience";
-import { TwinDesignDrawer } from "@/components/ui/TwinDesignDrawer";
 import { TwinExecutiveBrief } from "@/components/ui/TwinExecutiveBrief";
 import { TwinFocusChrome } from "@/components/ui/TwinFocusChrome";
 import { hasCompletedTwinLaunch } from "@/lib/twin/twinLaunchState";
@@ -26,7 +25,7 @@ export function AppShell() {
   const { t } = useTranslation("common");
   const workspaceMode = useWorkspaceStore((state) => state.mode);
   const [launchOpen, setLaunchOpen] = useState(false);
-  const [designOpen, setDesignOpen] = useState(false);
+  const [insightTab, setInsightTab] = useState<TwinInsightTab>("design");
   const { reconnect } = useSimulationWS();
   useTwinScenarioClock();
   useTwinProjectPersist();
@@ -60,6 +59,15 @@ export function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          {workspaceMode === "greenhouse" ? (
+            <button
+              type="button"
+              onClick={() => setInsightTab("design")}
+              className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800"
+            >
+              {t("app.openGreenhouseDesign")}
+            </button>
+          ) : null}
           <WorkspaceModeSwitch />
           <AuthPanel />
           <LanguagePicker />
@@ -72,13 +80,15 @@ export function AppShell() {
             <div className="relative min-h-0 min-w-0">
               <Viewport3D />
               <TwinExecutiveBrief />
-              <TwinFocusChrome designOpen={designOpen} onToggleDesign={() => setDesignOpen((v) => !v)} />
+              <TwinFocusChrome
+                designOpen={insightTab === "design"}
+                onToggleDesign={() => setInsightTab((prev) => (prev === "design" ? "advisor" : "design"))}
+              />
               <HUDOverlay />
               <ClimateDashboard onReconnect={reconnect} />
             </div>
-            <TwinInsightColumn />
+            <TwinInsightColumn activeTab={insightTab} onTabChange={setInsightTab} />
           </main>
-          <TwinDesignDrawer open={designOpen} onClose={() => setDesignOpen(false)} />
         </>
       ) : (
         <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">
@@ -89,7 +99,13 @@ export function AppShell() {
       )}
 
       {workspaceMode === "greenhouse" ? (
-        <TwinLaunchExperience open={launchOpen} onClose={() => setLaunchOpen(false)} />
+        <TwinLaunchExperience
+          open={launchOpen}
+          onClose={() => {
+            setLaunchOpen(false);
+            setInsightTab("design");
+          }}
+        />
       ) : null}
     </div>
   );

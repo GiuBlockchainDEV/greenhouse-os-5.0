@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { applyTwinRecommendation } from "@/lib/twin/applyTwinRecommendation";
 import { computeOfflineTwinRecommendations } from "@/lib/twin/offlineTwinAdvisor";
+import { isActionableTwinRecommendation } from "@/lib/twin/twinRecommendationUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 export function OfflineTwinAdvisor() {
@@ -86,7 +87,7 @@ export function OfflineTwinAdvisor() {
               </p>
               <p className="mt-1 text-label">{rec.rationale}</p>
               <p className="mt-0.5 text-[10px] text-status-optimalDark">{rec.impactHint}</p>
-              {rec.action.kind !== "climateScenario" || Object.keys(rec.action.patch).length > 0 ? (
+              {isActionableTwinRecommendation(rec) ? (
                 <button
                   type="button"
                   className="ui-btn-ghost mt-2 w-full py-1 text-[10px] font-semibold"

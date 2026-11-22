@@ -6,6 +6,7 @@ import { applyTwinFixPack } from "@/lib/twin/applyTwinFixPack";
 import { computeOfflineTwinRecommendations } from "@/lib/twin/offlineTwinAdvisor";
 import { applyTwinLaunchScenario } from "@/lib/twin/applyTwinLaunchScenario";
 import { assessTwinExecutive } from "@/lib/twin/twinExecutiveAssessment";
+import { isFixPackTwinRecommendation } from "@/lib/twin/twinRecommendationUtils";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 const VERDICT_STYLES = {
@@ -27,7 +28,7 @@ export function TwinExecutiveBrief() {
   const dimensions = useGreenhouseStore((s) => s.dimensions);
   const simulationStatus = useGreenhouseStore((s) => s.simulationStatus);
   const micro = useGreenhouseStore((s) => s.simulationResults?.microclimate);
-  const [appliedCount, setAppliedCount] = useState(0);
+  const [fixPackMessage, setFixPackMessage] = useState<string | null>(null);
 
   const recommendations = useMemo(
     () =>
@@ -49,11 +50,17 @@ export function TwinExecutiveBrief() {
     [view, crop, recommendations],
   );
 
-  const highCount = recommendations.filter((r) => r.priority === "high").length;
+  const fixPackCount = recommendations.filter(isFixPackTwinRecommendation).length;
 
   const handleFixPack = () => {
-    const n = applyTwinFixPack(recommendations);
-    setAppliedCount((c) => c + n);
+    const result = applyTwinFixPack(recommendations);
+    if (result.applied === 0) {
+      setFixPackMessage(t("executive.fixPackNone"));
+      return;
+    }
+    setFixPackMessage(
+      t("executive.fixPackDone", { count: result.applied, items: result.labels.join(", ") }),
+    );
   };
 
   const handleLoadDemo = () => {
@@ -69,7 +76,7 @@ export function TwinExecutiveBrief() {
       `At-risk OPEX: €${assessment.atRiskEur}`,
       `Savings if fixed (est.): €${assessment.savingsIfFixedEur}/yr`,
       `Indoor: ${view.internalTemp.toFixed(1)} °C · VPD ${view.vpdKpa.toFixed(2)} kPa`,
-      `Actions pending: ${recommendations.length} (${highCount} high)`,
+      `Actions pending: ${recommendations.length} (${fixPackCount} apply-all)`,
     ];
     const blob = new Blob([lines.join("\n")], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -120,22 +127,22 @@ export function TwinExecutiveBrief() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              disabled={highCount === 0}
+              disabled={fixPackCount === 0}
               onClick={handleFixPack}
-              className="ui-btn-primary flex-1 text-xs"
+              className="ui-btn-primary flex-1 text-xs disabled:cursor-not-allowed"
             >
-              {t("executive.applyFixPack", { count: highCount })}
+              {t("executive.applyFixPack", { count: fixPackCount })}
             </button>
             <button type="button" onClick={downloadBrief} className="ui-btn-secondary text-xs">
               {t("executive.exportBrief")}
             </button>
           </div>
 
-          {appliedCount > 0 ? (
-            <p className="text-center text-[10px] font-semibold text-status-optimalDark">
-              {t("executive.fixPackDone", { count: appliedCount })}
-            </p>
+          {fixPackMessage ? (
+            <p className="text-center text-[10px] font-semibold text-status-optimalDark">{fixPackMessage}</p>
           ) : null}
+
+          <p className="text-center text-[10px] text-label">{t("executive.whereToConfigure")}</p>
 
           {recommendations.length === 0 ? (
             <button type="button" onClick={handleLoadDemo} className="w-full text-xs text-label underline">

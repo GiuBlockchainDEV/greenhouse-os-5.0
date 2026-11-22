@@ -12,9 +12,14 @@ export function applyTwinRecommendation(recommendation: TwinRecommendation): voi
         store.setClimateScenario(action.patch);
       }
       break;
-    case "shadingScreen":
-      store.setShadingScreen(action.patch);
+    case "shadingScreen": {
+      const screenPatch = { ...action.patch };
+      if ((screenPatch.deploymentPct ?? 0) > 0) {
+        screenPatch.installed = true;
+      }
+      store.setShadingScreen(screenPatch);
       break;
+    }
     case "equipmentSizing": {
       const patch = { ...action.patch };
       if (patch.circulationFanCount !== undefined) {

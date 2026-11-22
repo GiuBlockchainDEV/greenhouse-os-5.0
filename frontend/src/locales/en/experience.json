@@ -41,6 +41,8 @@
     "insightPrefix": "Try next:"
   },
   "insightColumn": {
+    "tabDesign": "Design greenhouse",
+    "designHint": "Commercial preset, bay count, crop, HVAC sizing, and weather sliders.",
     "tabAdvisor": "Actions",
     "tabCopilot": "GAIA copilot",
     "advisorHint": "One-click fixes applied to your twin — exportable to climate computers."
@@ -64,11 +66,14 @@
     "savings": "Save up to",
     "applyFixPack": "Apply {{count}} critical fixes",
     "exportBrief": "Export brief",
-    "fixPackDone": "{{count}} fixes applied — check 3D & dashboard",
+    "fixPackDone": "{{count}} fixes applied ({{items}}) — see 3D & dashboard",
+    "fixPackNone": "No automatic fixes — tune equipment in Design tab or use Actions list",
+    "whereToConfigure": "Configure preset, size & weather in the right panel → Design greenhouse",
     "loadStressDemo": "Load Gulf stress demo to see value"
   },
   "design": {
-    "open": "Design & presets",
+    "open": "Open design panel",
+    "focusAdvisor": "Show actions",
     "close": "Close design panel",
     "title": "Structure, crop & equipment"
   },

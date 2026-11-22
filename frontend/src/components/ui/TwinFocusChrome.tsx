@@ -18,7 +18,7 @@ export function TwinFocusChrome({ designOpen, onToggleDesign }: TwinFocusChromeP
           : "border border-white/70 bg-white/95 text-gray-900 hover:bg-white"
       }`}
     >
-      {designOpen ? t("design.close") : t("design.open")}
+      {designOpen ? t("design.focusAdvisor") : t("design.open")}
     </button>
   );
 }

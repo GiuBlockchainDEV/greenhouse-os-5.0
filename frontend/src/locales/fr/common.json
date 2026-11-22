@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "GreenhouseOS 5.0",
-    "subtitle": "Concevez, testez et exploitez avant de construire"
+    "subtitle": "Concevez, testez et exploitez avant de construire",
+    "openGreenhouseDesign": "Conception serre"
   },
   "nav": {
     "viewport": "Viewport 3D",

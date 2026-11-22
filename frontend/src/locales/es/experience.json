@@ -41,6 +41,8 @@
     "insightPrefix": "Siguiente:"
   },
   "insightColumn": {
+    "tabDesign": "Diseño invernadero",
+    "designHint": "Preset OEM, bahías, cultivo, HVAC y clima.",
     "tabAdvisor": "Acciones",
     "tabCopilot": "Copiloto GAIA",
     "advisorHint": "Ajustes con un clic — exportables al climatizador."
@@ -64,11 +66,14 @@
     "savings": "Ahorra hasta",
     "applyFixPack": "Aplicar {{count}} fixes críticos",
     "exportBrief": "Exportar brief",
-    "fixPackDone": "{{count}} fixes aplicados",
+    "fixPackDone": "{{count}} fixes ({{items}})",
+    "fixPackNone": "Sin fixes automáticos — usa Diseño o Acciones",
+    "whereToConfigure": "Configura a la derecha → Diseño invernadero",
     "loadStressDemo": "Cargar demo estrés Golfo"
   },
   "design": {
-    "open": "Diseño y presets",
+    "open": "Abrir diseño",
+    "focusAdvisor": "Ver acciones",
     "close": "Cerrar diseño",
     "title": "Estructura, cultivo y equipos"
   },

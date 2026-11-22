@@ -41,6 +41,8 @@
     "insightPrefix": "Ensuite :"
   },
   "insightColumn": {
+    "tabDesign": "Conception serre",
+    "designHint": "Preset OEM, travées, culture, HVAC et météo.",
     "tabAdvisor": "Actions",
     "tabCopilot": "Copilote GAIA",
     "advisorHint": "Corrections en un clic — export vers ordinateur climatique."
@@ -64,11 +66,14 @@
     "savings": "Économisez jusqu'à",
     "applyFixPack": "Appliquer {{count}} correctifs critiques",
     "exportBrief": "Exporter le brief",
-    "fixPackDone": "{{count}} correctifs appliqués",
+    "fixPackDone": "{{count}} correctifs ({{items}})",
+    "fixPackNone": "Aucun correctif auto — onglet Conception ou Actions",
+    "whereToConfigure": "Réglages à droite → Conception serre",
     "loadStressDemo": "Charger la démo stress Golfe"
   },
   "design": {
-    "open": "Design et presets",
+    "open": "Ouvrir conception",
+    "focusAdvisor": "Voir actions",
     "close": "Fermer le design",
     "title": "Structure, culture et équipements"
   },
