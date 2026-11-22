@@ -36,6 +36,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Exhaust fan fill opening** — Scale fanex to `diameter + opening pad` so the GLB matches the gable cutout span (shared `exhaustFanGable.ts`).
 
+- **Circulation fan GLB** — Replaced `haf-fan.glb` with author circulation fan; hang-line placement and diameter scaling updated in `HafFanModel`.
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.

@@ -55,12 +55,18 @@ export function RoofExhaustFanModel({ fan }: { fan: RoofExhaustFanPlacement }) {
   return <EastGableExhaustFanModel fan={fan} wallInsetM={0.08} />;
 }
 
+/** Author circulation-fan GLB: rotor span ≈ 0.85 m, hanger at top (y ≈ 0.98 m). */
+const CIRCULATION_FAN_ROTOR_M = 0.85;
+const CIRCULATION_FAN_HEIGHT_M = 0.98;
+
 export function HafFanModel({ fan }: { fan: CirculationFanPlacement }) {
-  const scale = fan.diameterM / 0.9;
+  const scale = fan.diameterM / CIRCULATION_FAN_ROTOR_M;
+  /** `fan.y` is the truss hang line; asset base is at y = 0. */
+  const y = fan.y - CIRCULATION_FAN_HEIGHT_M * scale;
   return (
     <GltfPart
       file="haf-fan.glb"
-      position={[fan.x, fan.y + 0.45 * scale, fan.z]}
+      position={[fan.x, y, fan.z]}
       rotation={[0, fan.yaw - Math.PI / 2, 0]}
       scale={[scale, scale, scale]}
     />

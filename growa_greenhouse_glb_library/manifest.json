@@ -111,26 +111,21 @@
     },
     {
       "dimensions_m": [
-        0.9,
-        0.9,
-        0.32
+        0.85,
+        0.98,
+        0.51
       ],
-      "origin": "hanger_mount",
+      "origin": "floor_center",
       "y_up": true,
-      "triangles": 3604,
+      "triangles": 0,
       "file": "haf-fan.glb",
       "mesh_names": [
-        "fan_blade_1",
-        "fan_blade_2",
-        "fan_blade_3",
-        "fan_blade_4",
-        "guard_ring",
-        "hanger",
-        "motor_hub",
-        "mount_bracket"
+        "circulation_fan"
       ],
-      "triangle_budget": 15000,
-      "within_budget": true
+      "triangle_budget": 50000,
+      "within_budget": true,
+      "source": "author_circulation_fan",
+      "category": "ventilation"
     },
     {
       "dimensions_m": [
