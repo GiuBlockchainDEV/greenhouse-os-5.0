@@ -24,6 +24,13 @@
     "language": "Idioma",
     "loading": "Cargando..."
   },
+  "workspace": {
+    "ariaLabel": "Espacio de trabajo de la aplicación",
+    "greenhouse": "Gemelo invernadero",
+    "fertigation": "Estudio de fertirrigación",
+    "fertigationTitle": "Growa Digital Twin — simulador de fertirrigación y P&ID",
+    "fertigationHint": "El grafo P&ID, la escena 3D de fertirrigación y el almacenamiento local de proyectos se ejecutan en este estudio integrado."
+  },
   "units": {
     "meters": "m",
     "squareMeters": "m²",

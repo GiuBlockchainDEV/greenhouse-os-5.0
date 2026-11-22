@@ -168,6 +168,17 @@ Locale selection syncs between the Zustand store and `i18next.changeLanguage()`.
 
 **Implementation:** `frontend/src/i18n.ts`, `frontend/src/locales/`
 
+### Dual Workspace Shell
+
+The header **workspace switch** (`WorkspaceModeSwitch`) toggles `useWorkspaceStore` between:
+
+| Mode | UI | Asset |
+|------|-----|-------|
+| `greenhouse` | 3-column R3F viewport + GAIA copilot | WebGL simulation pipeline |
+| `fertigation` | Full-width sandboxed iframe | `frontend/public/growa-digital-twin-simulato-v20.html` (Growa P&ID / fertigation twin v20, localStorage projects) |
+
+Fertigation mode keeps auth and language controls in the header; the twin runs same-origin for `localStorage` without bundling its legacy monolith into Vite.
+
 ### Frontend Module Map
 
 ```text

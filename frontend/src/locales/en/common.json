@@ -24,6 +24,13 @@
     "language": "Language",
     "loading": "Loading..."
   },
+  "workspace": {
+    "ariaLabel": "Application workspace",
+    "greenhouse": "Greenhouse twin",
+    "fertigation": "Fertigation studio",
+    "fertigationTitle": "Growa Digital Twin — fertigation and P&ID simulator",
+    "fertigationHint": "P&ID graph, 3D fertigation scene, and local project storage run inside this embedded studio."
+  },
   "units": {
     "meters": "m",
     "squareMeters": "m²",

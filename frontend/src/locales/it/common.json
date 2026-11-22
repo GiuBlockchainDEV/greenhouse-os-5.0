@@ -24,6 +24,13 @@
     "language": "Lingua",
     "loading": "Caricamento..."
   },
+  "workspace": {
+    "ariaLabel": "Area di lavoro dell'app",
+    "greenhouse": "Gemello serra",
+    "fertigation": "Studio fertirrigazione",
+    "fertigationTitle": "Growa Digital Twin — simulatore fertirrigazione e P&ID",
+    "fertigationHint": "Grafo P&ID, scena 3D fertirrigazione e progetti locali sono eseguiti in questo studio incorporato."
+  },
   "units": {
     "meters": "m",
     "squareMeters": "m²",

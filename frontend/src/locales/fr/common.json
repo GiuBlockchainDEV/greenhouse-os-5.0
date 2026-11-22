@@ -24,6 +24,13 @@
     "language": "Langue",
     "loading": "Chargement..."
   },
+  "workspace": {
+    "ariaLabel": "Espace de travail de l'application",
+    "greenhouse": "Jumeau serre",
+    "fertigation": "Studio fertilisation",
+    "fertigationTitle": "Growa Digital Twin — simulateur fertilisation et P&ID",
+    "fertigationHint": "Graphe P&ID, scène 3D de fertilisation et projets locaux s'exécutent dans ce studio intégré."
+  },
   "units": {
     "meters": "m",
     "squareMeters": "m²",

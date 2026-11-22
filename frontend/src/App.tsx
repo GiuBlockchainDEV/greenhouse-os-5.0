@@ -3,13 +3,17 @@ import { useTranslation } from "react-i18next";
 import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
+import { FertigationTwinFrame } from "@/components/fertigation/FertigationTwinFrame";
 import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
+import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
 import { useSimulationWS } from "@/hooks/useSimulationWS";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 export function AppShell() {
   const { t } = useTranslation("common");
+  const workspaceMode = useWorkspaceStore((state) => state.mode);
   useSimulationWS();
 
   return (
@@ -31,19 +35,29 @@ export function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <WorkspaceModeSwitch />
           <AuthPanel />
           <LanguagePicker />
         </div>
       </header>
 
-      <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_480px] gap-4 overflow-hidden p-4">
-        <DimensionControls />
-        <div className="relative min-h-0">
-          <Viewport3D />
-          <HUDOverlay />
-        </div>
-        <AICopilotPanel />
-      </main>
+      {workspaceMode === "greenhouse" ? (
+        <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_480px] gap-4 overflow-hidden p-4">
+          <DimensionControls />
+          <div className="relative min-h-0">
+            <Viewport3D />
+            <HUDOverlay />
+          </div>
+          <AICopilotPanel />
+        </main>
+      ) : (
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+          <p className="mb-2 shrink-0 text-xs text-label">{t("workspace.fertigationHint")}</p>
+          <div className="min-h-0 flex-1">
+            <FertigationTwinFrame />
+          </div>
+        </main>
+      )}
     </div>
   );
 }
