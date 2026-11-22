@@ -3,6 +3,7 @@ import {
   createFertigationEdge,
   createFertigationNode,
 } from "@/lib/fertigation/projectFactory";
+import { nftDualPlantSkid } from "@/lib/fertigation/plantSkids/nftDualSkid";
 import type { FertigationTemplateDefinition } from "@/types/fertigation";
 
 export const nftDualTemplate: FertigationTemplateDefinition = {
@@ -16,6 +17,7 @@ export const nftDualTemplate: FertigationTemplateDefinition = {
     reference: "GR-FRT-001",
   },
   settings: baseSettings(),
+  plantSkid: nftDualPlantSkid,
   buildGraph: () => ({
     nodes: [
       createFertigationNode("source", "SRC-101", "source", 65, 75, { label: "Well / RO supply" }),

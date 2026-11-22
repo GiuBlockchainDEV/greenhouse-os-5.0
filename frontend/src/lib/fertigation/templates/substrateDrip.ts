@@ -3,6 +3,7 @@ import {
   createFertigationEdge,
   createFertigationNode,
 } from "@/lib/fertigation/projectFactory";
+import { substrateDripPlantSkid } from "@/lib/fertigation/plantSkids/substrateDripSkid";
 import type { FertigationTemplateDefinition } from "@/types/fertigation";
 
 /** Rockwool / slab drain-to-waste with 8 sectors (Priva-style field delivery). */
@@ -22,6 +23,7 @@ export const substrateDripTemplate: FertigationTemplateDefinition = {
     chemicalConcentrationGL: 180,
     autoCrop: false,
   }),
+  plantSkid: substrateDripPlantSkid,
   buildGraph: () => ({
     nodes: [
       createFertigationNode("source", "SRC-101", "source", 65, 75, { label: "RO / blended water" }),

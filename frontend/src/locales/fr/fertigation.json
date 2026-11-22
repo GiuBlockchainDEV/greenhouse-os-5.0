@@ -65,12 +65,22 @@
     "title": "Jumeau digital fertilisation Growa"
   },
   "viewport": {
-    "badge": "Plan 3D de l'installation",
+    "badge": "Plan 3D (réf. OEM)",
     "flowLegend": "Couleur des tuyaux",
     "circuitSource": "Appoint",
     "circuitMix": "Mélange",
     "circuitCrop": "Culture",
     "circuitReturn": "Retour"
+  },
+  "skid": {
+    "stockA": "Stock A",
+    "stockB": "Stock B (Ca)",
+    "stockAcid": "Acide",
+    "zonePumpHouse": "Local pompes",
+    "zonePipeGallery": "Galerie tuyauterie",
+    "zoneHut": "Local fertilisation",
+    "zoneCropHall": "Salle culture",
+    "reference": "D'après manuels OEM (Priva · Netafim · UF/IFAS)"
   },
   "templates": {
     "nftDual": {

@@ -3,10 +3,12 @@ import { useMemo } from "react";
 import * as THREE from "three";
 
 import { FertigationPlantPart } from "@/components/fertigation/FertigationPlantPart";
+import { FertigationSkidStructure } from "@/components/fertigation/FertigationSkidStructure";
 import {
-  computePlantLayout,
   connectionHeightY,
   plantLayoutCenter,
+  resolvePlantLayout,
+  type PlantPose,
 } from "@/lib/fertigation/plantLayoutEngine";
 import type { FertigationNode, FertigationProject } from "@/types/fertigation";
 
@@ -68,62 +70,70 @@ function nodeKindById(nodes: FertigationNode[]): Map<string, FertigationNode["ki
   return map;
 }
 
+function partPosition(pose: PlantPose): [number, number, number] {
+  const [x, , z] = pose.position;
+  return [x, pose.groundY, z];
+}
+
 export function FertigationPlantScene({ project }: { project: FertigationProject }) {
-  const poses = useMemo(() => computePlantLayout(project.nodes), [project.nodes]);
+  const { blueprint, poses } = useMemo(() => resolvePlantLayout(project), [project]);
   const kinds = useMemo(() => nodeKindById(project.nodes), [project.nodes]);
   const [centerX, centerZ] = useMemo(() => plantLayoutCenter(poses), [poses]);
 
-  const worldById = useMemo(() => {
-    const map = new Map<string, [number, number, number]>();
-    for (const [id, pose] of poses.entries()) {
-      map.set(id, pose.position);
-    }
-    return map;
-  }, [poses]);
+  const floor = blueprint?.bounds ?? { widthM: 24, depthM: 16 };
+
+  const poseById = useMemo(() => new Map(poses), [poses]);
 
   return (
     <group position={[-centerX, 0, -centerZ]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
-        <planeGeometry args={[24, 16]} />
+        <planeGeometry args={[floor.widthM + 2, floor.depthM + 2]} />
         <meshStandardMaterial color="#f1f5f9" roughness={0.92} metalness={0.05} />
       </mesh>
 
+      {blueprint ? <FertigationSkidStructure blueprint={blueprint} /> : null}
+
       {project.edges.map((edge) => {
-        const aXY = worldById.get(edge.from);
-        const bXY = worldById.get(edge.to);
-        if (!aXY || !bXY || edge.enabled === false) {
+        const poseA = poseById.get(edge.from);
+        const poseB = poseById.get(edge.to);
+        if (!poseA || !poseB || edge.enabled === false) {
           return null;
         }
         const kindA = kinds.get(edge.from) ?? "junction";
         const kindB = kinds.get(edge.to) ?? "junction";
-        const yA = connectionHeightY(kindA, edge.circuit);
-        const yB = connectionHeightY(kindB, edge.circuit);
+        const yA = connectionHeightY(kindA, edge.circuit, poseA.belowGrade);
+        const yB = connectionHeightY(kindB, edge.circuit, poseB.belowGrade);
+        const [ax, , az] = poseA.position;
+        const [bx, , bz] = poseB.position;
         return (
           <FertigationPipe
             key={edge.id}
-            from={[aXY[0], yA, aXY[2]]}
-            to={[bXY[0], yB, bXY[2]]}
+            from={[ax, yA, az]}
+            to={[bx, yB, bz]}
             tint={CIRCUIT_COLOR[edge.circuit] ?? "#94a3b8"}
           />
         );
       })}
 
       {project.nodes.map((node) => {
-        const base = worldById.get(node.id);
-        if (!base) {
+        const pose = poseById.get(node.id);
+        if (!pose) {
           return null;
         }
+        const base = partPosition(pose);
         const labelY =
           node.kind === "tank"
-            ? 1.55
+            ? pose.belowGrade
+              ? 0.85
+              : 1.55
             : node.kind === "crop"
-              ? 0.72
+              ? base[1] + 0.72
               : node.kind === "pump"
-                ? 0.62
-                : 0.95;
+                ? base[1] + 0.62
+                : base[1] + 0.95;
         return (
           <group key={node.id}>
-            <FertigationPlantPart node={node} position={base} />
+            <FertigationPlantPart node={node} position={base} rotationY={pose.rotationY} />
             <Text
               position={[base[0], labelY, base[2]]}
               fontSize={0.16}

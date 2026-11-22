@@ -11,6 +11,7 @@ import {
   fertigationPresetById,
   fertigationPresetLabel,
 } from "@/lib/fertigation/fertigationPresets";
+import { resolvePlantLayout } from "@/lib/fertigation/plantLayoutEngine";
 import { freshFertigationProject } from "@/lib/fertigation/projectFactory";
 import { FERTIGATION_TEMPLATES } from "@/lib/fertigation/templates";
 import { useFertigationStore } from "@/store/useFertigationStore";
@@ -22,7 +23,12 @@ function FertigationCanvasInner() {
 
   const project = activeProject ?? freshFertigationProject(templateId);
 
-  const span = useMemo(() => Math.max(9, 14 * 0.55 + 5), []);
+  const span = useMemo(() => {
+    const { blueprint } = resolvePlantLayout(project);
+    const w = blueprint?.bounds.widthM ?? 14;
+    const d = blueprint?.bounds.depthM ?? 13;
+    return Math.max(10, Math.max(w, d) * 0.58);
+  }, [project]);
 
   return (
     <>

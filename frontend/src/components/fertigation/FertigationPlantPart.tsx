@@ -201,13 +201,7 @@ function JunctionTee({ position }: PartProps) {
   );
 }
 
-export function FertigationPlantPart({
-  node,
-  position,
-}: {
-  node: FertigationNode;
-  position: [number, number, number];
-}) {
+function renderPart(node: FertigationNode, position: [number, number, number]) {
   switch (node.kind as FertigationComponentKind) {
     case "source":
       return <WaterSource position={position} />;
@@ -255,4 +249,16 @@ export function FertigationPlantPart({
     default:
       return <JunctionTee position={position} />;
   }
+}
+
+export function FertigationPlantPart({
+  node,
+  position,
+  rotationY = 0,
+}: {
+  node: FertigationNode;
+  position: [number, number, number];
+  rotationY?: number;
+}) {
+  return <group rotation={[0, rotationY, 0]}>{renderPart(node, position)}</group>;
 }

@@ -25,7 +25,7 @@
     "intro": "Choose the plant type on the left; the center shows the result. Data can follow your greenhouse crop and area.",
     "nowPlant3d": "You are viewing 3D",
     "nowPid": "You are viewing P&ID & simulation",
-    "plant3dBody": "Engineering layout: three rows (make-up, conditioning, crop). Pipe colours follow circuit type; crop beds use greenhouse crop models.",
+    "plant3dBody": "Each preset uses a manufacturer-style skid (dual NFT headwall, Netafim inline gallery, slab hut, etc.). Stock totes, pits and zone shells match public OEM docs—not random P&ID coordinates.",
     "pidBody": "Edit the schematic, run the virtual simulator and check flows, EC and pH inside the twin.",
     "footer": "If something is unclear, switch back to «3D plant»: each machine maps to a P&ID symbol."
   },
@@ -65,12 +65,22 @@
     "title": "Growa fertigation digital twin"
   },
   "viewport": {
-    "badge": "3D plant layout",
+    "badge": "3D plant layout (manufacturer reference)",
     "flowLegend": "Pipe colour",
     "circuitSource": "Make-up",
     "circuitMix": "Mixing",
     "circuitCrop": "Crop",
     "circuitReturn": "Return"
+  },
+  "skid": {
+    "stockA": "Stock A",
+    "stockB": "Stock B (Ca)",
+    "stockAcid": "Acid",
+    "zonePumpHouse": "Pump house / headwall",
+    "zonePipeGallery": "Pipe gallery",
+    "zoneHut": "Fertigation hut",
+    "zoneCropHall": "Crop hall",
+    "reference": "Layout from commercial OEM manuals (Priva · Netafim · UF/IFAS)"
   },
   "templates": {
     "nftDual": {

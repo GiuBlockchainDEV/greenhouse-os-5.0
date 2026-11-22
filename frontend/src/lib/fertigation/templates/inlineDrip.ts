@@ -3,6 +3,7 @@ import {
   createFertigationEdge,
   createFertigationNode,
 } from "@/lib/fertigation/projectFactory";
+import { inlineDripPlantSkid } from "@/lib/fertigation/plantSkids/inlineDripSkid";
 import type { FertigationTemplateDefinition } from "@/types/fertigation";
 
 export const inlineDripTemplate: FertigationTemplateDefinition = {
@@ -21,6 +22,7 @@ export const inlineDripTemplate: FertigationTemplateDefinition = {
     chemicalConcentrationGL: 250,
     autoCrop: false,
   }),
+  plantSkid: inlineDripPlantSkid,
   buildGraph: () => ({
     nodes: [
       createFertigationNode("source", "SRC-101", "source", 65, 75, {

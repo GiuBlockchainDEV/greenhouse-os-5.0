@@ -3,6 +3,7 @@ import {
   createFertigationEdge,
   createFertigationNode,
 } from "@/lib/fertigation/projectFactory";
+import { dwcRecircPlantSkid } from "@/lib/fertigation/plantSkids/dwcRecircSkid";
 import type { FertigationTemplateDefinition } from "@/types/fertigation";
 
 /** DWC rafts with conditioning tank + circulation (shared reservoir topology). */
@@ -17,6 +18,7 @@ export const dwcRecircTemplate: FertigationTemplateDefinition = {
     reference: "GR-FRT-005",
   },
   settings: baseSettings({ ecSet: 1.65, phSet: 6.0, cropTargetPct: 75 }),
+  plantSkid: dwcRecircPlantSkid,
   buildGraph: () => ({
     nodes: [
       createFertigationNode("source", "SRC-101", "source", 65, 75),

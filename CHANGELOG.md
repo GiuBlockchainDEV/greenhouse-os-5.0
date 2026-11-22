@@ -26,6 +26,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Fertigation 3D plant layout** — Replaced misleading greenhouse HVAC GLBs with engineering primitives (tanks, pumps, valves, injectors) on a three-row skid layout aligned with P&ID flow; pipe elevations per circuit; equipment tags in-scene; crop zones still use cultivation GLBs.
 
+- **Fertigation OEM canonical skids** — Per-template `plantSkids/*` blueprints (Priva/Grow-Tek dual NFT headwall, Netafim inline gallery, substrate hut) with stock tanks, zone shells, and `resolvePlantLayout()` decoupled from P&ID coordinates; `docs/FERTIGATION_PLANT_REFERENCES.md`.
+
 - **Cultivation bed clipping** — Bed GLBs use manifest start-origin anchoring on +X so tiled modules stay within `BedZone` bounds (no half-tile overhang at gable ends).
 
 - **Cultivation GLB orientation** — Soil, NFT, and other bed modules align with authored +X run axis (no erroneous Y-90°); scale maps module length to greenhouse +X and width to bay Z.

@@ -65,12 +65,22 @@
     "title": "Gemelo digital de fertirrigación Growa"
   },
   "viewport": {
-    "badge": "Disposición 3D del impianto",
+    "badge": "Disposición 3D (ref. OEM)",
     "flowLegend": "Color de tubería",
     "circuitSource": "Alimentación",
     "circuitMix": "Mezcla",
     "circuitCrop": "Cultivo",
     "circuitReturn": "Retorno"
+  },
+  "skid": {
+    "stockA": "Stock A",
+    "stockB": "Stock B (Ca)",
+    "stockAcid": "Ácido",
+    "zonePumpHouse": "Cuarto de bombas",
+    "zonePipeGallery": "Galería de tuberías",
+    "zoneHut": "Caseta de fertirrigación",
+    "zoneCropHall": "Nave de cultivo",
+    "reference": "Según manuales OEM (Priva · Netafim · UF/IFAS)"
   },
   "templates": {
     "nftDual": {

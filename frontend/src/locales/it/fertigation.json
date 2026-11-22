@@ -25,7 +25,7 @@
     "intro": "A sinistra scegli il tipo di impianto; al centro guardi il risultato. I dati possono seguire serra e coltura selezionate nel gemello 3D.",
     "nowPlant3d": "Stai guardando la vista 3D",
     "nowPid": "Stai guardando P&ID e simulazione",
-    "plant3dBody": "Layout ingegneristico in tre file (adduzione, condizionamento, coltura). Colori tubi = tipo di circuito; le colture usano i modelli colturali della serra.",
+    "plant3dBody": "Ogni preset segue uno skid commerciale (testata NFT doppio serbatoio, galleria inline Netafim, hut substrato, ecc.). IBC, fosse e zone seguono documentazione pubblica OEM, non le coordinate casuali del P&ID.",
     "pidBody": "Qui edichi lo schema, avvii la simulazione virtuale e controlli portate, EC e pH. Usa la colonna a sinistra nel twin per componenti e controlli.",
     "footer": "Se non riconosci un elemento, torna alla «Vista 3D»: ogni macchina corrisponde a un simbolo nel P&ID."
   },
@@ -65,12 +65,22 @@
     "title": "Digital twin fertirrigazione Growa"
   },
   "viewport": {
-    "badge": "Layout 3D impianto",
+    "badge": "Layout 3D (riferimento OEM)",
     "flowLegend": "Colore tubi",
     "circuitSource": "Adduzione",
     "circuitMix": "Miscelazione",
     "circuitCrop": "Coltura",
     "circuitReturn": "Ritorno"
+  },
+  "skid": {
+    "stockA": "Conc. A",
+    "stockB": "Conc. B (Ca)",
+    "stockAcid": "Acido",
+    "zonePumpHouse": "Sala pompe / testata",
+    "zonePipeGallery": "Galleria tubazioni",
+    "zoneHut": "Locale fertirrigazione",
+    "zoneCropHall": "Sala coltura",
+    "reference": "Layout da manuali OEM (Priva · Netafim · UF/IFAS)"
   },
   "templates": {
     "nftDual": {

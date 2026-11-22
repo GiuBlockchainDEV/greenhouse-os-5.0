@@ -3,6 +3,7 @@ import {
   createFertigationEdge,
   createFertigationNode,
 } from "@/lib/fertigation/projectFactory";
+import { nftSharedPlantSkid } from "@/lib/fertigation/plantSkids/nftSharedSkid";
 import type { FertigationTemplateDefinition } from "@/types/fertigation";
 
 export const nftSharedTemplate: FertigationTemplateDefinition = {
@@ -16,6 +17,7 @@ export const nftSharedTemplate: FertigationTemplateDefinition = {
     reference: "GR-FRT-002",
   },
   settings: baseSettings({ ecSet: 1.75 }),
+  plantSkid: nftSharedPlantSkid,
   buildGraph: () => ({
     nodes: [
       createFertigationNode("source", "SRC-101", "source", 65, 75, { label: "RO / fresh water" }),

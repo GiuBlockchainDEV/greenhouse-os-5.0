@@ -1,9 +1,17 @@
-import type { FertigationEdge, FertigationNode } from "@/types/fertigation";
+import { plantSkidForTemplate } from "@/lib/fertigation/plantSkids";
+import type {
+  FertigationEdge,
+  FertigationNode,
+  FertigationProject,
+  FertigationTemplateId,
+  PlantSkidBlueprint,
+} from "@/types/fertigation";
 
 export interface PlantPose {
   position: [number, number, number];
-  /** Base elevation of the equipment footprint (m). */
   groundY: number;
+  rotationY?: number;
+  belowGrade?: boolean;
 }
 
 const ROW_BY_PID_Y = [
@@ -23,11 +31,12 @@ function rowZ(pidY: number): number {
   return ROW_BY_PID_Y[ROW_BY_PID_Y.length - 1]?.z ?? 0;
 }
 
-/**
- * Converts P&ID schematic bands into a left-to-right plant skid:
- * make-up row (rear), conditioning / mixing (center), crop delivery (front).
- */
-export function computePlantLayout(nodes: FertigationNode[]): Map<string, PlantPose> {
+export interface ResolvedPlantLayout {
+  blueprint: PlantSkidBlueprint | null;
+  poses: Map<string, PlantPose>;
+}
+
+function schematicLayout(nodes: FertigationNode[]): Map<string, PlantPose> {
   const result = new Map<string, PlantPose>();
   if (nodes.length === 0) {
     return result;
@@ -47,6 +56,90 @@ export function computePlantLayout(nodes: FertigationNode[]): Map<string, PlantP
   return result;
 }
 
+/**
+ * Canonical physical skid from typed template blueprints (manufacturer-style layouts).
+ * P&ID coordinates are not used when a blueprint exists.
+ */
+export function resolvePlantLayout(project: FertigationProject): ResolvedPlantLayout {
+  const blueprint = plantSkidForTemplate(project.template);
+
+  const poses = new Map<string, PlantPose>();
+
+  if (blueprint) {
+    for (const node of project.nodes) {
+      const skidPose = blueprint.rolePoses[node.role];
+      if (!skidPose) {
+        continue;
+      }
+      const groundY = skidPose.groundY ?? (skidPose.belowGrade ? -0.45 : 0);
+      poses.set(node.id, {
+        position: [...skidPose.position],
+        groundY,
+        rotationY: skidPose.rotationY,
+        belowGrade: skidPose.belowGrade,
+      });
+    }
+    for (const node of project.nodes) {
+      if (!poses.has(node.id)) {
+        const fallback = schematicLayout([node]);
+        const entry = fallback.get(node.id);
+        if (entry) {
+          poses.set(node.id, entry);
+        }
+      }
+    }
+    return { blueprint, poses };
+  }
+
+  return { blueprint: null, poses: schematicLayout(project.nodes) };
+}
+
+export function resolvePlantLayoutByTemplate(
+  templateId: FertigationTemplateId,
+  nodes: FertigationNode[],
+): ResolvedPlantLayout {
+  return resolvePlantLayout({
+    version: 16,
+    id: "preview",
+    template: templateId,
+    meta: {
+      name: "",
+      site: "",
+      reference: "",
+      author: "",
+      revision: "",
+      createdAt: "",
+      updatedAt: "",
+    },
+    settings: {
+      ecSet: 1.8,
+      phSet: 5.8,
+      ecTolerance: 0.1,
+      phTolerance: 0.2,
+      qualityHoldS: 60,
+      transferAuto: true,
+      sourceAuto: true,
+      autoMix: true,
+      autoCrop: true,
+      autoDose: true,
+      sourceFillRate: 2,
+      sourceFillTargetPct: 55,
+      cropTargetPct: 65,
+      temperatureC: 22,
+      chemicalConcentrationGL: 120,
+      acidEffect: 0.02,
+      pipeWarningVelocity: 1.8,
+    },
+    nodes,
+    edges: [],
+  });
+}
+
+/** @deprecated Use resolvePlantLayout for template-aware placement */
+export function computePlantLayout(nodes: FertigationNode[]): Map<string, PlantPose> {
+  return schematicLayout(nodes);
+}
+
 export function plantLayoutCenter(poses: Map<string, PlantPose>): [number, number] {
   if (poses.size === 0) {
     return [0, 0];
@@ -63,9 +156,10 @@ export function plantLayoutCenter(poses: Map<string, PlantPose>): [number, numbe
 export function connectionHeightY(
   kind: FertigationNode["kind"],
   circuit: FertigationEdge["circuit"],
+  belowGrade?: boolean,
 ): number {
   if (kind === "tank") {
-    return 0.95;
+    return belowGrade ? 0.35 : 0.95;
   }
   if (kind === "crop") {
     return 0.52;

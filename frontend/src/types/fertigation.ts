@@ -101,6 +101,34 @@ export interface FertigationProject {
   edges: FertigationEdge[];
 }
 
+export type PlantSkidZoneKind = "pump_house" | "pipe_gallery" | "crop_hall" | "fertigation_hut";
+
+export interface PlantSkidPose {
+  position: [number, number, number];
+  groundY?: number;
+  rotationY?: number;
+  /** True for working reservoirs set in a below-grade sleeve (commercial NFT). */
+  belowGrade?: boolean;
+}
+
+export interface PlantSkidStockTankVisual {
+  id: string;
+  labelKey: string;
+  position: [number, number, number];
+  volumeL: number;
+  color: string;
+}
+
+export interface PlantSkidBlueprint {
+  id: FertigationTemplateId;
+  zoneKind: PlantSkidZoneKind;
+  /** Engineering reference for living docs (URL or citation). */
+  engineeringRef: string;
+  rolePoses: Record<string, PlantSkidPose>;
+  stockTanks: PlantSkidStockTankVisual[];
+  bounds: { widthM: number; depthM: number };
+}
+
 export interface FertigationTemplateDefinition {
   id: FertigationTemplateId;
   nameKey: string;
@@ -109,6 +137,7 @@ export interface FertigationTemplateDefinition {
   projectMeta: Pick<FertigationProjectMeta, "name" | "site" | "reference">;
   settings: FertigationSettings;
   buildGraph: () => { nodes: FertigationNode[]; edges: FertigationEdge[] };
+  plantSkid: PlantSkidBlueprint;
 }
 
 export interface MarketFertigationPreset {
