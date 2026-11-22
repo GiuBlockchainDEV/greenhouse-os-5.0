@@ -15,24 +15,50 @@ const MODULES: Record<CultivationSystem, { file: string; length: number; width: 
   ebb_flow: { file: "ebb-flow-bench.glb", length: 2, width: 1.2 },
 };
 
-/** GLB modules are authored with run length along +X; scale X/Z to bed run and line width (pad → exhaust on +X). */
+/** GLB origin is at the +X start of the run (`*_start_*` in manifest); tile without center offset. */
+function buildRunSegments(
+  xMin: number,
+  xMax: number,
+  moduleLength: number,
+  maxInstances: number,
+): Array<{ x: number; lengthM: number }> {
+  const runLen = Math.max(0, xMax - xMin);
+  if (runLen < 0.05) {
+    return [];
+  }
+
+  const count = Math.min(maxInstances, Math.max(1, Math.ceil(runLen / moduleLength)));
+  const step = runLen / count;
+  const segments: Array<{ x: number; lengthM: number }> = [];
+
+  for (let index = 0; index < count; index++) {
+    const x = xMin + index * step;
+    const end = index === count - 1 ? xMax : x + step;
+    const lengthM = Math.min(end - x, xMax - x);
+    if (lengthM < 0.04) {
+      continue;
+    }
+    segments.push({ x, lengthM });
+  }
+
+  return segments;
+}
+
 function CultivationBedMesh({ bed, system }: { bed: BedZone; system: CultivationSystem }) {
   const module = MODULES[system] ?? MODULES.soil;
-  const runLen = Math.max(module.length, bed.xMax - bed.xMin);
   const lineW = Math.max(0.05, bed.zMax - bed.zMin);
-  const count = Math.min(24, Math.max(1, Math.round(runLen / module.length)));
-  const step = runLen / count;
   const z = (bed.zMin + bed.zMax) / 2;
+  const segments = buildRunSegments(bed.xMin, bed.xMax, module.length, 24);
 
   return (
     <group>
-      {Array.from({ length: count }, (_, index) => (
+      {segments.map((segment, index) => (
         <GltfPart
           key={`${system}-${bed.bayIndex}-${bed.bedIndex}-${index}`}
           file={module.file}
-          position={[bed.xMin + index * step + step / 2, bed.elevationM, z]}
+          position={[segment.x, bed.elevationM, z]}
           rotation={[0, 0, 0]}
-          scale={[step / module.length, 1, lineW / module.width]}
+          scale={[segment.lengthM / module.length, 1, lineW / module.width]}
         />
       ))}
     </group>
