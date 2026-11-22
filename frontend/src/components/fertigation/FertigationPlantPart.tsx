@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { GltfPart } from "@/components/3d/GltfPart";
 import type { FertigationComponentKind, FertigationNode } from "@/types/fertigation";
 
