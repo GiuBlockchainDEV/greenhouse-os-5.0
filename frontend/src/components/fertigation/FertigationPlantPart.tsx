@@ -1,5 +1,11 @@
 import { GltfPart } from "@/components/3d/GltfPart";
+import { fertigationTankUniformScale } from "@/lib/fertigation/fertigationTankGlb";
 import type { FertigationComponentKind, FertigationNode } from "@/types/fertigation";
+
+export {
+  fertigationTankHeightM,
+  fertigationTankUniformScale,
+} from "@/lib/fertigation/fertigationTankGlb";
 
 const BODY = "#e2e8f0";
 const STEEL = "#94a3b8";
@@ -49,17 +55,6 @@ function WaterSource({ position }: PartProps) {
 
 const FERTIGATION_FILTER_GLB = "fertigation-filter-system.glb";
 const FERTIGATION_WATER_TANK_GLB = "fertigation-water-tank.glb";
-/** Native height of `fertigation-water-tank.glb` at reference capacity (m). */
-const TANK_REF_HEIGHT_M = 0.5551;
-
-/** Scales tank mesh from `capacityL` in project (engineering correlation preserved). */
-export function fertigationTankHeightM(capacityL: number): number {
-  return Math.min(1.65, 0.95 + capacityL / 4500);
-}
-
-function tankGlbScale(capacityL: number): number {
-  return fertigationTankHeightM(capacityL) / TANK_REF_HEIGHT_M;
-}
 
 function CentrifugalPump({ position }: PartProps) {
   return (
@@ -192,12 +187,12 @@ function renderPart(node: FertigationNode, position: [number, number, number]) {
       );
     case "tank": {
       const capacityL = Math.max(500, Number(node.params.capacityL) || 2000);
-      const s = tankGlbScale(capacityL);
+      const s = fertigationTankUniformScale(capacityL);
       return (
         <GltfPart
           file={FERTIGATION_WATER_TANK_GLB}
           position={position}
-          rotation={[0, 0, 0]}
+          rotation={[0, Math.PI / 2, 0]}
           scale={[s, s, s]}
         />
       );

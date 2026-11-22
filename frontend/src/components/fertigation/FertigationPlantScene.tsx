@@ -5,12 +5,15 @@ import * as THREE from "three";
 import { FertigationPlantPart, fertigationTankHeightM } from "@/components/fertigation/FertigationPlantPart";
 import { FertigationSkidStructure } from "@/components/fertigation/FertigationSkidStructure";
 import {
+  fertigationTankConnectionY,
+} from "@/lib/fertigation/fertigationTankGlb";
+import {
   connectionHeightY,
   plantLayoutCenter,
   resolvePlantLayout,
   type PlantPose,
 } from "@/lib/fertigation/plantLayoutEngine";
-import type { FertigationNode, FertigationProject } from "@/types/fertigation";
+import type { FertigationEdge, FertigationNode, FertigationProject } from "@/types/fertigation";
 
 const PIPE_RADIUS = 0.03;
 
@@ -51,6 +54,43 @@ function FertigationPipe({
   );
 }
 
+function FertigationPipeOrthogonal({
+  from,
+  to,
+  tint,
+}: {
+  from: [number, number, number];
+  to: [number, number, number];
+  tint: string;
+}) {
+  const followX = Math.abs(to[0] - from[0]) >= Math.abs(to[2] - from[2]);
+  const mid: [number, number, number] = followX
+    ? [to[0], from[1], from[2]]
+    : [from[0], from[1], to[2]];
+  return (
+    <>
+      <FertigationPipe from={from} to={mid} tint={tint} />
+      <FertigationPipe from={mid} to={to} tint={tint} />
+    </>
+  );
+}
+
+function nodeById(nodes: FertigationNode[]): Map<string, FertigationNode> {
+  const map = new Map<string, FertigationNode>();
+  for (const node of nodes) {
+    map.set(node.id, node);
+  }
+  return map;
+}
+
+function resolveNodeConnectionY(node: FertigationNode, pose: PlantPose, circuit: FertigationEdge["circuit"]): number {
+  if (node.kind === "tank") {
+    const capacityL = Math.max(500, Number(node.params.capacityL) || 2000);
+    return fertigationTankConnectionY(pose.groundY, capacityL);
+  }
+  return connectionHeightY(node.kind, circuit, pose.belowGrade);
+}
+
 const CIRCUIT_COLOR: Record<string, string> = {
   source: "#4A90A4",
   mix: "#64748b",
@@ -78,6 +118,7 @@ function partPosition(pose: PlantPose): [number, number, number] {
 export function FertigationPlantScene({ project }: { project: FertigationProject }) {
   const { blueprint, poses } = useMemo(() => resolvePlantLayout(project), [project]);
   const kinds = useMemo(() => nodeKindById(project.nodes), [project.nodes]);
+  const nodesById = useMemo(() => nodeById(project.nodes), [project.nodes]);
   const [centerX, centerZ] = useMemo(() => plantLayoutCenter(poses), [poses]);
 
   const floor = blueprint?.bounds ?? { widthM: 24, depthM: 16 };
@@ -99,19 +140,26 @@ export function FertigationPlantScene({ project }: { project: FertigationProject
         if (!poseA || !poseB || edge.enabled === false) {
           return null;
         }
+        const nodeA = nodesById.get(edge.from);
+        const nodeB = nodesById.get(edge.to);
         const kindA = kinds.get(edge.from) ?? "junction";
         const kindB = kinds.get(edge.to) ?? "junction";
-        const yA = connectionHeightY(kindA, edge.circuit, poseA.belowGrade);
-        const yB = connectionHeightY(kindB, edge.circuit, poseB.belowGrade);
+        const yA = nodeA
+          ? resolveNodeConnectionY(nodeA, poseA, edge.circuit)
+          : connectionHeightY(kindA, edge.circuit, poseA.belowGrade);
+        const yB = nodeB
+          ? resolveNodeConnectionY(nodeB, poseB, edge.circuit)
+          : connectionHeightY(kindB, edge.circuit, poseB.belowGrade);
         const [ax, , az] = poseA.position;
         const [bx, , bz] = poseB.position;
-        return (
-          <FertigationPipe
-            key={edge.id}
-            from={[ax, yA, az]}
-            to={[bx, yB, bz]}
-            tint={CIRCUIT_COLOR[edge.circuit] ?? "#94a3b8"}
-          />
+        const from: [number, number, number] = [ax, yA, az];
+        const to: [number, number, number] = [bx, yB, bz];
+        const tint = CIRCUIT_COLOR[edge.circuit] ?? "#94a3b8";
+        const orthogonal = kindA === "tank" || kindB === "tank";
+        return orthogonal ? (
+          <FertigationPipeOrthogonal key={edge.id} from={from} to={to} tint={tint} />
+        ) : (
+          <FertigationPipe key={edge.id} from={from} to={to} tint={tint} />
         );
       })}
 

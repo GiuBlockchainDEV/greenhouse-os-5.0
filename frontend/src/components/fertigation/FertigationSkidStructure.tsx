@@ -52,8 +52,8 @@ function PumpHouseShell({ width, depth }: { width: number; depth: number }) {
   const pitD = 2.8;
   return (
     <group>
-      <mesh position={[-1, -0.5, -3.6]} receiveShadow>
-        <boxGeometry args={[pitW, 1, pitD]} />
+      <mesh position={[-1, -0.38, -3.6]} receiveShadow>
+        <boxGeometry args={[pitW, 0.76, pitD]} />
         <meshStandardMaterial color="#cbd5e1" roughness={0.85} metalness={0.05} />
       </mesh>
       <mesh position={[-3.2, 0.02, -5.4]} receiveShadow>

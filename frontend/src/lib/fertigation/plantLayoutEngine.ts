@@ -71,7 +71,8 @@ export function resolvePlantLayout(project: FertigationProject): ResolvedPlantLa
       if (!skidPose) {
         continue;
       }
-      const groundY = skidPose.groundY ?? (skidPose.belowGrade ? -0.45 : 0);
+      /** Below-grade tanks: rim at finished floor (y=0); pit shell shows burial. */
+      const groundY = skidPose.groundY ?? 0;
       poses.set(node.id, {
         position: [...skidPose.position],
         groundY,
@@ -159,7 +160,7 @@ export function connectionHeightY(
   belowGrade?: boolean,
 ): number {
   if (kind === "tank") {
-    return belowGrade ? 0.35 : 0.95;
+    return belowGrade ? 0.48 : 0.95;
   }
   if (kind === "crop") {
     return 0.52;
