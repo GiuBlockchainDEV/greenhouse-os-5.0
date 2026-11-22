@@ -1,0 +1,55 @@
+{
+  "launch": {
+    "kicker": "Before you pour concrete",
+    "title": "Size your greenhouse. See OPEX, climate, and crop risk in minutes.",
+    "subtitle": "Pick a real commercial model, stress the weather, and watch microclimate flow across the 3D twin — no telemetry required.",
+    "skip": "Open blank custom twin",
+    "pillars": {
+      "capex": "Engineering-grade geometry & HVAC counts",
+      "opex": "Daily € / kWh·m² from physics, not spreadsheets",
+      "agronomy": "VPD, DLI, Botrytis — crop-aware bands",
+      "export": "Priva / Ridder / Hoogendoorn setpoint JSON"
+    },
+    "scenarios": {
+      "semi-closed-venlo": {
+        "title": "Semi-closed Venlo",
+        "hook": "Kubo Ultra-Clima · mechanical AC + screening",
+        "outcome": "See uniform cooling jets across 1,024 m²"
+      },
+      "fan-pad-tunnel": {
+        "title": "Fan & pad multispan",
+        "hook": "Richel tunnel · evaporative summer day",
+        "outcome": "Visualize pad-to-exhaust VPD gradients"
+      },
+      "gulf-summer-stress": {
+        "title": "Gulf summer stress",
+        "hook": "Certhon SuprimAir · 44 °C outside",
+        "outcome": "Test semi-closed payback under desert load"
+      }
+    },
+    "cta": "Load scenario"
+  },
+  "valueStrip": {
+    "sourcePreview": "Physics preview",
+    "sourceLive": "Live simulation",
+    "opex": "Est. OPEX",
+    "energy": "Energy",
+    "vpd": "VPD",
+    "indoor": "Indoor",
+    "outdoor": "Outdoor",
+    "perDay": "/ day",
+    "insightPrefix": "Try next:"
+  },
+  "insightColumn": {
+    "tabAdvisor": "Actions",
+    "tabCopilot": "GAIA copilot",
+    "advisorHint": "One-click fixes applied to your twin — exportable to climate computers."
+  },
+  "mission": {
+    "title": "Your workflow",
+    "stepHeatmap": "Read the 3D heatmap",
+    "stepOpex": "Review € / day at the bottom",
+    "stepFertigation": "Switch to fertigation twin",
+    "done": "You are in control — keep tuning or save the design."
+  }
+}

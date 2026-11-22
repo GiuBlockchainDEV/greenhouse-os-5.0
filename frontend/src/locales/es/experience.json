@@ -1,0 +1,55 @@
+{
+  "launch": {
+    "kicker": "Antes del hormigón",
+    "title": "Dimensiona el invernadero. OPEX, clima y riesgo en minutos.",
+    "subtitle": "Elige un modelo comercial, estrés meteorológico y microclima en el gemelo 3D — sin telemetría.",
+    "skip": "Abrir invernadero vacío",
+    "pillars": {
+      "capex": "Geometría e HVAC de ingeniería",
+      "opex": "€/día y kWh·m² con física real",
+      "agronomy": "VPD, DLI, Botrytis por cultivo",
+      "export": "JSON Priva / Ridder / Hoogendoorn"
+    },
+    "scenarios": {
+      "semi-closed-venlo": {
+        "title": "Venlo semi-cerrado",
+        "hook": "Kubo Ultra-Clima · AC mecánico",
+        "outcome": "Uniformidad de frío en 1.024 m²"
+      },
+      "fan-pad-tunnel": {
+        "title": "Multitúnel fan & pad",
+        "hook": "Richel · evaporativo verano",
+        "outcome": "Gradientes VPD pad → exhaust"
+      },
+      "gulf-summer-stress": {
+        "title": "Estrés verano Golfo",
+        "hook": "Certhon SuprimAir · 44 °C exterior",
+        "outcome": "Semi-cerrado bajo carga árida"
+      }
+    },
+    "cta": "Cargar escenario"
+  },
+  "valueStrip": {
+    "sourcePreview": "Vista previa física",
+    "sourceLive": "Simulación en vivo",
+    "opex": "OPEX est.",
+    "energy": "Energía",
+    "vpd": "VPD",
+    "indoor": "Interior",
+    "outdoor": "Exterior",
+    "perDay": "/ día",
+    "insightPrefix": "Siguiente:"
+  },
+  "insightColumn": {
+    "tabAdvisor": "Acciones",
+    "tabCopilot": "Copiloto GAIA",
+    "advisorHint": "Ajustes con un clic — exportables al climatizador."
+  },
+  "mission": {
+    "title": "Tu flujo",
+    "stepHeatmap": "Lee el mapa 3D",
+    "stepOpex": "Revisa €/día abajo",
+    "stepFertigation": "Cambia a fertirrigación",
+    "done": "Tú mandas — sigue afinando o guarda."
+  }
+}

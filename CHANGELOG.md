@@ -28,6 +28,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Market greenhouse catalog** — 24 selectable commercial models (Venlo, semi-closed, gothic multispan, tunnels) load structure, covering, crop, and typical HVAC so GAIA can analyze a built product as well as a custom design.
 
+### Added
+
+- **Product launch experience** — First-run scenario picker (Venlo semi-closed, fan & pad, Gulf stress), floating OPEX/VPD value strip, mission ribbon, preview-filled climate dashboard, and Actions vs GAIA tab column.
+
 ### Fixed
 
 - **3D heatmap overlays** — Uint8 textures (WebGL-safe), `depthTest` off with ~52% opacity so fields read through glazing; floor/canopy/roof/wall shells; heatmap enabled with heating or cooling.

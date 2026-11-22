@@ -1,7 +1,6 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AICopilotPanel } from "@/components/ai/AICopilotPanel";
-import { OfflineTwinAdvisor } from "@/components/ui/OfflineTwinAdvisor";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { Viewport3D } from "@/components/3d/Viewport3D";
 import { FertigationPresetControls } from "@/components/fertigation/FertigationPresetControls";
@@ -12,6 +11,11 @@ import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
 import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
+import { TwinInsightColumn } from "@/components/ui/TwinInsightColumn";
+import { TwinLaunchExperience } from "@/components/ui/TwinLaunchExperience";
+import { TwinMissionRibbon } from "@/components/ui/TwinMissionRibbon";
+import { TwinValueStrip } from "@/components/ui/TwinValueStrip";
+import { hasCompletedTwinLaunch } from "@/lib/twin/twinLaunchState";
 import { useFertigationGreenhouseSync } from "@/hooks/useFertigationGreenhouseSync";
 import { useTwinProjectPersist } from "@/hooks/useTwinProjectPersist";
 import { useSimulationWS } from "@/hooks/useSimulationWS";
@@ -21,10 +25,20 @@ import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 export function AppShell() {
   const { t } = useTranslation("common");
   const workspaceMode = useWorkspaceStore((state) => state.mode);
+  const [launchOpen, setLaunchOpen] = useState(false);
   const { reconnect } = useSimulationWS();
   useTwinScenarioClock();
   useTwinProjectPersist();
   useFertigationGreenhouseSync();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (!hasCompletedTwinLaunch()) {
+        setLaunchOpen(true);
+      }
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   return (
     <div className="flex h-screen flex-col bg-surface-page text-gray-900">
@@ -52,19 +66,16 @@ export function AppShell() {
       </header>
 
       {workspaceMode === "greenhouse" ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_480px] gap-4 overflow-hidden p-4">
+        <main className="grid min-h-0 flex-1 grid-cols-[300px_1fr_400px] gap-4 overflow-hidden p-4">
           <DimensionControls />
           <div className="relative min-h-0">
             <Viewport3D />
             <HUDOverlay />
+            <TwinValueStrip />
+            <TwinMissionRibbon />
             <ClimateDashboard onReconnect={reconnect} />
           </div>
-          <div className="flex min-h-0 flex-col gap-3">
-            <OfflineTwinAdvisor />
-            <div className="min-h-0 flex-1">
-              <AICopilotPanel />
-            </div>
-          </div>
+          <TwinInsightColumn />
         </main>
       ) : (
         <main className="grid min-h-0 flex-1 grid-cols-[320px_1fr_320px] gap-4 overflow-hidden p-4">
@@ -73,6 +84,10 @@ export function AppShell() {
           <FertigationSummaryPanel />
         </main>
       )}
+
+      {workspaceMode === "greenhouse" ? (
+        <TwinLaunchExperience open={launchOpen} onClose={() => setLaunchOpen(false)} />
+      ) : null}
     </div>
   );
 }

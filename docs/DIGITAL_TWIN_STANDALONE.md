@@ -1,5 +1,7 @@
 # Standalone digital twin (no field telemetry)
 
+GreenhouseOS answers one question: **“Should we build this greenhouse here, with this HVAC, under this weather?”** The first-run **launch scenarios** load a full commercial model, spatial heatmap, and OPEX preview in one click—no telemetry required.
+
 GreenhouseOS operates as a **self-contained virtual twin**: geometry, equipment, cultivation layout, weather scenarios, and physics outputs are generated inside the platform. External sensors, SCADA, or climate computers are optional future inputs—not required for design or what-if analysis.
 
 ## Runtime layers

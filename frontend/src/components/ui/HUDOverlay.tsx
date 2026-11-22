@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { GizmoToolbar } from "@/components/ui/GizmoToolbar";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { useTwinMicroclimateView } from "@/hooks/useTwinMicroclimateView";
 import { useGreenhouseStore } from "@/store/useGreenhouseStore";
 
 export function HUDOverlay() {
@@ -17,7 +18,7 @@ export function HUDOverlay() {
   const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const location = useGreenhouseStore((state) => state.location);
   const simulationStatus = useGreenhouseStore((state) => state.simulationStatus);
-  const results = useGreenhouseStore((state) => state.simulationResults);
+  const view = useTwinMicroclimateView();
 
   const statusTone =
     simulationStatus === "connected"
@@ -33,10 +34,9 @@ export function HUDOverlay() {
       ? tSim("status.ready", { defaultValue: "Physics engine" })
       : tSim(`status.${simulationStatus}`, { defaultValue: simulationStatus });
 
-  const microSnippet =
-    simulationStatus === "connected" && results?.microclimate
-      ? `${results.microclimate.internal_temp.toFixed(1)} °C · VPD ${results.microclimate.vpd_kpa.toFixed(2)} kPa`
-      : tSim("twin.previewMode", { defaultValue: "Local preview solver" });
+  const microSnippet = `${view.internalTemp.toFixed(1)} °C · VPD ${view.vpdKpa.toFixed(2)} kPa · €${view.opexEurDay.toFixed(0)}/d${
+    view.source === "preview" ? ` (${tSim("twin.previewMode", { defaultValue: "preview" })})` : ""
+  }`;
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4">

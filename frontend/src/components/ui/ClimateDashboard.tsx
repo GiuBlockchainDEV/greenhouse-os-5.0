@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { RangeGauge } from "@/components/ui/RangeGauge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAuth } from "@/hooks/useAuth";
+import { useTwinMicroclimateView } from "@/hooks/useTwinMicroclimateView";
 import {
   computeOpexMetrics,
   downloadExport,
@@ -55,12 +56,38 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const view = useTwinMicroclimateView();
   const thermal = results?.thermal_balance;
   const micro = results?.microclimate;
 
-  const opex = thermal
-    ? computeOpexMetrics(metrics.floorAreaM2, thermal.q_solar, thermal.q_net_delta)
-    : null;
+  const opex =
+    thermal && micro
+      ? computeOpexMetrics(metrics.floorAreaM2, thermal.q_solar, thermal.q_net_delta)
+      : {
+          energyKwhM2Day: view.energyKwhM2Day,
+          opexEurDay: view.opexEurDay,
+          co2KgDay: Number((view.energyKwhM2Day * metrics.floorAreaM2 * 0.4).toFixed(2)),
+        };
+
+  const microDisplay =
+    micro ??
+    ({
+      internal_temp: view.internalTemp,
+      internal_rh: view.internalRh,
+      external_temp: view.externalTemp,
+      vpd_kpa: view.vpdKpa,
+      et0_fao56: view.et0Fao56,
+    } as const);
+
+  const thermalDisplay =
+    thermal ??
+    ({
+      q_solar: view.qSolar,
+      q_transpiration: Number((-view.qSolar * 0.18).toFixed(1)),
+      q_net_delta: view.qNetDelta,
+    } as const);
+
+  const usingPreview = view.source === "preview";
 
   const handleExport = async (format: ClimateComputerFormat) => {
     setExporting(true);
@@ -93,7 +120,9 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
   const statusLabel =
     status === "connected"
       ? t("status.inRange", { defaultValue: "In range" })
-      : t(`status.${STATUS_LABELS[status]}`);
+      : usingPreview
+        ? t("status.previewActive", { defaultValue: "Physics preview — instant feedback" })
+        : t(`status.${STATUS_LABELS[status]}`);
 
   return (
     <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 p-4">
@@ -119,10 +148,10 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge
               label={statusLabel}
-              tone={STATUS_TONE[status]}
+              tone={usingPreview ? "sync" : STATUS_TONE[status]}
               pulse={status === "connecting"}
             />
-            {results && (
+            {results?.computation_ms != null && (
               <span className="font-mono text-[10px] text-gray-400">
                 {results.computation_ms.toFixed(1)} ms
               </span>
@@ -135,7 +164,7 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
             <button
               key={fmt}
               type="button"
-              disabled={exporting || !micro}
+              disabled={exporting}
               onClick={() => void handleExport(fmt)}
               className="ui-btn-ghost uppercase tracking-wide"
             >
@@ -161,12 +190,12 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
 
         {message && <p className="mb-2 text-xs text-status-optimalDark">{message}</p>}
 
-        {micro && thermal && opex ? (
+        {microDisplay && thermalDisplay && opex ? (
           <>
             <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
               <RangeGauge
                 label={t("metrics.internalTemp")}
-                value={micro.internal_temp}
+                value={microDisplay.internal_temp}
                 unit="°C"
                 min={10}
                 max={40}
@@ -177,7 +206,7 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
               />
               <RangeGauge
                 label={t("metrics.internalRh")}
-                value={micro.internal_rh}
+                value={microDisplay.internal_rh}
                 unit="%"
                 min={30}
                 max={100}
@@ -188,7 +217,7 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
               />
               <RangeGauge
                 label={t("metrics.vpd")}
-                value={micro.vpd_kpa}
+                value={microDisplay.vpd_kpa}
                 unit="kPa"
                 min={0}
                 max={2.5}
@@ -198,7 +227,7 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
               />
               <RangeGauge
                 label={t("metrics.et0")}
-                value={micro.et0_fao56}
+                value={microDisplay.et0_fao56}
                 unit="mm/d"
                 min={0}
                 max={12}
@@ -209,7 +238,8 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
               />
             </div>
 
-            {(micro.dli_mol_m2_day !== undefined || micro.botrytis_risk_index !== undefined) && (
+            {micro &&
+            (micro.dli_mol_m2_day !== undefined || micro.botrytis_risk_index !== undefined) ? (
               <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-2">
                 {micro.dli_mol_m2_day !== undefined && (
                   <RangeGauge
@@ -239,14 +269,17 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
                   />
                 )}
               </div>
-            )}
+            ) : null}
 
             <div className="ui-divider mb-3 pt-3">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
-                <MetricCard label={t("metrics.externalTemp")} value={`${micro.external_temp}°C`} />
-                <MetricCard label={t("thermal.qSolar")} value={`${thermal.q_solar} W/m²`} highlight />
-                <MetricCard label={t("thermal.qTranspiration")} value={`${thermal.q_transpiration} W/m²`} />
-                <MetricCard label={t("thermal.qNet")} value={`${thermal.q_net_delta} W/m²`} />
+                <MetricCard label={t("metrics.externalTemp")} value={`${microDisplay.external_temp}°C`} />
+                <MetricCard label={t("thermal.qSolar")} value={`${thermalDisplay.q_solar} W/m²`} highlight />
+                <MetricCard
+                  label={t("thermal.qTranspiration")}
+                  value={`${thermalDisplay.q_transpiration} W/m²`}
+                />
+                <MetricCard label={t("thermal.qNet")} value={`${thermalDisplay.q_net_delta} W/m²`} />
                 <MetricCard label={t("opex.energy")} value={`${opex.energyKwhM2Day} kWh/m²`} />
                 <MetricCard label={t("opex.cost")} value={`€${opex.opexEurDay}/d`} highlight />
                 <MetricCard label={t("opex.co2")} value={`${opex.co2KgDay} kg/d`} />
@@ -254,9 +287,13 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
             </div>
 
             <p className="text-center text-[11px] text-label">
-              {t("panel.syncFooter", {
-                defaultValue: "Live simulation · synced",
-              })}
+              {usingPreview
+                ? t("panel.previewFooter", {
+                    defaultValue: "Instant physics preview — connect WebSocket for live engine",
+                  })
+                : t("panel.syncFooter", {
+                    defaultValue: "Live simulation · synced",
+                  })}
             </p>
           </>
         ) : (

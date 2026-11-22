@@ -74,11 +74,13 @@
     "running": "Connessione...",
     "disconnected": "Disconnesso",
     "error": "Errore di connessione",
-    "inRange": "In range"
+    "inRange": "In range",
+    "previewActive": "Anteprima fisica — feedback immediato"
   },
   "panel": {
     "climateTitle": "Clima",
-    "syncFooter": "Simulazione live · sincronizzata"
+    "syncFooter": "Simulazione live · sincronizzata",
+    "previewFooter": "Anteprima fisica istantanea — collega il WebSocket per il motore live"
   },
   "location": {
     "latitude": "Latitudine",

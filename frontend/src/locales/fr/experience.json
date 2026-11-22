@@ -1,0 +1,55 @@
+{
+  "launch": {
+    "kicker": "Avant le béton",
+    "title": "Dimensionnez la serre. OPEX, climat et risque en quelques minutes.",
+    "subtitle": "Choisissez un modèle commercial, stressez la météo, voyez le microclimat en 3D — sans télémétrie.",
+    "skip": "Ouvrir une serre vide",
+    "pillars": {
+      "capex": "Géométrie & CVC d'ingénierie",
+      "opex": "€/jour et kWh·m² issus de la physique",
+      "agronomy": "VPD, DLI, Botrytis par culture",
+      "export": "JSON Priva / Ridder / Hoogendoorn"
+    },
+    "scenarios": {
+      "semi-closed-venlo": {
+        "title": "Venlo semi-fermé",
+        "hook": "Kubo Ultra-Clima · climatisation mécanique",
+        "outcome": "Refroidissement uniforme sur 1 024 m²"
+      },
+      "fan-pad-tunnel": {
+        "title": "Multitunnel fan & pad",
+        "hook": "Richel · évaporatif été",
+        "outcome": "Gradients VPD pad → extraction"
+      },
+      "gulf-summer-stress": {
+        "title": "Stress été Golfe",
+        "hook": "Certhon SuprimAir · 44 °C extérieur",
+        "outcome": "Semi-fermé sous charge désertique"
+      }
+    },
+    "cta": "Charger le scénario"
+  },
+  "valueStrip": {
+    "sourcePreview": "Aperçu physique",
+    "sourceLive": "Simulation live",
+    "opex": "OPEX est.",
+    "energy": "Énergie",
+    "vpd": "VPD",
+    "indoor": "Intérieur",
+    "outdoor": "Extérieur",
+    "perDay": "/ jour",
+    "insightPrefix": "Ensuite :"
+  },
+  "insightColumn": {
+    "tabAdvisor": "Actions",
+    "tabCopilot": "Copilote GAIA",
+    "advisorHint": "Corrections en un clic — export vers ordinateur climatique."
+  },
+  "mission": {
+    "title": "Votre parcours",
+    "stepHeatmap": "Lire la heatmap 3D",
+    "stepOpex": "Vérifier €/jour en bas",
+    "stepFertigation": "Basculer vers la fertigation",
+    "done": "Vous pilotez — affinez ou enregistrez le projet."
+  }
+}

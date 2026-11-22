@@ -1,0 +1,55 @@
+{
+  "launch": {
+    "kicker": "Prima di versare il cemento",
+    "title": "Dimensiona la serra. OPEX, clima e rischio coltura in pochi minuti.",
+    "subtitle": "Scegli un modello commerciale reale, stressa il meteo e guarda il microclima sul gemello 3D — senza telemetria.",
+    "skip": "Apri serra custom vuota",
+    "pillars": {
+      "capex": "Geometria e HVAC da progetto",
+      "opex": "€/giorno e kWh·m² dalla fisica",
+      "agronomy": "VPD, DLI, Botrytis — bande per coltura",
+      "export": "JSON setpoint Priva / Ridder / Hoogendoorn"
+    },
+    "scenarios": {
+      "semi-closed-venlo": {
+        "title": "Venlo semi-chiusa",
+        "hook": "Kubo Ultra-Clima · AC + schermatura",
+        "outcome": "Uniformità di raffrescamento su 1.024 m²"
+      },
+      "fan-pad-tunnel": {
+        "title": "Multitunnel fan & pad",
+        "hook": "Richel · evaporazione in estate",
+        "outcome": "Gradienti VPD pad → ventole"
+      },
+      "gulf-summer-stress": {
+        "title": "Stress estivo Golfo",
+        "hook": "Certhon SuprimAir · 44 °C esterni",
+        "outcome": "Semi-chiusa sotto carico desertico"
+      }
+    },
+    "cta": "Carica scenario"
+  },
+  "valueStrip": {
+    "sourcePreview": "Anteprima fisica",
+    "sourceLive": "Simulazione live",
+    "opex": "OPEX stimato",
+    "energy": "Energia",
+    "vpd": "VPD",
+    "indoor": "Interno",
+    "outdoor": "Esterno",
+    "perDay": "/ giorno",
+    "insightPrefix": "Prossimo passo:"
+  },
+  "insightColumn": {
+    "tabAdvisor": "Azioni",
+    "tabCopilot": "Copilot GAIA",
+    "advisorHint": "Correzioni in un clic sul gemello — esportabili ai climate computer."
+  },
+  "mission": {
+    "title": "Il tuo flusso",
+    "stepHeatmap": "Leggi la heatmap 3D",
+    "stepOpex": "Controlla €/giorno in basso",
+    "stepFertigation": "Passa al twin fertirrigazione",
+    "done": "Sei in controllo — continua a tarare o salva il progetto."
+  }
+}
