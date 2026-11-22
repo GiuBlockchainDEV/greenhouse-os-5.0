@@ -50,6 +50,9 @@ class WSCultivationLayout(BaseModel):
     pathway_width_m: float = Field(default=1.2, ge=0.6, le=3.0)
     side_clearance_m: float = Field(default=0.6, ge=0.2, le=2.0)
     aisle_width_m: float | None = Field(default=None, ge=0.3, le=3.0)
+    center_aisle_m: float | None = Field(default=None, ge=0.0, le=3.0)
+    gutter_walk_m: float | None = Field(default=None, ge=0.0, le=1.5)
+    cross_path_interval_m: float | None = Field(default=None, ge=0.0, le=120.0)
 
 
 class WSCrop(BaseModel):
@@ -143,6 +146,9 @@ class WSMicroclimate(BaseModel):
     internal_rh: float
     vpd_kpa: float
     et0_fao56: float
+    dli_mol_m2_day: float = Field(default=0.0, ge=0)
+    dli_adequacy_index: float = Field(default=0.0, ge=0)
+    botrytis_risk_index: float = Field(default=0.0, ge=0, le=100)
 
 
 class WSSimulationResultsData(BaseModel):

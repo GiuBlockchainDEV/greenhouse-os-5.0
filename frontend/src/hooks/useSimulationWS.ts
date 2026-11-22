@@ -66,6 +66,9 @@ function buildUpdatePayload(): WSUpdatePayload {
           bed_line_count: state.crop.layout.bedLineCount,
           pathway_width_m: state.crop.layout.pathwayWidthM,
           side_clearance_m: state.crop.layout.sideClearanceM,
+          center_aisle_m: state.crop.layout.centerAisleM,
+          gutter_walk_m: state.crop.layout.gutterWalkM,
+          cross_path_interval_m: state.crop.layout.crossPathIntervalM,
         },
       },
       equipment: {
@@ -215,6 +218,7 @@ export function useSimulationWS(): UseSimulationWSReturn {
         state.crop !== prev.crop ||
         state.climateEquipment !== prev.climateEquipment ||
         state.climateScenario !== prev.climateScenario ||
+        state.twinRuntime !== prev.twinRuntime ||
         state.location !== prev.location;
 
       if (!changed) return;

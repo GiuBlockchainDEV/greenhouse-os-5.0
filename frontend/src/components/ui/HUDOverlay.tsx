@@ -16,6 +16,27 @@ export function HUDOverlay() {
   const crop = useGreenhouseStore((state) => state.crop);
   const climateEquipment = useGreenhouseStore((state) => state.climateEquipment);
   const location = useGreenhouseStore((state) => state.location);
+  const simulationStatus = useGreenhouseStore((state) => state.simulationStatus);
+  const results = useGreenhouseStore((state) => state.simulationResults);
+
+  const statusTone =
+    simulationStatus === "connected"
+      ? "optimal"
+      : simulationStatus === "connecting"
+        ? "warning"
+        : simulationStatus === "error"
+          ? "error"
+          : "neutral";
+
+  const statusLabel =
+    simulationStatus === "connected"
+      ? tSim("status.ready", { defaultValue: "Physics engine" })
+      : tSim(`status.${simulationStatus}`, { defaultValue: simulationStatus });
+
+  const microSnippet =
+    simulationStatus === "connected" && results?.microclimate
+      ? `${results.microclimate.internal_temp.toFixed(1)} °C · VPD ${results.microclimate.vpd_kpa.toFixed(2)} kPa`
+      : tSim("twin.previewMode", { defaultValue: "Local preview solver" });
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4">
@@ -52,11 +73,9 @@ export function HUDOverlay() {
             <span className="text-xs font-semibold text-gray-800">
               {tSim("metrics.overview", { defaultValue: "Overview" })}
             </span>
-            <StatusBadge
-              label={tSim("metrics.live", { defaultValue: "Live" })}
-              tone="sync"
-            />
+            <StatusBadge label={statusLabel} tone={statusTone} pulse={simulationStatus === "connecting"} />
           </div>
+          <p className="mb-2 font-mono text-[10px] text-label">{microSnippet}</p>
           <dl className="grid grid-cols-2 gap-x-5 gap-y-2 text-xs sm:grid-cols-3">
             <MetricItem label={tSim("metrics.floorArea")} value={`${metrics.floorAreaM2} ${tCommon("units.squareMeters")}`} />
             <MetricItem label={tSim("metrics.cultivationArea")} value={`${metrics.cultivationAreaM2} ${tCommon("units.squareMeters")}`} />

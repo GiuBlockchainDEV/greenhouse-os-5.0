@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Standalone twin runtime** — Climate dashboard mounted on viewport; virtual day clock with diurnal weather; synthetic sensor panel; greenhouse design `localStorage` persist; WS agronomic fields (DLI, Botrytis risk); `docs/DIGITAL_TWIN_STANDALONE.md`.
+
 - **Fertigation studio UX simplification** — Single center area with tabs (`Vista 3D` / `P&ID e simulazione`), numbered steps in the sidebar, plain-language help panel, centered GLB layout; removed stacked dual views and catalog clutter.
 
 - **Fertigation engineering viewport (GLB)** — `FertigationPlantViewport` reuses GreenhouseOS R3F atmosphere and `growa_greenhouse_glb_library` assets for 3D plant layout; iframe twin runs in `embed=greenhouse-os` engineering mode (no voxel game shell).

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { CultivationClimateControls } from "@/components/ui/CultivationClimateControls";
+import { TwinRuntimePanel } from "@/components/ui/TwinRuntimePanel";
 import {
   CUSTOM_GREENHOUSE_PRESET_ID,
   MARKET_GREENHOUSE_PRESETS,
@@ -310,6 +311,8 @@ export function DimensionControls() {
       </section>
 
       <CultivationClimateControls />
+
+      <TwinRuntimePanel />
 
       <button
         type="button"

@@ -10,13 +10,18 @@ import { DimensionControls } from "@/components/ui/DimensionControls";
 import { HUDOverlay } from "@/components/ui/HUDOverlay";
 import { LanguagePicker } from "@/components/ui/LanguagePicker";
 import { WorkspaceModeSwitch } from "@/components/ui/WorkspaceModeSwitch";
+import { ClimateDashboard } from "@/components/ui/ClimateDashboard";
+import { useGreenhousePersist } from "@/hooks/useGreenhousePersist";
 import { useSimulationWS } from "@/hooks/useSimulationWS";
+import { useTwinScenarioClock } from "@/hooks/useTwinScenarioClock";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 export function AppShell() {
   const { t } = useTranslation("common");
   const workspaceMode = useWorkspaceStore((state) => state.mode);
-  useSimulationWS();
+  const { reconnect } = useSimulationWS();
+  useTwinScenarioClock();
+  useGreenhousePersist();
 
   return (
     <div className="flex h-screen flex-col bg-surface-page text-gray-900">
@@ -49,6 +54,7 @@ export function AppShell() {
           <div className="relative min-h-0">
             <Viewport3D />
             <HUDOverlay />
+            <ClimateDashboard onReconnect={reconnect} />
           </div>
           <AICopilotPanel />
         </main>

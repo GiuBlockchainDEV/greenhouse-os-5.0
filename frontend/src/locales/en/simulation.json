@@ -16,7 +16,25 @@
     "overview": "Overview",
     "live": "Live",
     "optimalTempHint": "Optimal for crop stage",
-    "et0Range": "Reference evapotranspiration"
+    "et0Range": "Reference evapotranspiration",
+    "dliAdequacy": "DLI vs crop requirement",
+    "botrytisRisk": "Botrytis risk",
+    "botrytisHint": "Lower is safer"
+  },
+  "twin": {
+    "title": "Virtual twin",
+    "subtitle": "Synthetic sensors from physics model — no external telemetry.",
+    "clock": "Time",
+    "play": "Play day",
+    "pause": "Pause day",
+    "dawn": "Dawn",
+    "noon": "Noon",
+    "sensors": "Synthetic tags",
+    "previewMode": "Local preview solver",
+    "source": {
+      "physics": "PHYSICS",
+      "preview": "PREVIEW"
+    }
   },
   "thermal": {
     "qSolar": "Solar Gain",

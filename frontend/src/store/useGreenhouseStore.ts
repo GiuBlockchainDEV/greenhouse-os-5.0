@@ -37,6 +37,7 @@ import type {
   ShadingScreen,
   StructureUpdate,
   SupportedLocale,
+  TwinRuntimeState,
   VolumeMetrics,
 } from "@/types/greenhouse";
 import type { GizmoMode, HeatmapMode } from "@/types/viewport";
@@ -123,6 +124,15 @@ const DEFAULT_CLIMATE_SCENARIO: ClimateScenario = {
   solarAzimuthDeg: 180,
   solarElevationDeg: 55,
   solarIntensityPct: 85,
+};
+
+const DEFAULT_TWIN_RUNTIME: TwinRuntimeState = {
+  clockMin: 600,
+  autoAdvance: false,
+  timeScale: 4,
+  baselineTempC: DEFAULT_CLIMATE_SCENARIO.externalTempC,
+  baselineRhPct: DEFAULT_CLIMATE_SCENARIO.externalRhPct,
+  baselineWindMS: DEFAULT_CLIMATE_SCENARIO.windSpeedMS,
 };
 
 function syncDimensionsFromStructure(
@@ -284,6 +294,7 @@ interface GreenhouseStore {
   crop: CropConfig;
   climateEquipment: ClimateEquipment;
   climateScenario: ClimateScenario;
+  twinRuntime: TwinRuntimeState;
   marketPresetId: string;
   metrics: VolumeMetrics;
   simulationStatus: WSConnectionStatus;
@@ -303,6 +314,7 @@ interface GreenhouseStore {
   setClimateEquipment: (equipment: Partial<ClimateEquipment>) => void;
   setClimateEquipmentSizing: (sizing: Partial<ClimateEquipmentSizing>) => void;
   setClimateScenario: (scenario: Partial<ClimateScenario>) => void;
+  setTwinRuntime: (runtime: Partial<TwinRuntimeState>) => void;
   setSimulationStatus: (status: WSConnectionStatus) => void;
   setSimulationResults: (results: SimulationData) => void;
   setGizmoMode: (mode: GizmoMode) => void;
@@ -325,6 +337,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
       crop: initialCrop,
       climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
       climateScenario: DEFAULT_CLIMATE_SCENARIO,
+      twinRuntime: DEFAULT_TWIN_RUNTIME,
       marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
       metrics: initialMetrics,
       simulationStatus: "idle",
@@ -476,11 +489,34 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
         );
       },
 
-      setClimateScenario: (scenario) =>
+      setClimateScenario: (scenario) => {
+        const next = { ...get().climateScenario, ...scenario };
+        const twin = get().twinRuntime;
+        const baselinePatch: Partial<TwinRuntimeState> = {};
+        if (scenario.externalTempC !== undefined) {
+          baselinePatch.baselineTempC = next.externalTempC;
+        }
+        if (scenario.externalRhPct !== undefined) {
+          baselinePatch.baselineRhPct = next.externalRhPct;
+        }
+        if (scenario.windSpeedMS !== undefined) {
+          baselinePatch.baselineWindMS = next.windSpeedMS;
+        }
         set(
-          { climateScenario: { ...get().climateScenario, ...scenario } },
+          {
+            climateScenario: next,
+            twinRuntime: { ...twin, ...baselinePatch },
+          },
           false,
           "setClimateScenario",
+        );
+      },
+
+      setTwinRuntime: (runtime) =>
+        set(
+          { twinRuntime: { ...get().twinRuntime, ...runtime } },
+          false,
+          "setTwinRuntime",
         ),
 
       setSimulationStatus: (simulationStatus) =>
@@ -565,6 +601,7 @@ export const useGreenhouseStore = create<GreenhouseStore>()(
             crop,
             climateEquipment: DEFAULT_CLIMATE_EQUIPMENT,
             climateScenario: DEFAULT_CLIMATE_SCENARIO,
+            twinRuntime: DEFAULT_TWIN_RUNTIME,
             marketPresetId: CUSTOM_GREENHOUSE_PRESET_ID,
             metrics: computeVolumeMetrics(DEFAULT_STRUCTURE, dimensions, crop),
           },

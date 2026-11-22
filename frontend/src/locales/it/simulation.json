@@ -16,7 +16,25 @@
     "overview": "Panoramica",
     "live": "Live",
     "optimalTempHint": "Ottimale per la fase colturale",
-    "et0Range": "Evapotraspirazione di riferimento"
+    "et0Range": "Evapotraspirazione di riferimento",
+    "dliAdequacy": "DLI vs fabbisogno coltura",
+    "botrytisRisk": "Rischio Botrytis",
+    "botrytisHint": "Più basso è più sicuro"
+  },
+  "twin": {
+    "title": "Gemello virtuale",
+    "subtitle": "Sensori sintetici dal modello fisico — senza telemetria esterna.",
+    "clock": "Ora",
+    "play": "Avvia giornata",
+    "pause": "Pausa giornata",
+    "dawn": "Alba",
+    "noon": "Mezzogiorno",
+    "sensors": "Tag sintetici",
+    "previewMode": "Solver anteprima locale",
+    "source": {
+      "physics": "FISICA",
+      "preview": "ANTEPRIMA"
+    }
   },
   "thermal": {
     "qSolar": "Guadagno Solare",

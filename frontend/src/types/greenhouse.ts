@@ -1,3 +1,5 @@
+import type { HeatmapMode } from "@/types/viewport";
+
 export type SupportedLocale = "en" | "it" | "es" | "fr";
 
 export type ArchType = "triangular" | "semicircular";
@@ -213,6 +215,36 @@ export interface ClimateScenario {
   solarElevationDeg: number;
   /** Relative solar intensity 0–100%. */
   solarIntensityPct: number;
+}
+
+/** Virtual day clock for standalone twin (no field telemetry). */
+export interface TwinRuntimeState {
+  /** Minutes from midnight (0–1439). */
+  clockMin: number;
+  autoAdvance: boolean;
+  /** Realtime multiplier when autoAdvance is on. */
+  timeScale: number;
+  /** User-defined exterior baseline before diurnal shaping. */
+  baselineTempC: number;
+  baselineRhPct: number;
+  baselineWindMS: number;
+}
+
+/** Persisted greenhouse twin slice (localStorage / export). */
+export interface GreenhouseStoreSnapshot {
+  locale: SupportedLocale;
+  name: string;
+  location: GeoLocation;
+  structure: GreenhouseStructure;
+  dimensions: GreenhouseDimensions;
+  covering: CoveringMaterial;
+  shadingScreen: ShadingScreen;
+  crop: CropConfig;
+  climateEquipment: ClimateEquipment;
+  climateScenario: ClimateScenario;
+  marketPresetId: string;
+  twinRuntime: TwinRuntimeState;
+  heatmapMode: HeatmapMode;
 }
 
 export interface GreenhouseState {

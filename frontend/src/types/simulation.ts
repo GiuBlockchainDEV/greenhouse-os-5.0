@@ -48,6 +48,9 @@ export interface WSCultivationLayout {
   bed_line_count: number;
   pathway_width_m: number;
   side_clearance_m: number;
+  center_aisle_m?: number;
+  gutter_walk_m?: number;
+  cross_path_interval_m?: number;
 }
 
 export interface WSCrop {
@@ -137,7 +140,12 @@ export interface WSMicroclimate {
   internal_rh: number;
   vpd_kpa: number;
   et0_fao56: number;
+  dli_mol_m2_day?: number;
+  dli_adequacy_index?: number;
+  botrytis_risk_index?: number;
 }
+
+export type TwinDataSource = "physics" | "preview";
 
 export interface WSSimulationResults {
   event: "SIMULATION_RESULTS";

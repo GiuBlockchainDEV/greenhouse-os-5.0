@@ -4,7 +4,9 @@ import time
 from datetime import date
 
 from app.simulation.shading_screen import effective_solar_transmittance
-from app.simulation.engine import SimulationEngine
+from app.simulation.agronomic import botrytis_cinerea_risk_index
+from app.simulation.dli import calculate_dli_from_solar_radiation, dli_adequacy_index
+from app.simulation.engine import CROP_DLI_REQUIREMENTS, SimulationEngine
 from app.simulation.fao56 import daylight_hours, estimate_solar_radiation
 from app.simulation.schemas import (
     ClimateEquipmentInput,
@@ -175,6 +177,17 @@ class RealtimeSimulationEngine:
         thermal = compute_thermal_balance(thermal_input)
         elapsed_ms = (time.perf_counter() - start) * 1000.0
 
+        solar_scale = (
+            climate_override.solar_intensity_pct / 100.0
+            if climate_override.solar_intensity_pct is not None
+            else 1.0
+        )
+        solar_scale = max(0.05, min(solar_scale, 1.0))
+        dli = calculate_dli_from_solar_radiation(solar * solar_scale, effective_transmittance)
+        crop_dli_req = CROP_DLI_REQUIREMENTS.get(CropType(payload.crop.type), 20.0)
+        dli_index = dli_adequacy_index(dli, crop_dli_req)
+        botrytis = botrytis_cinerea_risk_index(thermal.internal_rh_pct, thermal.vpd_kpa)
+
         return WSSimulationResults(
             data=WSSimulationResultsData(
                 thermal_balance=WSThermalBalance(
@@ -190,6 +203,9 @@ class RealtimeSimulationEngine:
                     internal_rh=thermal.internal_rh_pct,
                     vpd_kpa=thermal.vpd_kpa,
                     et0_fao56=fao_result.et0.et0_mm_day,
+                    dli_mol_m2_day=round(dli, 3),
+                    dli_adequacy_index=round(dli_index, 3),
+                    botrytis_risk_index=botrytis,
                 ),
                 heatmap_matrix=thermal.heatmap_matrix,
                 computation_ms=round(elapsed_ms, 2),

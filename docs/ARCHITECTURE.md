@@ -199,6 +199,10 @@ frontend/src/
 
 ## Real-Time Simulation (Milestone 3)
 
+### Standalone twin runtime
+
+No field telemetry is required: virtual time drives exterior weather (`twinScenarioClock.ts`), WebSocket physics returns microclimate + DLI + Botrytis risk, and the UI labels data as **PHYSICS** or **PREVIEW**. Greenhouse designs auto-save to `localStorage`. See `docs/DIGITAL_TWIN_STANDALONE.md`.
+
 ### Greenhouse Energy Balance
 
 $$

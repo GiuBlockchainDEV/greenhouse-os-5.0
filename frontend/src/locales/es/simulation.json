@@ -12,7 +12,25 @@
     "et0": "ET₀ de Referencia",
     "internalTemp": "Temp. Interna",
     "externalTemp": "Temp. Externa",
-    "internalRh": "HR Interna"
+    "internalRh": "HR Interna",
+    "botrytisRisk": "Riesgo Botrytis",
+    "botrytisHint": "Más bajo es más seguro",
+    "dliAdequacy": "DLI vs cultivo"
+  },
+  "twin": {
+    "title": "Gemelo virtual",
+    "subtitle": "Sensores sintéticos del modelo físico — sin telemetría externa.",
+    "clock": "Hora",
+    "play": "Reproducir día",
+    "pause": "Pausar día",
+    "dawn": "Amanecer",
+    "noon": "Mediodía",
+    "sensors": "Etiquetas sintéticas",
+    "previewMode": "Solver de vista previa local",
+    "source": {
+      "physics": "FÍSICA",
+      "preview": "VISTA PREVIA"
+    }
   },
   "thermal": {
     "qSolar": "Ganancia Solar",

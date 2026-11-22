@@ -12,7 +12,25 @@
     "et0": "ET₀ de Référence",
     "internalTemp": "Temp. Intérieure",
     "externalTemp": "Temp. Extérieure",
-    "internalRh": "HR Intérieure"
+    "internalRh": "HR Intérieure",
+    "botrytisRisk": "Risque Botrytis",
+    "botrytisHint": "Plus bas est plus sûr",
+    "dliAdequacy": "DLI vs culture"
+  },
+  "twin": {
+    "title": "Jumeau virtuel",
+    "subtitle": "Capteurs synthétiques du modèle physique — sans télémétrie externe.",
+    "clock": "Heure",
+    "play": "Lancer la journée",
+    "pause": "Pause journée",
+    "dawn": "Aube",
+    "noon": "Midi",
+    "sensors": "Tags synthétiques",
+    "previewMode": "Solveur d'aperçu local",
+    "source": {
+      "physics": "PHYSIQUE",
+      "preview": "APERÇU"
+    }
   },
   "thermal": {
     "qSolar": "Gain Solaire",

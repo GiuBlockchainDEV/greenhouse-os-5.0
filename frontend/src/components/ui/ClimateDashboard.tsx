@@ -209,6 +209,38 @@ export function ClimateDashboard({ onReconnect }: ClimateDashboardProps) {
               />
             </div>
 
+            {(micro.dli_mol_m2_day !== undefined || micro.botrytis_risk_index !== undefined) && (
+              <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-2">
+                {micro.dli_mol_m2_day !== undefined && (
+                  <RangeGauge
+                    label={t("metrics.dli")}
+                    value={micro.dli_mol_m2_day}
+                    unit="mol/m²/d"
+                    min={0}
+                    max={45}
+                    optimalMin={18}
+                    optimalMax={30}
+                    rangeLabel={t("metrics.dliAdequacy", {
+                      defaultValue: `Adequacy ${(micro.dli_adequacy_index ?? 0).toFixed(2)}`,
+                    })}
+                  />
+                )}
+                {micro.botrytis_risk_index !== undefined && (
+                  <RangeGauge
+                    label={t("metrics.botrytisRisk")}
+                    value={micro.botrytis_risk_index}
+                    unit="%"
+                    min={0}
+                    max={100}
+                    optimalMin={0}
+                    optimalMax={25}
+                    rangeLabel={t("metrics.botrytisHint", { defaultValue: "Lower is safer" })}
+                    decimals={0}
+                  />
+                )}
+              </div>
+            )}
+
             <div className="ui-divider mb-3 pt-3">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
                 <MetricCard label={t("metrics.externalTemp")} value={`${micro.external_temp}°C`} />
